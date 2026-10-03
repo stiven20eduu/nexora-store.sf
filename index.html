@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXORA STORE</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #090b12;
+      color: white;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* =========================
+       NAVBAR
+    ========================== */
+
+    .navbar {
+      height: 76px;
+      background: #0d1018;
+      border-bottom: 1px solid #242936;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 7%;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 22px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ff4d00, #ff9d00);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .country {
+      padding: 10px 14px;
+      border: 1px solid #303541;
+      border-radius: 10px;
+      background: #121620;
+      font-size: 14px;
+    }
+
+    .login {
+      color: #ddd;
+      padding: 10px 14px;
+      font-weight: 600;
+    }
+
+    .signup {
+      background: #f4aa32;
+      color: #111;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight: 800;
+    }
+
+    /* =========================
+       COMPRAS RECIENTES
+    ========================== */
+
+    .ticker {
+      height: 34px;
+      background: #070910;
+      border-bottom: 1px solid #1f2330;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+
+    .ticker-content {
+      width: max-content;
+      display: flex;
+      gap: 55px;
+      padding-left: 7%;
+      color: #aeb4c2;
+      font-size: 12px;
+      white-space: nowrap;
+      animation: move 25s linear infinite;
+    }
+
+    @keyframes move {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(-35%);
+      }
+    }
+
+    .dot {
+      color: #f4aa32;
+    }
+
+    /* =========================
+       HERO
+    ========================== */
+
+    .container {
+      width: 86%;
+      max-width: 1250px;
+      margin: auto;
+    }
+
+    .hero {
+      margin-top: 30px;
+      min-height: 410px;
+      border-radius: 22px;
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at 80% 20%, rgba(255, 150, 40, .25), transparent 35%),
+        linear-gradient(110deg, #080a10 15%, #171a24 48%, #30343e 100%);
+      border: 1px solid #2b303c;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(7,9,14,.98) 0%, rgba(7,9,14,.78) 38%, rgba(7,9,14,.10) 75%),
+        repeating-linear-gradient(
+          135deg,
+          transparent 0,
+          transparent 50px,
+          rgba(255,255,255,.025) 51px,
+          transparent 52px
+        );
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 70px 60px;
+      max-width: 680px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #f4aa32;
+      color: #17100a;
+      padding: 7px 13px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-size: clamp(42px, 6vw, 70px);
+      margin-bottom: 10px;
+      letter-spacing: -2px;
+    }
+
+    .hero .subtitle {
+      color: #f4aa32;
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .hero p {
+      color: #c9ced8;
+      font-size: 17px;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .feature {
+      color: #d9dde5;
+      font-size: 14px;
+    }
+
+    .feature span {
+      color: #27d98b;
+      margin-right: 7px;
+    }
+
+    .hero-btn {
+      display: inline-block;
+      padding: 15px 23px;
+      background: #f4aa32;
+      color: #111;
+      border-radius: 11px;
+      font-weight: 900;
+      transition: .2s;
+    }
+
+    .hero-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(244,170,50,.25);
+    }
+
+    /* =========================
+       SEARCH
+    ========================== */
+
+    .search-row {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border-bottom: 1px solid #272c38;
+      padding-bottom: 22px;
+    }
+
+    .search {
+      flex: 1;
+      position: relative;
+    }
+
+    .search input {
+      width: 100%;
+      height: 48px;
+      border-radius: 11px;
+      border: 1px solid #2b313e;
+      background: #111521;
+      color: white;
+      padding: 0 18px 0 46px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 17px;
+      top: 14px;
+      color: #8d94a4;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+    }
+
+    .filter {
+      border: 1px solid #2d3340;
+      background: #111521;
+      color: #aeb5c3;
+      padding: 11px 15px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .filter.active {
+      background: #f4aa32;
+      color: #111;
+      border-color: #f4aa32;
+    }
+
+    /* =========================
+       CATALOGO
+    ========================== */
+
+    .section-title {
+      margin: 30px 0 18px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .section-title span {
+      color: #f4aa32;
+    }
+
+    .catalog {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      padding-bottom: 50px;
+    }
+
+    .card {
+      background: #111521;
+      border: 1px solid #272d39;
+      border-radius: 15px;
+      overflow: hidden;
+      transition: .2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: #f4aa32;
+    }
+
+    .card-image {
+      height: 180px;
+      display: flex;
+      align-items: flex-end;
+      padding: 18px;
+      font-size: 24px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #172039, #10131b);
+    }
+
+    .freefire {
+      background: linear-gradient(135deg, #151515, #47200d, #e85a11);
+    }
+
+    .roblox {
+      background: linear-gradient(135deg, #101010, #263e1c, #52a93e);
+    }
+
+    .bloodstrike {
+      background: linear-gradient(135deg, #101216, #243446, #8b9ba8);
+    }
+
+    .mobilelegends {
+      background: linear-gradient(135deg, #131523, #3b4165, #7e9fe0);
+    }
+
+    .card-body {
+      padding: 16px;
+    }
+
+    .card-body h3 {
+      margin-bottom: 7px;
+    }
+
+    .card-body p {
+      color: #9299a8;
+      font-size: 13px;
+      margin-bottom: 15px;
+    }
+
+    .card-btn {
+      display: block;
+      text-align: center;
+      background: #1b202d;
+      border: 1px solid #303747;
+      padding: 11px;
+      border-radius: 9px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .card-btn:hover {
+      background: #f4aa32;
+      color: #111;
+      border-color: #f4aa32;
+    }
+
+    /* =========================
+       FOOTER
+    ========================== */
+
+    footer {
+      border-top: 1px solid #272c37;
+      background: #070910;
+      padding: 30px 7%;
+      color: #7f8797;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================== */
+
+    @media (max-width: 900px) {
+      .navbar {
+        padding: 0 4%;
+      }
+
+      .container {
+        width: 92%;
+      }
+
+      .catalog {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .search-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .nav-actions .country,
+      .login {
+        display: none;
+      }
+
+      .hero-content {
+        padding: 45px 28px;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      .catalog {
+        grid-template-columns: 1fr;
+      }
+
+      .filters {
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+
+    <div class="logo-area">
+      <div class="logo">N</div>
+      <span>NEXORA STORE</span>
+    </div>
+
+    <div class="nav-actions">
+      <div class="country">🇵🇪 Perú</div>
+      <a href="#" class="login">Ingresar</a>
+      <a href="#" class="signup">Crear cuenta</a>
+    </div>
+
+  </header>
+
+
+  <!-- COMPRAS RECIENTES -->
+  <div class="ticker">
+    <div class="ticker-content">
+
+      <span><span class="dot">●</span> Diego compró 5600 Diamantes • ID: 780540****</span>
+
+      <span><span class="dot">●</span> Kenx compró 100 + 10 Diamantes • ID: 701136****</span>
+
+      <span><span class="dot">●</span> Jordan compró 1060 + 106 Diamantes • ID: 725200****</span>
+
+      <span><span class="dot">●</span> José Miguel compró 100 + 10 Diamantes • ID: 137789****</span>
+
+    </div>
+  </div>
+
+
+  <main class="container">
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <span class="badge">MÁS POPULAR</span>
+
+        <h1>Free Fire</h1>
+
+        <div class="subtitle">
+          Diamantes • Pases • Membresías
+        </div>
+
+        <p>
+          Recarga tus juegos favoritos de forma rápida, segura y sencilla.
+          Elige tu producto y realiza tu pedido en pocos pasos.
+        </p>
+
+        <div class="features">
+
+          <div class="feature">
+            <span>✓</span> Recargas rápidas
+          </div>
+
+          <div class="feature">
+            <span>✓</span> Atención segura
+          </div>
+
+          <div class="feature">
+            <span>✓</span> Diferentes cantidades
+          </div>
+
+          <div class="feature">
+            <span>✓</span> Soporte NEXORA
+          </div>
+
+        </div>
+
+        <a href="#catalogo" class="hero-btn">
+          Ver paquetes de recarga →
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- BUSCADOR -->
+    <section class="search-row">
+
+      <div class="search">
+        <span class="search-icon">🔎</span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Buscar juego..."
+          onkeyup="buscarJuego()"
+        >
+      </div>
+
+      <div class="filters">
+
+        <button class="filter active">
+          Todos
+        </button>
+
+        <button class="filter">
+          Móviles
+        </button>
+
+        <button class="filter">
+          Pines Digitales
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- CATALOGO -->
+    <section id="catalogo">
+
+      <div class="section-title">
+        <span>●</span> CATÁLOGO DE JUEGOS
+      </div>
+
+      <div class="catalog">
+
+
+        <article class="card juego">
+
+          <div class="card-image freefire">
+            🔥 FREE FIRE
+          </div>
+
+          <div class="card-body">
+
+            <h3>Free Fire</h3>
+
+            <p>
+              Diamantes, pases y membresías.
+            </p>
+
+            <a href="#" class="card-btn">
+              Ver recargas
+            </a>
+
+          </div>
+
+        </article>
+
+
+        <article class="card juego">
+
+          <div class="card-image roblox">
+            🟩 ROBLOX
+          </div>
+
+          <div class="card-body">
+
+            <h3>Roblox</h3>
+
+            <p>
+              Robux y productos digitales.
+            </p>
+
+            <a href="#" class="card-btn">
+              Ver productos
+            </a>
+
+          </div>
+
+        </article>
+
+
+        <article class="card juego">
+
+          <div class="card-image bloodstrike">
+            ⚡ BLOOD STRIKE
+          </div>
+
+          <div class="card-body">
+
+            <h3>Blood Strike</h3>
+
+            <p>
+              Recargas para tu cuenta.
+            </p>
+
+            <a href="#" class="card-btn">
+              Ver recargas
+            </a>
+
+          </div>
+
+        </article>
+
+
+        <article class="card juego">
+
+          <div class="card-image mobilelegends">
+            🛡️ MOBILE LEGENDS
+          </div>
+
+          <div class="card-body">
+
+            <h3>Mobile Legends</h3>
+
+            <p>
+              Diamantes y contenido.
+            </p>
+
+            <a href="#" class="card-btn">
+              Ver recargas
+            </a>
+
+          </div>
+
+        </article>
+
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <footer>
+    © 2026 NEXORA STORE • Recargas y productos digitales
+  </footer>
+
+
+  <script>
+
+    function buscarJuego() {
+
+      const texto =
+        document.getElementById("searchInput")
+        .value
+        .toLowerCase();
+
+      const juegos =
+        document.querySelectorAll(".juego");
+
+      juegos.forEach(function(juego) {
+
+        const nombre =
+          juego.innerText.toLowerCase();
+
+        if (nombre.includes(texto)) {
+          juego.style.display = "";
+        } else {
+          juego.style.display = "none";
+        }
+
+      });
+
+    }
+
+  </script>
+
+</body>
+</html>
