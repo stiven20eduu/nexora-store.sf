@@ -299,169 +299,135 @@
     </div>
 
   </section>
+<script type="module">
+
+  import {
+    createUserWithEmailAndPassword,
+    updateProfile,
+    signInWithPopup
+  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+  import {
+    auth,
+    googleProvider
+  } from "./firebase.js";
 
 
-  <script type="module">
+  const form = document.querySelector("form");
 
-    import {
-      createUserWithEmailAndPassword,
-      updateProfile,
-      signInWithPopup
-    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+  const nameInput = document.getElementById("name");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const confirmInput = document.getElementById("confirm");
 
-    import {
-      auth,
-      googleProvider
-    } from "./firebase.js";
+  const googleButton = document.querySelector(".google");
 
 
-    const registerForm =
-      document.getElementById("registerForm");
+  const message = document.createElement("div");
 
-    const nameInput =
-      document.getElementById("name");
+  message.style.color = "#ffae74";
+  message.style.textAlign = "center";
+  message.style.fontSize = "13px";
+  message.style.margin = "10px 0";
 
-    const emailInput =
-      document.getElementById("email");
-
-    const passwordInput =
-      document.getElementById("password");
-
-    const confirmInput =
-      document.getElementById("confirm");
-
-    const registerButton =
-      document.getElementById("registerButton");
-
-    const googleButton =
-      document.getElementById("googleButton");
-
-    const message =
-      document.getElementById("message");
+  form.insertBefore(message, form.querySelector("button"));
 
 
-    function showMessage(text) {
-      message.textContent = text;
+  function showMessage(text) {
+    message.textContent = text;
+  }
+
+
+  function getError(error) {
+
+    switch (error.code) {
+
+      case "auth/email-already-in-use":
+        return "Ese correo ya tiene una cuenta.";
+
+      case "auth/invalid-email":
+        return "El correo no es válido.";
+
+      case "auth/weak-password":
+        return "La contraseña debe tener al menos 6 caracteres.";
+
+      case "auth/popup-closed-by-user":
+        return "La ventana de Google fue cerrada.";
+
+      case "auth/popup-blocked":
+        return "El navegador bloqueó la ventana de Google.";
+
+      default:
+        return "No se pudo crear la cuenta.";
+    }
+  }
+
+
+  form.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    showMessage("");
+
+    if (passwordInput.value !== confirmInput.value) {
+      showMessage("Las contraseñas no coinciden.");
+      return;
     }
 
+    try {
 
-    function firebaseError(error) {
+      const credential =
+        await createUserWithEmailAndPassword(
+          auth,
+          emailInput.value.trim(),
+          passwordInput.value
+        );
 
-      switch (error.code) {
 
-        case "auth/email-already-in-use":
-          return "Ese correo ya tiene una cuenta.";
+      if (nameInput.value.trim()) {
 
-        case "auth/invalid-email":
-          return "El correo electrónico no es válido.";
+        await updateProfile(
+          credential.user,
+          {
+            displayName: nameInput.value.trim()
+          }
+        );
 
-        case "auth/weak-password":
-          return "La contraseña debe tener al menos 6 caracteres.";
-
-        case "auth/popup-closed-by-user":
-          return "La ventana de Google fue cerrada.";
-
-        case "auth/popup-blocked":
-          return "El navegador bloqueó la ventana de Google.";
-
-        default:
-          return "No se pudo crear la cuenta.";
       }
+
+
+      window.location.href = "index.html";
+
+    } catch (error) {
+
+      showMessage(getError(error));
+
     }
 
-
-    registerForm.addEventListener(
-      "submit",
-      async (event) => {
-
-        event.preventDefault();
-
-        showMessage("");
-
-        if (
-          passwordInput.value !==
-          confirmInput.value
-        ) {
-          showMessage(
-            "Las contraseñas no coinciden."
-          );
-          return;
-        }
-
-        registerButton.disabled = true;
-
-        try {
-
-          const credential =
-            await createUserWithEmailAndPassword(
-              auth,
-              emailInput.value.trim(),
-              passwordInput.value
-            );
+  });
 
 
-          await updateProfile(
-            credential.user,
-            {
-              displayName:
-                nameInput.value.trim()
-            }
-          );
+  googleButton.addEventListener("click", async () => {
 
+    showMessage("");
 
-          window.location.href =
-            "index.html";
+    try {
 
+      await signInWithPopup(
+        auth,
+        googleProvider
+      );
 
-        } catch (error) {
+      window.location.href = "index.html";
 
-          showMessage(
-            firebaseError(error)
-          );
+    } catch (error) {
 
-        } finally {
+      showMessage(getError(error));
 
-          registerButton.disabled = false;
+    }
 
-        }
+  });
 
-      }
-    );
-
-
-    googleButton.addEventListener(
-      "click",
-      async () => {
-
-        showMessage("");
-
-        googleButton.disabled = true;
-
-        try {
-
-          await signInWithPopup(
-            auth,
-            googleProvider
-          );
-
-          window.location.href =
-            "index.html";
-
-        } catch (error) {
-
-          showMessage(
-            firebaseError(error)
-          );
-
-        } finally {
-
-          googleButton.disabled = false;
-        }
-
-      }
-    );
-
-  </script>
-
+</script>
 </body>
 </html>
