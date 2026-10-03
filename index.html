@@ -8,7 +8,7 @@
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
+      margin: 0;  
       padding: 0;
     }
 
@@ -100,30 +100,24 @@
       align-items: center;
     }
 
-    .ticker-content {
-      width: max-content;
-      display: flex;
-      gap: 55px;
-      padding-left: 7%;
-      color: #aeb4c2;
-      font-size: 12px;
-      white-space: nowrap;
-      animation: move 25s linear infinite;
-    }
+.welcome-message {
+  width: 100%;
+  text-align: center;
+  color: #d9dde5;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
 
-    @keyframes move {
-      from {
-        transform: translateX(0);
-      }
-      to {
-        transform: translateX(-35%);
-      }
-    }
+.welcome-dot {
+  color: #f4aa32;
+  margin-right: 8px;
+}
 
-    .dot {
-      color: #f4aa32;
-    }
-
+.welcome-separator {
+  color: #596171;
+  margin: 0 12px;
+}
     /* =========================
        HERO
     ========================== */
@@ -463,19 +457,15 @@
 
   <!-- COMPRAS RECIENTES -->
   <div class="ticker">
-    <div class="ticker-content">
-
-      <span><span class="dot">●</span> Diego compró 5600 Diamantes • ID: 780540****</span>
-
-      <span><span class="dot">●</span> Kenx compró 100 + 10 Diamantes • ID: 701136****</span>
-
-      <span><span class="dot">●</span> Jordan compró 1060 + 106 Diamantes • ID: 725200****</span>
-
-      <span><span class="dot">●</span> José Miguel compró 100 + 10 Diamantes • ID: 137789****</span>
-
-    </div>
+  <div class="welcome-message">
+    <span class="welcome-dot">●</span>
+    BIENVENIDOS A NEXORA STORE
+    <span class="welcome-separator">•</span>
+    TU CENTRO DE RECARGAS GAMER
+    <span class="welcome-separator">•</span>
+    RÁPIDO, SEGURO Y CONFIABLE
   </div>
-
+</div>
 
   <main class="container">
 
