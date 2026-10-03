@@ -3,10 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Crear cuenta — NEXORA STORE</title>
   <link rel="icon" type="image/png" href="nexora-logo.png">
+
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
     body{
       min-height:100vh;
       font-family:Arial,Helvetica,sans-serif;
@@ -16,6 +23,7 @@
       justify-content:flex-end;
       align-items:center;
     }
+
     .panel{
       width:47%;
       min-height:100vh;
@@ -26,80 +34,434 @@
       padding:40px 6%;
       box-shadow:-25px 0 80px rgba(0,0,0,.55);
     }
-    .box{width:100%;max-width:440px}
-    .brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}
-    .brand img{width:42px;height:42px;border-radius:50%;object-fit:cover}
-    .brand span{font-size:18px;font-weight:800}
-    h1{text-align:center;font-size:34px;margin-bottom:8px}
-    .subtitle{text-align:center;color:#8e95a3;font-size:14px;margin-bottom:24px}
-    .field{margin-bottom:13px}
-    .field label{display:block;color:#b8beca;font-size:13px;margin-bottom:7px}
+
+    .box{
+      width:100%;
+      max-width:440px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:24px;
+    }
+
+    .brand img{
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+
+    .brand span{
+      font-size:18px;
+      font-weight:800;
+    }
+
+    h1{
+      text-align:center;
+      font-size:34px;
+      margin-bottom:8px;
+    }
+
+    .subtitle{
+      text-align:center;
+      color:#8e95a3;
+      font-size:14px;
+      margin-bottom:24px;
+    }
+
+    .field{
+      margin-bottom:13px;
+    }
+
+    .field label{
+      display:block;
+      color:#b8beca;
+      font-size:13px;
+      margin-bottom:7px;
+    }
+
     .field input{
-      width:100%;height:50px;padding:0 16px;border:1px solid #303642;
-      border-radius:11px;background:#11141a;color:#fff;outline:none;font-size:15px
+      width:100%;
+      height:50px;
+      padding:0 16px;
+      border:1px solid #303642;
+      border-radius:11px;
+      background:#11141a;
+      color:#fff;
+      outline:none;
+      font-size:15px;
     }
-    .field input:focus{border-color:#f26822;box-shadow:0 0 0 3px rgba(242,104,34,.12)}
-    .primary,.google{
-      width:100%;height:52px;border-radius:11px;font-weight:800;font-size:14px;cursor:pointer
+
+    .field input:focus{
+      border-color:#f26822;
+      box-shadow:0 0 0 3px rgba(242,104,34,.12);
     }
-    .primary{border:0;background:#f26822;color:#fff;margin-top:6px}
-    .primary:hover{filter:brightness(1.08)}
-    .or{display:flex;align-items:center;gap:12px;color:#707785;font-size:12px;margin:18px 0}
-    .or::before,.or::after{content:"";height:1px;background:#282d36;flex:1}
-    .google{border:1px solid #303642;background:#11141a;color:#fff}
-    .login-link{text-align:center;color:#808795;font-size:13px;margin-top:22px}
-    .login-link a{color:#fff;text-decoration:none;font-weight:700}
+
+    .primary,
+    .google{
+      width:100%;
+      height:52px;
+      border-radius:11px;
+      font-weight:800;
+      font-size:14px;
+      cursor:pointer;
+    }
+
+    .primary{
+      border:0;
+      background:#f26822;
+      color:#fff;
+      margin-top:6px;
+    }
+
+    .primary:hover{
+      filter:brightness(1.08);
+    }
+
+    .primary:disabled,
+    .google:disabled{
+      opacity:.65;
+      cursor:not-allowed;
+    }
+
+    .or{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      color:#707785;
+      font-size:12px;
+      margin:18px 0;
+    }
+
+    .or::before,
+    .or::after{
+      content:"";
+      height:1px;
+      background:#282d36;
+      flex:1;
+    }
+
+    .google{
+      border:1px solid #303642;
+      background:#11141a;
+      color:#fff;
+    }
+
+    .login-link{
+      text-align:center;
+      color:#808795;
+      font-size:13px;
+      margin-top:22px;
+    }
+
+    .login-link a{
+      color:#fff;
+      text-decoration:none;
+      font-weight:700;
+    }
+
+    .login-link a:hover{
+      text-decoration:underline;
+    }
+
+    .message{
+      min-height:20px;
+      text-align:center;
+      color:#ffae74;
+      font-size:13px;
+      margin:10px 0;
+    }
+
     @media(max-width:900px){
-      body{background:#080a0f}
-      .panel{width:100%;min-height:100vh;box-shadow:none;padding:32px 7%}
-      .brand{justify-content:center}
+      body{
+        background:#080a0f;
+      }
+
+      .panel{
+        width:100%;
+        min-height:100vh;
+        box-shadow:none;
+        padding:32px 7%;
+      }
+
+      .brand{
+        justify-content:center;
+      }
     }
   </style>
 </head>
+
 <body>
+
   <section class="panel">
+
     <div class="box">
+
       <div class="brand">
         <img src="nexora-logo.png" alt="NEXORA STORE">
         <span>NEXORA STORE</span>
       </div>
 
       <h1>Crear una cuenta</h1>
-      <p class="subtitle">Únete a NEXORA STORE y disfruta de nuestras recargas.</p>
 
-      <form>
+      <p class="subtitle">
+        Únete a NEXORA STORE y disfruta de nuestras recargas.
+      </p>
+
+      <form id="registerForm">
+
         <div class="field">
           <label for="name">Nombre completo</label>
-          <input id="name" type="text" placeholder="Nombre completo" autocomplete="name" required>
+
+          <input
+            id="name"
+            type="text"
+            placeholder="Nombre completo"
+            autocomplete="name"
+            required
+          >
         </div>
 
         <div class="field">
           <label for="email">Correo electrónico</label>
-          <input id="email" type="email" placeholder="Correo electrónico" autocomplete="email" required>
+
+          <input
+            id="email"
+            type="email"
+            placeholder="Correo electrónico"
+            autocomplete="email"
+            required
+          >
         </div>
 
         <div class="field">
           <label for="password">Crear contraseña</label>
-          <input id="password" type="password" placeholder="Crear contraseña" autocomplete="new-password" minlength="6" required>
+
+          <input
+            id="password"
+            type="password"
+            placeholder="Crear contraseña"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          >
         </div>
 
         <div class="field">
           <label for="confirm">Confirmar contraseña</label>
-          <input id="confirm" type="password" placeholder="Confirmar contraseña" autocomplete="new-password" minlength="6" required>
+
+          <input
+            id="confirm"
+            type="password"
+            placeholder="Confirmar contraseña"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          >
         </div>
 
-        <button class="primary" type="submit">Crear mi cuenta</button>
+        <div
+          id="message"
+          class="message"
+          aria-live="polite"
+        ></div>
+
+        <button
+          class="primary"
+          id="registerButton"
+          type="submit"
+        >
+          Crear mi cuenta
+        </button>
+
       </form>
 
       <div class="or">O</div>
 
-      <button class="google" type="button">G &nbsp; Registrarse con Google</button>
+      <button
+        class="google"
+        id="googleButton"
+        type="button"
+      >
+        🔵 &nbsp; Registrarse con Google
+      </button>
 
       <p class="login-link">
         ¿Ya tienes cuenta?
-        <a href="login.html">Inicia sesión</a>
+        <a href="login.html">
+          Inicia sesión
+        </a>
       </p>
+
     </div>
+
   </section>
+
+
+  <script type="module">
+
+    import {
+      createUserWithEmailAndPassword,
+      updateProfile,
+      signInWithPopup
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+    import {
+      auth,
+      googleProvider
+    } from "./firebase.js";
+
+
+    const registerForm =
+      document.getElementById("registerForm");
+
+    const nameInput =
+      document.getElementById("name");
+
+    const emailInput =
+      document.getElementById("email");
+
+    const passwordInput =
+      document.getElementById("password");
+
+    const confirmInput =
+      document.getElementById("confirm");
+
+    const registerButton =
+      document.getElementById("registerButton");
+
+    const googleButton =
+      document.getElementById("googleButton");
+
+    const message =
+      document.getElementById("message");
+
+
+    function showMessage(text) {
+      message.textContent = text;
+    }
+
+
+    function firebaseError(error) {
+
+      switch (error.code) {
+
+        case "auth/email-already-in-use":
+          return "Ese correo ya tiene una cuenta.";
+
+        case "auth/invalid-email":
+          return "El correo electrónico no es válido.";
+
+        case "auth/weak-password":
+          return "La contraseña debe tener al menos 6 caracteres.";
+
+        case "auth/popup-closed-by-user":
+          return "La ventana de Google fue cerrada.";
+
+        case "auth/popup-blocked":
+          return "El navegador bloqueó la ventana de Google.";
+
+        default:
+          return "No se pudo crear la cuenta.";
+      }
+    }
+
+
+    registerForm.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+        showMessage("");
+
+        if (
+          passwordInput.value !==
+          confirmInput.value
+        ) {
+          showMessage(
+            "Las contraseñas no coinciden."
+          );
+          return;
+        }
+
+        registerButton.disabled = true;
+
+        try {
+
+          const credential =
+            await createUserWithEmailAndPassword(
+              auth,
+              emailInput.value.trim(),
+              passwordInput.value
+            );
+
+
+          await updateProfile(
+            credential.user,
+            {
+              displayName:
+                nameInput.value.trim()
+            }
+          );
+
+
+          window.location.href =
+            "index.html";
+
+
+        } catch (error) {
+
+          showMessage(
+            firebaseError(error)
+          );
+
+        } finally {
+
+          registerButton.disabled = false;
+
+        }
+
+      }
+    );
+
+
+    googleButton.addEventListener(
+      "click",
+      async () => {
+
+        showMessage("");
+
+        googleButton.disabled = true;
+
+        try {
+
+          await signInWithPopup(
+            auth,
+            googleProvider
+          );
+
+          window.location.href =
+            "index.html";
+
+        } catch (error) {
+
+          showMessage(
+            firebaseError(error)
+          );
+
+        } finally {
+
+          googleButton.disabled = false;
+        }
+
+      }
+    );
+
+  </script>
+
 </body>
 </html>
