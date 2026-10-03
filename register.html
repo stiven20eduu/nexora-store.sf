@@ -400,7 +400,7 @@
 
     } catch (error) {
 
-      showMessage(getError(error));
+      showMessage(getError(error) + " [" + error.code + "]");
 
     }
 
@@ -422,7 +422,7 @@
 
     } catch (error) {
 
-      showMessage(getError(error));
+      showMessage(getError(error) + " [" + error.code + "]");
 
     }
 
