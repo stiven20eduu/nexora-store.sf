@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar sesión — NEXORA STORE</title>
+  <link rel="icon" type="image/png" href="nexora-logo.png">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      min-height:100vh;
+      font-family:Arial,Helvetica,sans-serif;
+      color:#fff;
+      background:#050608 url("login-bg.png") left center/cover no-repeat fixed;
+      display:flex;
+      justify-content:flex-end;
+      align-items:center;
+    }
+    .panel{
+      width:47%;
+      min-height:100vh;
+      background:rgba(5,7,10,.96);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:40px 6%;
+      box-shadow:-25px 0 80px rgba(0,0,0,.55);
+    }
+    .box{width:100%;max-width:440px}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+    .brand img{width:42px;height:42px;border-radius:50%;object-fit:cover}
+    .brand span{font-size:18px;font-weight:800}
+    h1{text-align:center;font-size:34px;margin-bottom:10px}
+    .subtitle{text-align:center;color:#8e95a3;font-size:14px;margin-bottom:28px}
+    .field{margin-bottom:15px}
+    .field label{display:block;color:#b8beca;font-size:13px;margin-bottom:8px}
+    .field input{
+      width:100%;height:52px;padding:0 16px;border:1px solid #303642;
+      border-radius:11px;background:#11141a;color:#fff;outline:none;font-size:15px
+    }
+    .field input:focus{border-color:#f26822;box-shadow:0 0 0 3px rgba(242,104,34,.12)}
+    .row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:7px 0 22px;font-size:12px}
+    .remember{display:flex;align-items:center;gap:7px;color:#aab0bb}
+    .row a,.register-link a{color:#fff;text-decoration:none;font-weight:700}
+    .row a:hover,.register-link a:hover{text-decoration:underline}
+    .primary,.google{
+      width:100%;height:52px;border-radius:11px;font-weight:800;font-size:14px;cursor:pointer
+    }
+    .primary{border:0;background:#f26822;color:#fff}
+    .primary:hover{filter:brightness(1.08)}
+    .or{display:flex;align-items:center;gap:12px;color:#707785;font-size:12px;margin:20px 0}
+    .or::before,.or::after{content:"";height:1px;background:#282d36;flex:1}
+    .google{border:1px solid #303642;background:#11141a;color:#fff}
+    .register-link{text-align:center;color:#808795;font-size:13px;margin-top:24px}
+    @media(max-width:900px){
+      body{background:#080a0f}
+      .panel{width:100%;min-height:100vh;box-shadow:none;padding:32px 7%}
+      .brand{justify-content:center}
+    }
+  </style>
+</head>
+<body>
+  <section class="panel">
+    <div class="box">
+      <div class="brand">
+        <img src="nexora-logo.png" alt="NEXORA STORE">
+        <span>NEXORA STORE</span>
+      </div>
+
+      <h1>Inicio de sesión</h1>
+      <p class="subtitle">Accede a tu cuenta de NEXORA STORE.</p>
+
+      <form>
+        <div class="field">
+          <label for="email">Correo electrónico</label>
+          <input id="email" type="email" placeholder="Correo electrónico" autocomplete="email" required>
+        </div>
+
+        <div class="field">
+          <label for="password">Contraseña</label>
+          <input id="password" type="password" placeholder="Contraseña" autocomplete="current-password" required>
+        </div>
+
+        <div class="row">
+          <label class="remember"><input type="checkbox"> Recordarme</label>
+          <a href="#">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button class="primary" type="submit">Iniciar sesión</button>
+      </form>
+
+      <div class="or">O</div>
+
+      <button class="google" type="button">G &nbsp; Continuar con Google</button>
+
+      <p class="register-link">
+        ¿Aún no tienes cuenta?
+        <a href="register.html">Regístrate gratis</a>
+      </p>
+    </div>
+  </section>
+</body>
+</html>

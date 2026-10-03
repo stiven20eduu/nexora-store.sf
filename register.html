@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear cuenta — NEXORA STORE</title>
+  <link rel="icon" type="image/png" href="nexora-logo.png">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      min-height:100vh;
+      font-family:Arial,Helvetica,sans-serif;
+      color:#fff;
+      background:#050608 url("register-bg.png") left center/cover no-repeat fixed;
+      display:flex;
+      justify-content:flex-end;
+      align-items:center;
+    }
+    .panel{
+      width:47%;
+      min-height:100vh;
+      background:rgba(5,7,10,.96);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:40px 6%;
+      box-shadow:-25px 0 80px rgba(0,0,0,.55);
+    }
+    .box{width:100%;max-width:440px}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+    .brand img{width:42px;height:42px;border-radius:50%;object-fit:cover}
+    .brand span{font-size:18px;font-weight:800}
+    h1{text-align:center;font-size:34px;margin-bottom:8px}
+    .subtitle{text-align:center;color:#8e95a3;font-size:14px;margin-bottom:24px}
+    .field{margin-bottom:13px}
+    .field label{display:block;color:#b8beca;font-size:13px;margin-bottom:7px}
+    .field input{
+      width:100%;height:50px;padding:0 16px;border:1px solid #303642;
+      border-radius:11px;background:#11141a;color:#fff;outline:none;font-size:15px
+    }
+    .field input:focus{border-color:#f26822;box-shadow:0 0 0 3px rgba(242,104,34,.12)}
+    .primary,.google{
+      width:100%;height:52px;border-radius:11px;font-weight:800;font-size:14px;cursor:pointer
+    }
+    .primary{border:0;background:#f26822;color:#fff;margin-top:6px}
+    .primary:hover{filter:brightness(1.08)}
+    .or{display:flex;align-items:center;gap:12px;color:#707785;font-size:12px;margin:18px 0}
+    .or::before,.or::after{content:"";height:1px;background:#282d36;flex:1}
+    .google{border:1px solid #303642;background:#11141a;color:#fff}
+    .login-link{text-align:center;color:#808795;font-size:13px;margin-top:22px}
+    .login-link a{color:#fff;text-decoration:none;font-weight:700}
+    @media(max-width:900px){
+      body{background:#080a0f}
+      .panel{width:100%;min-height:100vh;box-shadow:none;padding:32px 7%}
+      .brand{justify-content:center}
+    }
+  </style>
+</head>
+<body>
+  <section class="panel">
+    <div class="box">
+      <div class="brand">
+        <img src="nexora-logo.png" alt="NEXORA STORE">
+        <span>NEXORA STORE</span>
+      </div>
+
+      <h1>Crear una cuenta</h1>
+      <p class="subtitle">Únete a NEXORA STORE y disfruta de nuestras recargas.</p>
+
+      <form>
+        <div class="field">
+          <label for="name">Nombre completo</label>
+          <input id="name" type="text" placeholder="Nombre completo" autocomplete="name" required>
+        </div>
+
+        <div class="field">
+          <label for="email">Correo electrónico</label>
+          <input id="email" type="email" placeholder="Correo electrónico" autocomplete="email" required>
+        </div>
+
+        <div class="field">
+          <label for="password">Crear contraseña</label>
+          <input id="password" type="password" placeholder="Crear contraseña" autocomplete="new-password" minlength="6" required>
+        </div>
+
+        <div class="field">
+          <label for="confirm">Confirmar contraseña</label>
+          <input id="confirm" type="password" placeholder="Confirmar contraseña" autocomplete="new-password" minlength="6" required>
+        </div>
+
+        <button class="primary" type="submit">Crear mi cuenta</button>
+      </form>
+
+      <div class="or">O</div>
+
+      <button class="google" type="button">G &nbsp; Registrarse con Google</button>
+
+      <p class="login-link">
+        ¿Ya tienes cuenta?
+        <a href="login.html">Inicia sesión</a>
+      </p>
+    </div>
+  </section>
+</body>
+</html>
