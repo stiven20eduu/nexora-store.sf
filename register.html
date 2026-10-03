@@ -8,187 +8,225 @@
   <link rel="icon" type="image/png" href="nexora-logo.png">
 
   <style>
-    *{
-      box-sizing:border-box;
-      margin:0;
-      padding:0;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    body{
-      min-height:100vh;
-      font-family:Arial,Helvetica,sans-serif;
-      color:#fff;
-      background:#050608 url("register-bg.png") left center/cover no-repeat fixed;
-      display:flex;
-      justify-content:flex-end;
-      align-items:center;
+    body {
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #fff;
+      background:
+        #050608 url("register-bg.png")
+        left center / cover
+        no-repeat fixed;
+
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
     }
 
-    .panel{
-      width:47%;
-      min-height:100vh;
-      background:rgba(5,7,10,.96);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:40px 6%;
-      box-shadow:-25px 0 80px rgba(0,0,0,.55);
+    .panel {
+      width: 47%;
+      min-height: 100vh;
+
+      background: rgba(5, 7, 10, 0.97);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 40px 6%;
+
+      box-shadow:
+        -25px 0 80px rgba(0, 0, 0, 0.55);
     }
 
-    .box{
-      width:100%;
-      max-width:440px;
+    .box {
+      width: 100%;
+      max-width: 440px;
     }
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      margin-bottom:24px;
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+
+      margin-bottom: 25px;
     }
 
-    .brand img{
-      width:42px;
-      height:42px;
-      border-radius:50%;
-      object-fit:cover;
+    .brand img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
     }
 
-    .brand span{
-      font-size:18px;
-      font-weight:800;
+    .brand span {
+      font-size: 19px;
+      font-weight: 800;
     }
 
-    h1{
-      text-align:center;
-      font-size:34px;
-      margin-bottom:8px;
+    h1 {
+      text-align: center;
+      font-size: 34px;
+      margin-bottom: 8px;
     }
 
-    .subtitle{
-      text-align:center;
-      color:#8e95a3;
-      font-size:14px;
-      margin-bottom:24px;
+    .subtitle {
+      text-align: center;
+      color: #8e95a3;
+      font-size: 14px;
+      margin-bottom: 25px;
     }
 
-    .field{
-      margin-bottom:13px;
+    .field {
+      margin-bottom: 14px;
     }
 
-    .field label{
-      display:block;
-      color:#b8beca;
-      font-size:13px;
-      margin-bottom:7px;
+    .field label {
+      display: block;
+      color: #b8beca;
+      font-size: 13px;
+      margin-bottom: 7px;
     }
 
-    .field input{
-      width:100%;
-      height:50px;
-      padding:0 16px;
-      border:1px solid #303642;
-      border-radius:11px;
-      background:#11141a;
-      color:#fff;
-      outline:none;
-      font-size:15px;
+    .field input {
+      width: 100%;
+      height: 52px;
+
+      padding: 0 16px;
+
+      border: 1px solid #303642;
+      border-radius: 11px;
+
+      background: #11141a;
+      color: #fff;
+
+      outline: none;
+      font-size: 15px;
+
+      transition: 0.2s;
     }
 
-    .field input:focus{
-      border-color:#f26822;
-      box-shadow:0 0 0 3px rgba(242,104,34,.12);
+    .field input:focus {
+      border-color: #f26822;
+
+      box-shadow:
+        0 0 0 3px rgba(242, 104, 34, 0.12);
     }
 
     .primary,
-    .google{
-      width:100%;
-      height:52px;
-      border-radius:11px;
-      font-weight:800;
-      font-size:14px;
-      cursor:pointer;
+    .google {
+      width: 100%;
+      height: 52px;
+
+      border-radius: 11px;
+
+      font-size: 14px;
+      font-weight: 800;
+
+      cursor: pointer;
+
+      transition: 0.2s;
     }
 
-    .primary{
-      border:0;
-      background:#f26822;
-      color:#fff;
-      margin-top:6px;
+    .primary {
+      border: none;
+      background: #f26822;
+      color: #fff;
+      margin-top: 5px;
     }
 
-    .primary:hover{
-      filter:brightness(1.08);
+    .primary:hover {
+      filter: brightness(1.08);
+    }
+
+    .google {
+      border: 1px solid #303642;
+      background: #11141a;
+      color: #fff;
+    }
+
+    .google:hover {
+      background: #181c24;
     }
 
     .primary:disabled,
-    .google:disabled{
-      opacity:.65;
-      cursor:not-allowed;
+    .google:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
-    .or{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      color:#707785;
-      font-size:12px;
-      margin:18px 0;
+    .or {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      color: #707785;
+      font-size: 12px;
+
+      margin: 18px 0;
     }
 
     .or::before,
-    .or::after{
-      content:"";
-      height:1px;
-      background:#282d36;
-      flex:1;
+    .or::after {
+      content: "";
+
+      height: 1px;
+      background: #282d36;
+
+      flex: 1;
     }
 
-    .google{
-      border:1px solid #303642;
-      background:#11141a;
-      color:#fff;
+    .message {
+      min-height: 20px;
+
+      text-align: center;
+
+      color: #ffae74;
+
+      font-size: 13px;
+
+      margin: 10px 0;
     }
 
-    .login-link{
-      text-align:center;
-      color:#808795;
-      font-size:13px;
-      margin-top:22px;
+    .login-link {
+      text-align: center;
+
+      color: #808795;
+
+      font-size: 13px;
+
+      margin-top: 22px;
     }
 
-    .login-link a{
-      color:#fff;
-      text-decoration:none;
-      font-weight:700;
+    .login-link a {
+      color: #fff;
+      font-weight: 700;
+      text-decoration: none;
     }
 
-    .login-link a:hover{
-      text-decoration:underline;
+    .login-link a:hover {
+      text-decoration: underline;
     }
 
-    .message{
-      min-height:20px;
-      text-align:center;
-      color:#ffae74;
-      font-size:13px;
-      margin:10px 0;
-    }
+    @media (max-width: 900px) {
 
-    @media(max-width:900px){
-      body{
-        background:#080a0f;
+      body {
+        background: #080a0f;
       }
 
-      .panel{
-        width:100%;
-        min-height:100vh;
-        box-shadow:none;
-        padding:32px 7%;
-      }
+      .panel {
+        width: 100%;
+        min-height: 100vh;
 
-      .brand{
-        justify-content:center;
+        padding: 32px 7%;
+
+        box-shadow: none;
       }
     }
   </style>
@@ -201,20 +239,32 @@
     <div class="box">
 
       <div class="brand">
-        <img src="nexora-logo.png" alt="NEXORA STORE">
-        <span>NEXORA STORE</span>
+        <img
+          src="nexora-logo.png"
+          alt="NEXORA STORE"
+        >
+
+        <span>
+          NEXORA STORE
+        </span>
       </div>
 
-      <h1>Crear una cuenta</h1>
+      <h1>
+        Crear una cuenta
+      </h1>
 
       <p class="subtitle">
         Únete a NEXORA STORE y disfruta de nuestras recargas.
       </p>
 
+
       <form id="registerForm">
 
         <div class="field">
-          <label for="name">Nombre completo</label>
+
+          <label for="name">
+            Nombre completo
+          </label>
 
           <input
             id="name"
@@ -223,10 +273,15 @@
             autocomplete="name"
             required
           >
+
         </div>
 
+
         <div class="field">
-          <label for="email">Correo electrónico</label>
+
+          <label for="email">
+            Correo electrónico
+          </label>
 
           <input
             id="email"
@@ -235,10 +290,15 @@
             autocomplete="email"
             required
           >
+
         </div>
 
+
         <div class="field">
-          <label for="password">Crear contraseña</label>
+
+          <label for="password">
+            Crear contraseña
+          </label>
 
           <input
             id="password"
@@ -248,20 +308,27 @@
             minlength="6"
             required
           >
+
         </div>
 
+
         <div class="field">
-          <label for="confirm">Confirmar contraseña</label>
+
+          <label for="confirmPassword">
+            Confirmar contraseña
+          </label>
 
           <input
-            id="confirm"
+            id="confirmPassword"
             type="password"
             placeholder="Confirmar contraseña"
             autocomplete="new-password"
             minlength="6"
             required
           >
+
         </div>
+
 
         <div
           id="message"
@@ -269,9 +336,10 @@
           aria-live="polite"
         ></div>
 
+
         <button
-          class="primary"
           id="registerButton"
+          class="primary"
           type="submit"
         >
           Crear mi cuenta
@@ -279,155 +347,267 @@
 
       </form>
 
-      <div class="or">O</div>
+
+      <div class="or">
+        O
+      </div>
+
 
       <button
-        class="google"
         id="googleButton"
+        class="google"
         type="button"
       >
         🔵 &nbsp; Registrarse con Google
       </button>
 
+
       <p class="login-link">
+
         ¿Ya tienes cuenta?
+
         <a href="login.html">
           Inicia sesión
         </a>
+
       </p>
 
     </div>
 
   </section>
-<script type="module">
-
-  import {
-    createUserWithEmailAndPassword,
-    updateProfile,
-    signInWithPopup
-  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-
-  import {
-    auth,
-    googleProvider
-  } from "./firebase.js";
 
 
-  const form = document.querySelector("form");
+  <script type="module">
 
-  const nameInput = document.getElementById("name");
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
-  const confirmInput = document.getElementById("confirm");
-
-  const googleButton = document.querySelector(".google");
-
-
-  const message = document.createElement("div");
-
-  message.style.color = "#ffae74";
-  message.style.textAlign = "center";
-  message.style.fontSize = "13px";
-  message.style.margin = "10px 0";
-
-  form.insertBefore(message, form.querySelector("button"));
+    import {
+      createUserWithEmailAndPassword,
+      updateProfile,
+      signInWithPopup
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 
-  function showMessage(text) {
-    message.textContent = text;
-  }
+    import {
+      auth,
+      googleProvider
+    } from "./firebase.js";
 
 
-  function getError(error) {
+    const form =
+      document.getElementById("registerForm");
 
-    switch (error.code) {
+    const nameInput =
+      document.getElementById("name");
 
-      case "auth/email-already-in-use":
-        return "Ese correo ya tiene una cuenta.";
+    const emailInput =
+      document.getElementById("email");
 
-      case "auth/invalid-email":
-        return "El correo no es válido.";
+    const passwordInput =
+      document.getElementById("password");
 
-      case "auth/weak-password":
-        return "La contraseña debe tener al menos 6 caracteres.";
+    const confirmPasswordInput =
+      document.getElementById("confirmPassword");
 
-      case "auth/popup-closed-by-user":
-        return "La ventana de Google fue cerrada.";
+    const registerButton =
+      document.getElementById("registerButton");
 
-      case "auth/popup-blocked":
-        return "El navegador bloqueó la ventana de Google.";
+    const googleButton =
+      document.getElementById("googleButton");
 
-      default:
-        return "No se pudo crear la cuenta.";
-    }
-  }
+    const message =
+      document.getElementById("message");
 
 
-  form.addEventListener("submit", async (event) => {
-
-    event.preventDefault();
-
-    showMessage("");
-
-    if (passwordInput.value !== confirmInput.value) {
-      showMessage("Las contraseñas no coinciden.");
-      return;
+    function showMessage(text) {
+      message.textContent = text;
     }
 
-    try {
 
-      const credential =
-        await createUserWithEmailAndPassword(
-          auth,
-          emailInput.value.trim(),
-          passwordInput.value
-        );
+    function getFirebaseError(error) {
+
+      switch (error.code) {
+
+        case "auth/email-already-in-use":
+          return "Ese correo ya tiene una cuenta.";
+
+        case "auth/invalid-email":
+          return "El correo electrónico no es válido.";
+
+        case "auth/weak-password":
+          return "La contraseña es demasiado débil.";
+
+        case "auth/password-does-not-meet-requirements":
+          return "La contraseña no cumple los requisitos.";
+
+        case "auth/operation-not-allowed":
+          return "El registro con correo y contraseña no está habilitado en Firebase.";
+
+        case "auth/network-request-failed":
+          return "Error de conexión. Revisa tu Internet.";
+
+        case "auth/popup-blocked":
+          return "El navegador bloqueó la ventana de Google.";
+
+        case "auth/popup-closed-by-user":
+          return "La ventana de Google fue cerrada.";
+
+        case "auth/unauthorized-domain":
+          return "Este dominio no está autorizado en Firebase.";
+
+        default:
+          return "No se pudo crear la cuenta.";
+      }
+    }
 
 
-      if (nameInput.value.trim()) {
+    form.addEventListener(
+      "submit",
+      async (event) => {
 
-        await updateProfile(
-          credential.user,
-          {
-            displayName: nameInput.value.trim()
+        event.preventDefault();
+
+        showMessage("");
+
+        const name =
+          nameInput.value.trim();
+
+        const email =
+          emailInput.value.trim();
+
+        const password =
+          passwordInput.value;
+
+        const confirmPassword =
+          confirmPasswordInput.value;
+
+
+        if (password !== confirmPassword) {
+
+          showMessage(
+            "Las contraseñas no coinciden."
+          );
+
+          return;
+        }
+
+
+        registerButton.disabled = true;
+
+
+        try {
+
+          const result =
+            await createUserWithEmailAndPassword(
+              auth,
+              email,
+              password
+            );
+
+
+          if (name) {
+
+            await updateProfile(
+              result.user,
+              {
+                displayName: name
+              }
+            );
+
           }
-        );
+
+
+          showMessage(
+            "Cuenta creada correctamente. Entrando..."
+          );
+
+
+          setTimeout(() => {
+
+            window.location.href =
+              "index.html";
+
+          }, 700);
+
+
+        } catch (error) {
+
+          console.error(
+            "Error al crear cuenta:",
+            error
+          );
+
+          showMessage(
+            getFirebaseError(error) +
+            " [" +
+            error.code +
+            "]"
+          );
+
+
+        } finally {
+
+          registerButton.disabled = false;
+
+        }
 
       }
+    );
 
 
-      window.location.href = "index.html";
+    googleButton.addEventListener(
+      "click",
+      async () => {
 
-    } catch (error) {
+        showMessage("");
 
-      showMessage(getError(error) + " [" + error.code + "]");
-
-    }
-
-  });
+        googleButton.disabled = true;
 
 
-  googleButton.addEventListener("click", async () => {
+        try {
 
-    showMessage("");
+          await signInWithPopup(
+            auth,
+            googleProvider
+          );
 
-    try {
 
-      await signInWithPopup(
-        auth,
-        googleProvider
-      );
+          showMessage(
+            "Cuenta de Google conectada. Entrando..."
+          );
 
-      window.location.href = "index.html";
 
-    } catch (error) {
+          setTimeout(() => {
 
-      showMessage(getError(error) + " [" + error.code + "]");
+            window.location.href =
+              "index.html";
 
-    }
+          }, 700);
 
-  });
 
-</script>
+        } catch (error) {
+
+          console.error(
+            "Error con Google:",
+            error
+          );
+
+          showMessage(
+            getFirebaseError(error) +
+            " [" +
+            error.code +
+            "]"
+          );
+
+
+        } finally {
+
+          googleButton.disabled = false;
+
+        }
+
+      }
+    );
+
+  </script>
+
 </body>
 </html>
