@@ -690,19 +690,577 @@
     }
 
   </script>
-<!-- TODO TU CÓDIGO ACTUAL -->
+<!-- ================================
+     CARRUSEL DE JUEGOS - NEXORA
+================================= -->
 
-<!-- AQUÍ PONEMOS EL CARRUSEL -->
-<section class="games-section">
-   ...
+<section class="nexora-games">
+
+  <div class="nexora-games-header">
+    <div>
+      <span class="nexora-badge">CATÁLOGO</span>
+      <h2>Elige tu juego</h2>
+      <p>Recargas y productos digitales en NEXORA STORE.</p>
+    </div>
+
+    <div class="nexora-controls">
+      <button id="nexoraPrev" aria-label="Anterior">‹</button>
+      <button id="nexoraNext" aria-label="Siguiente">›</button>
+    </div>
+  </div>
+
+
+  <div class="nexora-carousel">
+    <div class="nexora-track" id="nexoraTrack">
+
+      <!-- FREE FIRE -->
+      <article class="nexora-card">
+
+        <img
+          src="freefire-naruto.png"
+          alt="Free Fire"
+        >
+
+        <div class="nexora-overlay"></div>
+
+        <div class="nexora-content">
+
+          <span class="nexora-tag">MÁS POPULAR</span>
+
+          <h3>Free Fire</h3>
+
+          <h4>Diamantes, Pases Booyah &amp; Membresías</h4>
+
+          <p>
+            Recarga tu cuenta de forma rápida y segura con solo tu
+            ID de jugador. Tu pedido será procesado en
+            <strong>menos de 24 horas</strong>.
+          </p>
+
+          <div class="nexora-features">
+
+            <span>✓ Solo necesitas tu ID de jugador</span>
+
+            <span>✓ Acreditación automática</span>
+
+            <span>✓ Pases Booyah y membresías</span>
+
+            <span>✓ Soporte NEXORA</span>
+
+          </div>
+
+          <button class="nexora-buy">
+            Ver paquetes de recarga
+            <span>→</span>
+          </button>
+
+        </div>
+
+      </article>
+
+
+      <!-- MOBILE LEGENDS -->
+      <article class="nexora-card">
+
+        <img
+          src="mobile-legends.png"
+          alt="Mobile Legends"
+        >
+
+        <div class="nexora-overlay"></div>
+
+        <div class="nexora-content">
+
+          <span class="nexora-tag">DISPONIBLE AHORA</span>
+
+          <h3>Mobile Legends</h3>
+
+          <h4>Diamantes, Pase Semanal &amp; Crepúsculo</h4>
+
+          <p>
+            Obtén tus diamantes y pases directamente en tu cuenta.
+            Solo necesitas tu <strong>ID + Zone ID</strong> y tu pedido
+            será procesado en <strong>menos de 24 horas</strong>.
+          </p>
+
+          <div class="nexora-features">
+
+            <span>✓ Recarga directa con ID + Zone ID</span>
+
+            <span>✓ 100% seguro</span>
+
+            <span>✓ Pase Semanal y diamantes</span>
+
+            <span>✓ Soporte NEXORA</span>
+
+          </div>
+
+          <button class="nexora-buy">
+            Ver paquetes de recarga
+            <span>→</span>
+          </button>
+
+        </div>
+
+      </article>
+
+
+      <!-- ROBLOX -->
+      <article class="nexora-card">
+
+        <img
+          src="roblox.png"
+          alt="Roblox"
+        >
+
+        <div class="nexora-overlay"></div>
+
+        <div class="nexora-content">
+
+          <span class="nexora-tag">PIN DIGITAL</span>
+
+          <h3>Roblox</h3>
+
+          <h4>Robux &amp; Membresías Premium</h4>
+
+          <p>
+            Adquiere códigos digitales para Roblox de forma sencilla.
+            Recibe tu código después de realizar tu compra,
+            con entrega en <strong>menos de 24 horas</strong>.
+          </p>
+
+          <div class="nexora-features">
+
+            <span>✓ Códigos digitales seguros</span>
+
+            <span>✓ Canje directo en Roblox</span>
+
+            <span>✓ Válido según las condiciones del código</span>
+
+            <span>✓ Soporte NEXORA</span>
+
+          </div>
+
+          <button class="nexora-buy">
+            Ver paquetes de recarga
+            <span>→</span>
+          </button>
+
+        </div>
+
+      </article>
+
+    </div>
+  </div>
+
 </section>
 
+
 <style>
-   ...
+
+/* =================================
+   SECCIÓN
+================================= */
+
+.nexora-games {
+  width: 100%;
+  padding: 45px 22px;
+  overflow: hidden;
+}
+
+
+/* =================================
+   CABECERA
+================================= */
+
+.nexora-games-header {
+  max-width: 1450px;
+  margin: 0 auto 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.nexora-badge {
+  display: inline-block;
+  padding: 7px 13px;
+  border-radius: 30px;
+  background: #f5a623;
+  color: #111;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .4px;
+  margin-bottom: 10px;
+}
+
+.nexora-games-header h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.nexora-games-header p {
+  margin-top: 7px;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+
+/* =================================
+   BOTONES
+================================= */
+
+.nexora-controls {
+  display: flex;
+  gap: 9px;
+}
+
+.nexora-controls button {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid #30323b;
+  background: #15171d;
+  color: #fff;
+  font-size: 26px;
+  cursor: pointer;
+  transition: .25s ease;
+}
+
+.nexora-controls button:hover {
+  background: #f5a623;
+  color: #111;
+  border-color: #f5a623;
+}
+
+
+/* =================================
+   CARRUSEL
+================================= */
+
+.nexora-carousel {
+  width: 100%;
+  overflow: hidden;
+}
+
+.nexora-track {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  padding: 7px 0 18px;
+  transform: translateX(0);
+  transition: transform .65s cubic-bezier(.22,.61,.36,1);
+}
+
+
+/* =================================
+   TARJETAS
+================================= */
+
+.nexora-card {
+  position: relative;
+  width: 460px;
+  min-width: 460px;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #101218;
+  border: 1px solid #292d36;
+  box-shadow: 0 12px 35px rgba(0,0,0,.28);
+  transition: transform .25s ease, border-color .25s ease;
+}
+
+.nexora-card:hover {
+  transform: translateY(-5px);
+  border-color: #f5a623;
+}
+
+.nexora-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+/* =================================
+   OSCURECER IMAGEN
+================================= */
+
+.nexora-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(4,6,10,.97) 0%,
+      rgba(4,6,10,.82) 34%,
+      rgba(4,6,10,.38) 67%,
+      rgba(4,6,10,.08) 100%
+    );
+
+  z-index: 1;
+}
+
+
+/* =================================
+   CONTENIDO
+================================= */
+
+.nexora-content {
+  position: absolute;
+  z-index: 2;
+  left: 24px;
+  right: 24px;
+  top: 22px;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.nexora-tag {
+  display: inline-block;
+  padding: 6px 11px;
+  border-radius: 30px;
+  background: #f5a623;
+  color: #111;
+  font-size: 10px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.nexora-content h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.nexora-content h4 {
+  margin: 8px 0 8px;
+  color: #f5a623;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.nexora-content p {
+  max-width: 390px;
+  margin: 0;
+  color: #d7d9df;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+
+/* =================================
+   CARACTERÍSTICAS
+================================= */
+
+.nexora-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px 20px;
+  margin-top: 13px;
+  max-width: 405px;
+}
+
+.nexora-features span {
+  color: #dce0e7;
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+
+/* =================================
+   BOTÓN
+================================= */
+
+.nexora-buy {
+  margin-top: auto;
+  padding: 11px 17px;
+  border: none;
+  border-radius: 10px;
+  background: #f5a623;
+  color: #111;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 7px 20px rgba(245,166,35,.22);
+  transition: .2s ease;
+}
+
+.nexora-buy span {
+  margin-left: 8px;
+  font-size: 16px;
+}
+
+.nexora-buy:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+
+/* =================================
+   MÓVIL
+================================= */
+
+@media (max-width: 700px) {
+
+  .nexora-games {
+    padding: 35px 15px;
+  }
+
+  .nexora-games-header h2 {
+    font-size: 25px;
+  }
+
+  .nexora-games-header p {
+    font-size: 12px;
+  }
+
+  .nexora-controls {
+    display: none;
+  }
+
+  .nexora-card {
+    width: 330px;
+    min-width: 330px;
+    height: 290px;
+  }
+
+  .nexora-content {
+    left: 18px;
+    right: 18px;
+  }
+
+  .nexora-content h3 {
+    font-size: 28px;
+  }
+
+  .nexora-features {
+    gap: 6px 12px;
+  }
+
+}
+
 </style>
 
+
 <script>
-   ...
+
+(function () {
+
+  const track = document.getElementById("nexoraTrack");
+  const next = document.getElementById("nexoraNext");
+  const prev = document.getElementById("nexoraPrev");
+
+  if (!track) return;
+
+  let currentIndex = 0;
+  let timer = null;
+
+  function getCardWidth() {
+
+    const card = track.querySelector(".nexora-card");
+
+    if (!card) return 0;
+
+    const gap = 20;
+
+    return card.offsetWidth + gap;
+  }
+
+
+  function moveTo(index) {
+
+    const cards = track.querySelectorAll(".nexora-card");
+
+    if (!cards.length) return;
+
+    if (index >= cards.length) {
+      index = 0;
+    }
+
+    if (index < 0) {
+      index = cards.length - 1;
+    }
+
+    currentIndex = index;
+
+    track.style.transform =
+      "translateX(-" +
+      (currentIndex * getCardWidth()) +
+      "px)";
+  }
+
+
+  function nextSlide() {
+    moveTo(currentIndex + 1);
+  }
+
+
+  function prevSlide() {
+    moveTo(currentIndex - 1);
+  }
+
+
+  if (next) {
+    next.addEventListener("click", function () {
+      nextSlide();
+      restartAuto();
+    });
+  }
+
+
+  if (prev) {
+    prev.addEventListener("click", function () {
+      prevSlide();
+      restartAuto();
+    });
+  }
+
+
+  function startAuto() {
+
+    clearInterval(timer);
+
+    timer = setInterval(function () {
+      nextSlide();
+    }, 4500);
+
+  }
+
+
+  function restartAuto() {
+    startAuto();
+  }
+
+
+  track.addEventListener("mouseenter", function () {
+    clearInterval(timer);
+  });
+
+
+  track.addEventListener("mouseleave", function () {
+    startAuto();
+  });
+
+
+  window.addEventListener("resize", function () {
+    moveTo(currentIndex);
+  });
+
+
+  startAuto();
+
+})();
+
 </script>
 
 </body>
