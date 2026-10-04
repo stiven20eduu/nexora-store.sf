@@ -18,6 +18,8 @@ label{display:block;font-size:14px;margin:20px 0 9px}input{width:100%;padding:15
 button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}.primary{background:#f5a623;color:#111}.secondary,.shop{background:#1b2330;color:#fff;border:1px solid #353e4d}button:disabled{opacity:.6;cursor:wait}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
 #message{min-height:24px;margin:16px 0 0;font-size:14px}#message[data-error="true"]{color:#ff9b9b}#message[data-error="false"]{color:#83e1b9}
 @media(max-width:480px){main{margin-top:30px}.card{padding:22px}h1{font-size:30px}.actions>*{width:100%;text-align:center}}
+.avatar{overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}
+.order-item{padding:16px 0;border-bottom:1px solid #353e4d}.order-item p{margin:6px 0;font-size:14px}.order-status{color:#f5a623}.photo-actions{margin-bottom:24px}.photo-actions label{margin-top:0}
 </style>
 </head>
 <body>
@@ -29,6 +31,13 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
 <p id="loading" role="status">Cargando tu perfil…</p>
 <section class="card" id="profile" hidden aria-label="Datos de mi cuenta">
 <div class="identity"><div class="avatar" id="avatar" aria-hidden="true"></div><div><h2 id="profileName"></h2><div class="detail" id="profileEmail"></div></div></div>
+<div class="photo-actions">
+<label for="photoFile">Foto de perfil</label>
+<input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="photoHint">
+<p id="photoHint" class="detail">JPG, PNG o WebP, hasta 5 MB. Se recorta al centro y se guarda al seleccionarla.</p>
+<button class="secondary" id="removePhoto" type="button">Quitar foto</button>
+<p id="photoStatus" role="status"></p>
+</div>
 <form id="profileForm">
 <label for="displayName">Nombre de perfil</label>
 <input id="displayName" name="displayName" autocomplete="name" maxlength="60" required>
@@ -37,6 +46,11 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
 <div class="actions"><button class="primary" id="save" type="submit">Guardar cambios</button><a class="shop" href="index.html#catalogo">Ir a comprar</a></div>
 </form>
 <div class="actions"><button class="secondary" id="logout" type="button">Cerrar sesión</button></div>
+</section>
+<section class="card" id="ordersSection" hidden>
+<h2>Mis compras</h2><p class="detail">Pedidos recientes iniciados desde tu cuenta. Enviar por WhatsApp no confirma el pago ni la entrega.</p>
+<p id="ordersStatus" role="status">Cargando historial…</p><div id="ordersList"></div>
+<button class="secondary" id="reloadOrders" type="button">Actualizar historial</button>
 </section>
 <p id="message" role="status" aria-live="polite"></p>
 <noscript><p>Activa JavaScript para acceder a tu perfil.</p></noscript>
@@ -52,6 +66,14 @@ function notify(text, error = false) {
   message.textContent = text;
   message.dataset.error = String(error);
 }
+let savedPhoto = "";
+function showPhoto() {
+  if (!savedPhoto || !/^data:image\/jpeg;base64,/.test(savedPhoto)) return;
+  const image = document.createElement("img");
+  image.src = savedPhoto;
+  image.alt = "";
+  document.getElementById("avatar").replaceChildren(image);
+}
 function render(user) {
   const name = user.displayName || "Mi cuenta";
   document.getElementById("profileName").textContent = name;
@@ -59,21 +81,121 @@ function render(user) {
   document.getElementById("email").value = user.email || "";
   nameInput.value = user.displayName || "";
   document.getElementById("avatar").textContent = name.trim().split(/\s+/).slice(0, 2).map(part => Array.from(part)[0]).join("").toUpperCase();
+  showPhoto();
 }
 try {
   const [{ auth }, { onAuthStateChanged, updateProfile, signOut }] = await Promise.all([
     import("./firebase.js"),
     import("https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js")
   ]);
+
+  const photoInput = document.getElementById("photoFile");
+  const photoStatus = document.getElementById("photoStatus");
+  const removePhoto = document.getElementById("removePhoto");
+  const ordersStatus = document.getElementById("ordersStatus");
+  let accountModule;
+  async function dataModule() {
+    if (!accountModule) accountModule = import("./account-data.js").catch(error => { accountModule = null; throw error; });
+    return accountModule;
+  }
+  async function refreshAccount(user) {
+    ordersStatus.textContent = "Cargando historial…";
+    document.getElementById("ordersList").replaceChildren();
+    try {
+      const result = await (await dataModule()).loadAccount();
+      if (auth.currentUser?.uid !== user.uid || result.uid !== user.uid) return;
+      savedPhoto = result.photo;
+      render(user);
+      ordersStatus.textContent = result.orders.length ? "Últimos " + result.orders.length + " pedidos." : "Todavía no tienes pedidos registrados en tu cuenta.";
+      for (const order of result.orders) {
+        const item = document.createElement("article");
+        item.className = "order-item";
+        const title = document.createElement("h3");
+        title.textContent = order.game + " · " + order.product;
+        const detail = document.createElement("p");
+        const date = order.createdAt?.toDate?.();
+        detail.textContent = "S/ " + Number(order.price).toFixed(2) + (date ? " · " + date.toLocaleString("es-PE") : "");
+        const status = document.createElement("p");
+        status.className = "order-status";
+        status.textContent = ({pending:"Pendiente de verificación",completed:"Completado",cancelled:"Cancelado"})[order.status] || "En revisión";
+        const code = document.createElement("p");
+        code.className = "detail";
+        code.textContent = "Pedido: " + order.id;
+        item.append(title, detail, status, code);
+        document.getElementById("ordersList").append(item);
+      }
+    } catch {
+      if (auth.currentUser?.uid === user.uid) ordersStatus.textContent = "El historial no está disponible en este momento. Inténtalo más tarde.";
+    }
+  }
+  document.getElementById("reloadOrders").addEventListener("click", async function() {
+    if (!auth.currentUser) return;
+    this.disabled = true;
+    await refreshAccount(auth.currentUser);
+    this.disabled = false;
+  });
+  async function uploadPhoto(photo, user) {
+    const uid = await (await dataModule()).savePhoto(photo);
+    if (auth.currentUser?.uid !== user.uid || uid !== user.uid) return;
+    savedPhoto = photo;
+    render(user);
+    photoStatus.textContent = photo ? "Foto guardada en tu cuenta." : "Foto eliminada.";
+  }
+  photoInput.addEventListener("change", async () => {
+    const file = photoInput.files?.[0];
+    const user = auth.currentUser;
+    if (!file || !user) return;
+    if (!["image/jpeg","image/png","image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      photoStatus.textContent = "Selecciona una imagen JPG, PNG o WebP de hasta 5 MB.";
+      photoInput.value = ""; return;
+    }
+    photoInput.disabled = removePhoto.disabled = logout.disabled = true;
+    photoStatus.textContent = "Guardando foto…";
+    let bitmap;
+    try {
+      bitmap = await createImageBitmap(file);
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = 160;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#10151e"; ctx.fillRect(0,0,160,160);
+      const size = Math.min(bitmap.width, bitmap.height);
+      ctx.drawImage(bitmap,(bitmap.width-size)/2,(bitmap.height-size)/2,size,size,0,0,160,160);
+      const photo = canvas.toDataURL("image/jpeg",0.75);
+      if (auth.currentUser?.uid !== user.uid) return;
+      await uploadPhoto(photo, user);
+    } catch {
+      photoStatus.textContent = "No se pudo guardar la foto. Inténtalo más tarde.";
+    } finally {
+      bitmap?.close();
+      photoInput.value = "";
+      photoInput.disabled = removePhoto.disabled = logout.disabled = false;
+    }
+  });
+  removePhoto.addEventListener("click", async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+    photoInput.disabled = removePhoto.disabled = logout.disabled = true;
+    try { await uploadPhoto("", user); }
+    catch { photoStatus.textContent = "No se pudo quitar la foto. Inténtalo más tarde."; }
+    finally { photoInput.disabled = removePhoto.disabled = logout.disabled = false; }
+  });
+
   onAuthStateChanged(auth, (user) => {
     if (!user) {
+      savedPhoto = "";
+      document.getElementById("ordersSection").hidden = true;
+      document.getElementById("ordersList").replaceChildren();
+      document.getElementById("avatar").replaceChildren();
       panel.hidden = true;
       nameInput.value = "";
       document.getElementById("email").value = "";
       window.location.replace("login.html");
       return;
     }
+    savedPhoto = "";
     render(user);
+    document.getElementById("ordersSection").hidden = false;
+    refreshAccount(user);
     loading.hidden = true;
     panel.hidden = false;
   }, () => {
