@@ -6,8 +6,19 @@ async function current() {
   if (!auth.currentUser) throw new Error("Inicia sesión para guardar datos en tu cuenta.");
   return auth.currentUser;
 }
+export async function ensureMemberRecord() {
+  const user = await current();
+  const joinedAt = user.metadata?.creationTime || "";
+  await setDoc(doc(db, "users", user.uid), {
+    displayName: String(user.displayName || "").slice(0, 60),
+    joinedAt: String(joinedAt).slice(0, 80)
+  }, { merge: true });
+  return user.uid;
+}
+
 export async function loadAccount() {
   const user = await current();
+  try { await ensureMemberRecord(); } catch (error) { console.warn("No se pudo registrar la cuenta NEXORA.", error); }
   const [photo, orders] = await Promise.all([
     getDoc(doc(db, "users", user.uid, "profile", "main")),
     getDocs(query(collection(db, "users", user.uid, "orders"), orderBy("createdAt", "desc"), limit(100)))
