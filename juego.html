@@ -2807,27 +2807,14 @@ async function lookupFreeFirePlayer(id){
   const encodedId =
     encodeURIComponent(id);
 
-  const endpoints = [
 
-    `https://api-info.ffapi.cloud/api/nick?id=${encodedId}&region=latam`,
+  const requests = [
 
-    `https://freefirefwx-beta.squareweb.app/api/nick?id=${encodedId}&region=latam`
-
-  ];
-
-  let lastError = null;
-
-
-  for(
-    const endpoint
-    of endpoints
-  ){
-
-    try{
+    async () => {
 
       const response =
         await fetch(
-          endpoint,
+          `https://freefirefwx-beta.squareweb.app/api/nick?id=${encodedId}`,
           {
             method:"GET",
             headers:{
@@ -2881,25 +2868,14 @@ async function lookupFreeFirePlayer(id){
         ||
         data?.nickname
         ||
-        data?.basicInfo?.nickname
-        ||
-        data?.accountBasicInfo?.nickname
-        ||
-        data?.result?.nickname
-        ||
         "";
-
 
       const region =
         data?.player_region
         ||
         data?.region
         ||
-        data?.basicInfo?.region
-        ||
-        data?.accountBasicInfo?.region
-        ||
-        "LATAM";
+        "";
 
 
       if(nickname){
@@ -2914,6 +2890,236 @@ async function lookupFreeFirePlayer(id){
 
       }
 
+
+      throw new Error(
+        "Respuesta sin nickname"
+      );
+
+    },
+
+
+    async () => {
+
+      const regions = [
+        "sac",
+        "us",
+        "br",
+        "sg"
+      ];
+
+
+      for(
+        const region
+        of regions
+      ){
+
+        const response =
+          await fetch(
+            `https://api-info.ffapi.cloud/api/info_player?uid=${encodedId}&region=${region}`,
+            {
+              method:"GET",
+              headers:{
+                "Accept":"application/json"
+              },
+              cache:"no-store"
+            }
+          );
+
+
+        if(
+          !response.ok
+        ){
+
+          continue;
+
+        }
+
+
+        const data =
+          await response.json();
+
+
+        if(
+          data?.error ===
+          "player_not_found"
+          ||
+          data?.success === false
+        ){
+
+          continue;
+
+        }
+
+
+        const nickname =
+          data?.basicInfo?.nickname
+          ||
+          data?.accountBasicInfo?.nickname
+          ||
+          data?.nickname
+          ||
+          "";
+
+        const detectedRegion =
+          data?.basicInfo?.region
+          ||
+          data?.accountBasicInfo?.region
+          ||
+          data?.region
+          ||
+          region.toUpperCase();
+
+
+        if(nickname){
+
+          return {
+            nickname:
+              String(nickname),
+
+            region:
+              String(
+                detectedRegion
+              )
+          };
+
+        }
+
+      }
+
+
+      return {
+        notFound:true
+      };
+
+    },
+
+
+    async () => {
+
+      const regions = [
+        "SAC",
+        "US",
+        "BR",
+        "SG"
+      ];
+
+
+      for(
+        const region
+        of regions
+      ){
+
+        const response =
+          await fetch(
+            `https://freefireapis.lat/info-player?uid=${encodedId}&region=${region}`,
+            {
+              method:"GET",
+              headers:{
+                "Accept":"application/json"
+              },
+              cache:"no-store"
+            }
+          );
+
+
+        if(
+          !response.ok
+        ){
+
+          continue;
+
+        }
+
+
+        const data =
+          await response.json();
+
+
+        const basicInfo =
+          data?.result?.basicInfo
+          ||
+          data?.basicInfo
+          ||
+          {};
+
+
+        const nickname =
+          basicInfo?.nickname
+          ||
+          data?.nickname
+          ||
+          "";
+
+        const detectedRegion =
+          basicInfo?.region
+          ||
+          data?.region
+          ||
+          region;
+
+
+        if(nickname){
+
+          return {
+            nickname:
+              String(nickname),
+
+            region:
+              String(
+                detectedRegion
+              )
+          };
+
+        }
+
+      }
+
+
+      return {
+        notFound:true
+      };
+
+    }
+
+  ];
+
+
+  let sawNotFound =
+    false;
+
+  let lastError =
+    null;
+
+
+  for(
+    const request
+    of requests
+  ){
+
+    try{
+
+      const result =
+        await request();
+
+
+      if(
+        result?.nickname
+      ){
+
+        return result;
+
+      }
+
+
+      if(
+        result?.notFound
+      ){
+
+        sawNotFound =
+          true;
+
+      }
+
     }
     catch(error){
 
@@ -2921,6 +3127,19 @@ async function lookupFreeFirePlayer(id){
         error;
 
     }
+
+  }
+
+
+  if(
+    sawNotFound
+    &&
+    !lastError
+  ){
+
+    return {
+      notFound:true
+    };
 
   }
 
@@ -2934,7 +3153,6 @@ async function lookupFreeFirePlayer(id){
   );
 
 }
-
 
 verifyBtn.addEventListener(
   "click",
