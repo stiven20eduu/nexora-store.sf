@@ -764,6 +764,89 @@ a{
 }
 
 
+
+/* ==========================================================
+   ICONOS DE PRODUCTO - NEXORA
+========================================================== */
+
+.product{
+  position:relative;
+  min-height:96px;
+  padding:11px 38px 11px 11px;
+  display:grid;
+  grid-template-columns:72px minmax(0,1fr);
+  align-items:center;
+  gap:12px;
+  text-align:left;
+}
+
+.product-media{
+  width:72px;
+  height:72px;
+  display:grid;
+  place-items:center;
+  border-radius:12px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(255,255,255,.07),transparent 68%),
+    rgba(5,9,15,.42);
+  border:1px solid rgba(255,255,255,.045);
+}
+
+.product-media img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  padding:3px;
+  filter:drop-shadow(0 7px 9px rgba(0,0,0,.36));
+  transition:transform .2s ease;
+}
+
+.product:hover .product-media img{
+  transform:scale(1.07);
+}
+
+.product-info{
+  min-width:0;
+}
+
+.product-name{
+  font-size:11.5px;
+  line-height:1.3;
+}
+
+.product-desc{
+  margin-top:4px;
+  line-height:1.3;
+}
+
+.product-bottom{
+  margin-top:9px;
+  display:block;
+}
+
+.product-price{
+  font-size:14px;
+}
+
+.product-check{
+  position:absolute;
+  right:10px;
+  top:10px;
+}
+
+@media(max-width:600px){
+  .product{
+    grid-template-columns:68px minmax(0,1fr);
+    min-height:92px;
+  }
+
+  .product-media{
+    width:68px;
+    height:68px;
+  }
+}
+
 /* ==========================================================
    RESUMEN
 ========================================================== */
@@ -2352,6 +2435,97 @@ let selectedProduct =
   null;
 
 
+
+function getProductImage(categoryName, productName){
+
+  const category =
+    categoryName.toUpperCase();
+
+  const name =
+    productName.toLowerCase();
+
+
+  if(gameKey === "free-fire"){
+
+    if(category.includes("DIAMANTES")){
+      return "icon-ff-diamantes.png";
+    }
+
+    if(category.includes("CAJAS")){
+      return "icon-ff-cajas.png";
+    }
+
+    if(category.includes("FRAGMENTOS")){
+      return "icon-ff-fragmentos.png";
+    }
+
+    if(name.includes("semanal")){
+      return "icon-ff-membresia-semanal.png";
+    }
+
+    if(name.includes("mensual")){
+      return "icon-ff-membresia-mensual.png";
+    }
+
+    if(name.includes("booyah")){
+      return "icon-ff-pase-booyah.png";
+    }
+
+    return "icon-ff-diamantes.png";
+  }
+
+
+  if(gameKey === "blood-strike"){
+    return "icon-blood-oro.png";
+  }
+
+
+  if(gameKey === "mobile-legends"){
+
+    const chestPackages = [
+      "1860",
+      "3099",
+      "4649",
+      "7740"
+    ];
+
+    if(
+      chestPackages.some(
+        amount => name.startsWith(amount)
+      )
+    ){
+      return "icon-ml-cofre.png";
+    }
+
+    return "icon-ml-diamantes.png";
+  }
+
+
+  if(gameKey === "roblox"){
+    return "icon-robux.png";
+  }
+
+
+  if(gameKey === "fc-mobile"){
+
+    if(category.includes("FC POINTS")){
+      return "icon-fc-points.png";
+    }
+
+    if(category.includes("SILVER")){
+      return "icon-fc-silver.png";
+    }
+
+    if(category.includes("PASE ESTELAR")){
+      return "icon-fc-pase-estelar.png";
+    }
+  }
+
+
+  return "nexora-logo.png";
+}
+
+
 function renderProducts(){
 
   productsArea.innerHTML =
@@ -2415,30 +2589,47 @@ function renderProducts(){
             "product";
 
 
+          const productImage =
+            getProductImage(
+              category.category,
+              productName
+            );
+
+
           product.innerHTML = `
 
-            <div>
+            <div class="product-media">
+
+              <img
+                src="${productImage}"
+                alt="${productName}"
+                loading="lazy"
+              >
+
+            </div>
+
+            <div class="product-info">
 
               <div class="product-name">
                 ${productName}
               </div>
 
               <div class="product-desc">
-                Procesamiento en menos de 24 horas
+                Entrega en menos de 24 horas
+              </div>
+
+              <div class="product-bottom">
+
+                <div class="product-price">
+                  S/ ${price.toFixed(2)}
+                </div>
+
               </div>
 
             </div>
 
-            <div class="product-bottom">
-
-              <div class="product-price">
-                S/ ${price.toFixed(2)}
-              </div>
-
-              <div class="product-check">
-                ✓
-              </div>
-
+            <div class="product-check">
+              ✓
             </div>
 
           `;
