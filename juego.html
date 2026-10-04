@@ -571,6 +571,11 @@ a{
     var(--orange2);
 }
 
+.verify-btn:disabled{
+  opacity:.62;
+  cursor:wait;
+}
+
 .verify-message{
   display:none;
 
@@ -2445,6 +2450,15 @@ if(game.mobileLegends){
 let selectedProduct =
   null;
 
+let verifiedPlayer = {
+  id:"",
+  nickname:"",
+  region:""
+};
+
+let freeFireVerificationStatus =
+  "idle";
+
 
 
 function getProductImage(categoryName, productName){
@@ -2788,12 +2802,156 @@ function updateSummary(){
    VERIFICAR ID
 ========================================================== */
 
+async function lookupFreeFirePlayer(id){
+
+  const encodedId =
+    encodeURIComponent(id);
+
+  const endpoints = [
+
+    `https://api-info.ffapi.cloud/api/nick?id=${encodedId}&region=latam`,
+
+    `https://freefirefwx-beta.squareweb.app/api/nick?id=${encodedId}&region=latam`
+
+  ];
+
+  let lastError = null;
+
+
+  for(
+    const endpoint
+    of endpoints
+  ){
+
+    try{
+
+      const response =
+        await fetch(
+          endpoint,
+          {
+            method:"GET",
+            headers:{
+              "Accept":"application/json"
+            },
+            cache:"no-store"
+          }
+        );
+
+
+      if(
+        response.status === 404
+      ){
+
+        return {
+          notFound:true
+        };
+
+      }
+
+
+      if(
+        !response.ok
+      ){
+
+        throw new Error(
+          `HTTP ${response.status}`
+        );
+
+      }
+
+
+      const data =
+        await response.json();
+
+
+      if(
+        data?.error ===
+        "player_not_found"
+      ){
+
+        return {
+          notFound:true
+        };
+
+      }
+
+
+      const nickname =
+        data?.player_nickname
+        ||
+        data?.nickname
+        ||
+        data?.basicInfo?.nickname
+        ||
+        data?.accountBasicInfo?.nickname
+        ||
+        data?.result?.nickname
+        ||
+        "";
+
+
+      const region =
+        data?.player_region
+        ||
+        data?.region
+        ||
+        data?.basicInfo?.region
+        ||
+        data?.accountBasicInfo?.region
+        ||
+        "LATAM";
+
+
+      if(nickname){
+
+        return {
+          nickname:
+            String(nickname),
+
+          region:
+            String(region)
+        };
+
+      }
+
+    }
+    catch(error){
+
+      lastError =
+        error;
+
+    }
+
+  }
+
+
+  throw(
+    lastError
+    ||
+    new Error(
+      "Servicio no disponible"
+    )
+  );
+
+}
+
+
 verifyBtn.addEventListener(
   "click",
-  function(){
+  async function(){
 
     const id =
       playerId.value.trim();
+
+
+    verifiedPlayer = {
+      id:"",
+      nickname:"",
+      region:""
+    };
+
+    freeFireVerificationStatus =
+      "idle";
 
 
     if(
@@ -2816,18 +2974,116 @@ verifyBtn.addEventListener(
     }
 
 
+    if(
+      gameKey !==
+      "free-fire"
+    ){
+
+      verifyMessage.textContent =
+        "✓ ID ingresado correctamente.";
+
+      verifyMessage.style.color =
+        "var(--green)";
+
+      verifyMessage.classList.add(
+        "show"
+      );
+
+      updateSummary();
+
+      return;
+
+    }
+
+
+    verifyBtn.disabled =
+      true;
+
+    verifyBtn.textContent =
+      "Verificando...";
+
     verifyMessage.textContent =
-      "✓ ID ingresado correctamente.";
+      "Buscando jugador de Free Fire...";
 
     verifyMessage.style.color =
-      "var(--green)";
+      "var(--muted)";
 
     verifyMessage.classList.add(
       "show"
     );
 
 
-    updateSummary();
+    try{
+
+      const result =
+        await lookupFreeFirePlayer(
+          id
+        );
+
+
+      if(
+        result?.notFound
+      ){
+
+        freeFireVerificationStatus =
+          "invalid";
+
+        verifyMessage.textContent =
+          "✕ No encontramos una cuenta de Free Fire con ese ID.";
+
+        verifyMessage.style.color =
+          "var(--red)";
+
+        return;
+
+      }
+
+
+      verifiedPlayer = {
+        id:
+          id,
+
+        nickname:
+          result.nickname,
+
+        region:
+          result.region
+      };
+
+      freeFireVerificationStatus =
+        "valid";
+
+
+      verifyMessage.textContent =
+        `✓ Jugador encontrado: ${result.nickname}${result.region ? ` • Región: ${result.region}` : ""}`;
+
+      verifyMessage.style.color =
+        "var(--green)";
+
+    }
+    catch(error){
+
+      freeFireVerificationStatus =
+        "unavailable";
+
+      verifyMessage.textContent =
+        "⚠ No se pudo consultar el nombre ahora. Puedes continuar usando el ID.";
+
+      verifyMessage.style.color =
+        "var(--orange)";
+
+    }
+    finally{
+
+      verifyBtn.disabled =
+        false;
+
+      verifyBtn.textContent =
+        "Verificar ID";
+
+      updateSummary();
+
+    }
 
   }
 );
@@ -2839,7 +3095,31 @@ verifyBtn.addEventListener(
 
 playerId.addEventListener(
   "input",
-  updateSummary
+  function(){
+
+    updateSummary();
+
+    if(
+      gameKey ===
+      "free-fire"
+    ){
+
+      verifiedPlayer = {
+        id:"",
+        nickname:"",
+        region:""
+      };
+
+      freeFireVerificationStatus =
+        "idle";
+
+      verifyMessage.classList.remove(
+        "show"
+      );
+
+    }
+
+  }
 );
 
 mlPlayerId.addEventListener(
@@ -2868,6 +3148,8 @@ continueBtn.addEventListener(
 
     let orderPlayerId = "";
     let orderServerId = "";
+    let orderPlayerName = "";
+    let orderPlayerRegion = "";
 
 
     if(game.mobileLegends){
@@ -2908,6 +3190,58 @@ continueBtn.addEventListener(
         return;
       }
 
+
+      if(
+        gameKey ===
+        "free-fire"
+      ){
+
+        if(
+          freeFireVerificationStatus ===
+          "idle"
+        ){
+
+          alert(
+            "Primero pulsa Verificar ID para comprobar tu cuenta de Free Fire."
+          );
+
+          return;
+
+        }
+
+
+        if(
+          freeFireVerificationStatus ===
+          "invalid"
+        ){
+
+          alert(
+            "Ese ID de Free Fire no fue encontrado. Revísalo antes de continuar."
+          );
+
+          return;
+
+        }
+
+
+        if(
+          freeFireVerificationStatus ===
+          "valid"
+          &&
+          verifiedPlayer.id ===
+          orderPlayerId
+        ){
+
+          orderPlayerName =
+            verifiedPlayer.nickname;
+
+          orderPlayerRegion =
+            verifiedPlayer.region;
+
+        }
+
+      }
+
     }
 
 
@@ -2930,6 +3264,12 @@ continueBtn.addEventListener(
 
       serverId:
         orderServerId,
+
+      playerName:
+        orderPlayerName,
+
+      playerRegion:
+        orderPlayerRegion,
 
       delivery:
         "Menos de 24 horas",
