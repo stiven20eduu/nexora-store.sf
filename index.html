@@ -1,2378 +1,1575 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
+<meta charset="UTF-8">
 
-  <meta charset="UTF-8">
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+<title>NEXORA STORE | Recargas de videojuegos</title>
 
-  <title>
-    NEXORA STORE | Recargas de videojuegos
-  </title>
+<link
+  rel="icon"
+  type="image/png"
+  href="nexora-logo.png"
+>
 
-  <link
-    rel="icon"
-    type="image/png"
-    href="nexora-logo.png"
-  >
+<style>
 
-  <style>
+/* =========================================================
+   VARIABLES
+========================================================= */
 
-    /* =====================================================
-       VARIABLES
-    ===================================================== */
+:root{
+  --bg:#07090e;
+  --bg-soft:#0b0f16;
+  --panel:#10151e;
+  --panel-2:#141a23;
+  --border:#272f3b;
 
-    :root {
+  --text:#ffffff;
+  --muted:#929baa;
 
-      --bg: #07090d;
-      --bg-2: #0b0e14;
+  --orange:#f5a623;
+  --orange-hover:#ffbd4b;
 
-      --panel: #10141c;
-      --panel-2: #141922;
+  --green:#20d99b;
 
-      --border: #272e3a;
+  --radius:18px;
+}
 
-      --text: #ffffff;
-      --muted: #9099a8;
 
-      --orange: #f5a623;
-      --orange-hover: #ffbc4b;
+/* =========================================================
+   RESET
+========================================================= */
 
-      --green: #20d99b;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
-      --shadow:
-        0 22px 65px rgba(0,0,0,.40);
+html{
+  scroll-behavior:smooth;
+}
 
-    }
+body{
+  min-height:100vh;
 
+  background:
+    radial-gradient(
+      circle at 85% 0%,
+      rgba(245,166,35,.08),
+      transparent 28%
+    ),
+    var(--bg);
 
-    /* =====================================================
-       RESET
-    ===================================================== */
+  color:var(--text);
 
-    * {
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
 
-      margin: 0;
-      padding: 0;
+  overflow-x:hidden;
+}
 
-      box-sizing: border-box;
+img{
+  display:block;
+}
 
-    }
+button,
+input{
+  font:inherit;
+}
 
+button{
+  cursor:pointer;
+}
 
-    html {
+a{
+  color:inherit;
+  text-decoration:none;
+}
 
-      scroll-behavior: smooth;
 
-    }
+/* =========================================================
+   CONTAINER
+========================================================= */
 
+.container{
+  width:
+    min(
+      1420px,
+      calc(100% - 44px)
+    );
 
-    body {
+  margin:auto;
+}
 
-      min-height: 100vh;
 
-      background:
-        radial-gradient(
-          circle at 85% 0%,
-          rgba(245,166,35,.08),
-          transparent 28%
-        ),
-        radial-gradient(
-          circle at 10% 35%,
-          rgba(50,90,255,.035),
-          transparent 28%
-        ),
-        var(--bg);
+/* =========================================================
+   NAVBAR
+========================================================= */
 
-      color: var(--text);
+.navbar{
+  position:sticky;
+  top:0;
+  z-index:1000;
 
-      font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
+  height:68px;
 
-      overflow-x: hidden;
+  background:
+    rgba(7,9,14,.94);
 
-    }
+  backdrop-filter:
+    blur(18px);
 
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.06);
+}
 
-    button,
-    input {
+.nav-inner{
+  width:
+    min(
+      1420px,
+      calc(100% - 44px)
+    );
 
-      font: inherit;
+  height:100%;
+  margin:auto;
 
-    }
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
 
+.brand{
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
 
-    button {
+.brand img{
+  width:45px;
+  height:45px;
+  object-fit:contain;
+}
 
-      cursor: pointer;
+.brand-name{
+  display:block;
 
-    }
+  font-size:15px;
+  font-weight:900;
+}
 
+.brand-sub{
+  display:block;
 
-    a {
+  margin-top:2px;
 
-      color: inherit;
-      text-decoration: none;
+  color:#707987;
 
-    }
+  font-size:9px;
 
+  letter-spacing:1px;
+}
 
-    img {
+.nav-actions{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
 
-      display: block;
+.country{
+  padding:10px 13px;
 
-    }
+  border:
+    1px solid
+    var(--border);
 
+  background:#10151d;
 
-    /* =====================================================
-       CONTAINER
-    ===================================================== */
+  color:#fff;
 
-    .container {
+  border-radius:10px;
 
-      width:
-        min(
-          1420px,
-          calc(100% - 44px)
-        );
+  font-size:12px;
+}
 
-      margin: 0 auto;
+.login{
+  padding:10px 12px;
 
-    }
+  color:#c8ced7;
 
+  font-size:13px;
+  font-weight:700;
+}
 
-    /* =====================================================
-       NAVBAR
-    ===================================================== */
+.login:hover{
+  color:#fff;
+}
 
-    .navbar {
+.register{
+  padding:11px 17px;
 
-      position: sticky;
+  border-radius:10px;
 
-      top: 0;
+  background:var(--orange);
 
-      z-index: 1000;
+  color:#111;
 
-      height: 68px;
+  font-size:13px;
+  font-weight:900;
 
-      background:
-        rgba(7,9,13,.92);
+  transition:.2s;
+}
 
-      backdrop-filter:
-        blur(18px);
+.register:hover{
+  background:var(--orange-hover);
+  transform:translateY(-2px);
+}
 
-      border-bottom:
-        1px solid
-        rgba(255,255,255,.06);
 
-    }
+/* =========================================================
+   TICKER
+========================================================= */
 
+.ticker{
+  height:31px;
 
-    .nav-inner {
+  overflow:hidden;
+  white-space:nowrap;
 
-      width:
-        min(
-          1420px,
-          calc(100% - 44px)
-        );
+  background:#05070a;
 
-      height: 100%;
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.04);
+}
 
-      margin: auto;
+.ticker-track{
+  width:max-content;
+  height:100%;
 
-      display: flex;
+  display:flex;
+  align-items:center;
 
-      align-items: center;
+  animation:
+    tickerMove
+    35s
+    linear
+    infinite;
+}
 
-      justify-content: space-between;
+.ticker-item{
+  margin-right:75px;
 
-    }
+  color:#858e9b;
 
+  font-size:10px;
+}
 
-    .brand {
+.ticker-item strong{
+  color:#e0e5eb;
+}
 
-      display: flex;
+.ticker-dot{
+  color:var(--orange);
+  margin-right:6px;
+}
 
-      align-items: center;
+@keyframes tickerMove{
+  from{
+    transform:translateX(0);
+  }
 
-      gap: 11px;
+  to{
+    transform:translateX(-50%);
+  }
+}
 
-    }
 
+/* =========================================================
+   HERO
+========================================================= */
 
-    .brand img {
+.hero-section{
+  padding-top:24px;
+}
 
-      width: 44px;
-      height: 44px;
+.hero{
+  position:relative;
 
-      object-fit: contain;
+  height:500px;
 
-    }
+  overflow:hidden;
 
+  border:
+    1px solid
+    rgba(255,255,255,.08);
 
-    .brand-text {
+  border-radius:24px;
 
-      display: flex;
+  background:#0a0d13;
 
-      flex-direction: column;
+  box-shadow:
+    0 22px 65px
+    rgba(0,0,0,.42);
+}
 
-      gap: 2px;
+.hero-slide{
+  position:absolute;
+  inset:0;
 
-    }
+  opacity:0;
 
+  pointer-events:none;
 
-    .brand-name {
+  transition:
+    opacity
+    .65s
+    ease;
+}
 
-      font-size: 15px;
+.hero-slide.active{
+  opacity:1;
+  pointer-events:auto;
+}
 
-      font-weight: 900;
+.hero-slide img{
+  position:absolute;
+  inset:0;
 
-      letter-spacing: .3px;
+  width:100%;
+  height:100%;
 
-    }
+  object-fit:cover;
+}
 
+.hero-slide::after{
+  content:"";
 
-    .brand-sub {
+  position:absolute;
+  inset:0;
 
-      color: #707987;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(3,5,8,.99) 0%,
+      rgba(3,5,8,.93) 27%,
+      rgba(3,5,8,.62) 52%,
+      rgba(3,5,8,.18) 80%,
+      rgba(3,5,8,.03) 100%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(3,5,8,.22),
+      transparent 55%
+    );
+}
 
-      font-size: 9px;
+.hero-content{
+  position:relative;
+  z-index:2;
 
-      letter-spacing: 1px;
+  width:67%;
+  height:100%;
 
-    }
+  padding:
+    70px
+    56px;
 
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-start;
+}
 
-    .nav-actions {
+.badge{
+  display:inline-block;
 
-      display: flex;
+  padding:7px 13px;
 
-      align-items: center;
+  border-radius:30px;
 
-      gap: 7px;
+  background:var(--orange);
 
-    }
+  color:#111;
 
+  font-size:10px;
+  font-weight:900;
 
-    .country {
+  margin-bottom:16px;
+}
 
-      padding:
-        10px
-        13px;
+.hero-content h1{
+  max-width:700px;
 
-      border-radius: 10px;
+  font-size:
+    clamp(
+      44px,
+      5vw,
+      76px
+    );
 
-      background:
-        #10151e;
+  line-height:.95;
 
-      border:
-        1px solid
-        var(--border);
+  letter-spacing:-2px;
 
-      color: #fff;
+  margin-bottom:13px;
+}
 
-      font-size: 12px;
+.hero-subtitle{
+  color:var(--orange);
 
-    }
+  font-size:17px;
 
+  font-weight:900;
 
-    .login {
+  margin-bottom:13px;
+}
 
-      padding:
-        10px
-        12px;
+.hero-description{
+  max-width:640px;
 
-      color:
-        #c7ccd5;
+  color:#d7dce4;
 
-      font-size: 13px;
+  font-size:14px;
 
-      font-weight: 700;
+  line-height:1.6;
+}
 
-    }
+.hero-features{
+  display:grid;
 
+  grid-template-columns:
+    1fr
+    1fr;
 
-    .login:hover {
+  gap:
+    10px
+    28px;
 
-      color: #fff;
+  max-width:620px;
 
-    }
+  margin-top:20px;
+}
 
+.hero-features span{
+  color:#e0e4ea;
 
-    .register {
+  font-size:12px;
+}
 
-      padding:
-        11px
-        17px;
+.hero-btn{
+  margin-top:25px;
 
-      border-radius: 10px;
+  padding:
+    14px
+    20px;
 
-      background:
-        var(--orange);
+  border:0;
 
-      color: #111;
+  border-radius:10px;
 
-      font-size: 13px;
+  background:var(--orange);
 
-      font-weight: 900;
+  color:#111;
 
-      transition:
-        .2s ease;
+  font-size:12px;
 
-    }
+  font-weight:900;
 
+  transition:.2s;
+}
 
-    .register:hover {
+.hero-btn:hover{
+  background:var(--orange-hover);
+  transform:translateY(-2px);
+}
 
-      background:
-        var(--orange-hover);
 
-      transform:
-        translateY(-2px);
+/* =========================================================
+   HERO CONTROLES
+========================================================= */
 
-    }
+.hero-controls{
+  position:absolute;
 
+  right:18px;
+  bottom:18px;
 
-    /* =====================================================
-       TICKER
-    ===================================================== */
+  z-index:10;
 
-    .ticker {
+  display:flex;
+  align-items:center;
 
-      height: 31px;
+  gap:8px;
 
-      overflow: hidden;
+  padding:
+    8px
+    12px;
 
-      white-space: nowrap;
+  border-radius:30px;
 
-      background:
-        #05070a;
+  background:
+    rgba(3,5,8,.76);
 
-      border-bottom:
-        1px solid
-        rgba(255,255,255,.04);
+  border:
+    1px solid
+    rgba(245,166,35,.26);
 
-    }
+  backdrop-filter:
+    blur(10px);
+}
 
+.hero-arrow{
+  width:24px;
+  height:24px;
 
-    .ticker-track {
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
-      width: max-content;
+  border:0;
 
-      height: 100%;
+  background:transparent;
 
-      display: flex;
+  color:#fff;
 
-      align-items: center;
+  font-size:22px;
 
-      animation:
-        tickerMove
-        35s
-        linear
-        infinite;
+  line-height:1;
+}
 
-    }
+.hero-arrow:hover{
+  color:var(--orange);
+}
 
+.hero-dot{
+  width:8px;
+  height:8px;
 
-    .ticker-item {
+  padding:0;
 
-      margin-right: 75px;
+  border:0;
 
-      color:
-        #858e9b;
+  border-radius:50%;
 
-      font-size: 10px;
+  background:#555e6b;
+}
 
-    }
+.hero-dot.active{
+  width:19px;
 
+  border-radius:20px;
 
-    .ticker-item strong {
+  background:var(--orange);
+}
 
-      color:
-        #e1e5eb;
 
-    }
+/* =========================================================
+   TOOLBAR
+========================================================= */
 
+.toolbar{
+  margin-top:28px;
 
-    .ticker-dot {
+  padding-bottom:15px;
 
-      color:
-        var(--orange);
+  border-bottom:
+    1px solid
+    var(--border);
 
-      margin-right: 6px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 
-    }
+  gap:20px;
+}
 
+.search{
+  position:relative;
 
-    @keyframes tickerMove {
+  width:350px;
+}
 
-      from {
+.search-icon{
+  position:absolute;
 
-        transform:
-          translateX(0);
+  left:13px;
+  top:50%;
 
-      }
+  transform:
+    translateY(-50%);
 
-      to {
+  color:#7f8997;
 
-        transform:
-          translateX(-50%);
+  pointer-events:none;
+}
 
-      }
+.search input{
+  width:100%;
 
-    }
+  padding:
+    12px
+    14px
+    12px
+    38px;
 
+  background:#10151e;
 
-    /* =====================================================
-       HERO
-    ===================================================== */
+  border:
+    1px solid
+    var(--border);
 
-    .hero-section {
+  border-radius:10px;
 
-      padding-top: 24px;
+  outline:none;
 
-    }
+  color:#fff;
 
+  font-size:12px;
+}
 
-    .hero {
+.search input:focus{
+  border-color:
+    var(--orange);
+}
 
-      position: relative;
+.filters{
+  display:flex;
 
-      height: 500px;
+  align-items:center;
 
-      overflow: hidden;
+  gap:7px;
+}
 
-      border-radius: 24px;
+.filter{
+  padding:
+    9px
+    13px;
 
-      border:
-        1px solid
-        rgba(255,255,255,.08);
+  background:#10151e;
 
-      background:
-        #0a0d13;
+  border:
+    1px solid
+    var(--border);
 
-      box-shadow:
-        var(--shadow);
+  border-radius:9px;
 
-    }
+  color:#9ca5b2;
 
+  font-size:11px;
+}
 
-    .hero-slide {
+.filter.active,
+.filter:hover{
+  background:var(--orange);
 
-      position: absolute;
+  border-color:var(--orange);
 
-      inset: 0;
+  color:#111;
 
-      opacity: 0;
+  font-weight:900;
+}
 
-      pointer-events: none;
+.counter{
+  color:#737d8b;
 
-      transition:
-        opacity .7s ease;
+  font-size:11px;
 
-    }
+  white-space:nowrap;
 
+  margin-left:5px;
+}
 
-    .hero-slide.active {
 
-      opacity: 1;
+/* =========================================================
+   SECCIONES
+========================================================= */
 
-      pointer-events: auto;
+.section{
+  margin-top:40px;
+}
 
-    }
+.section-head{
+  display:flex;
 
+  justify-content:space-between;
 
-    .hero-slide img {
+  align-items:flex-end;
 
-      position: absolute;
+  gap:20px;
 
-      inset: 0;
+  margin-bottom:18px;
+}
 
-      width: 100%;
-      height: 100%;
+.eyebrow{
+  color:var(--orange);
 
-      object-fit: cover;
+  font-size:10px;
 
-      transform:
-        scale(1.01);
+  font-weight:900;
 
-    }
+  letter-spacing:1.2px;
 
+  margin-bottom:7px;
+}
 
-    .hero-slide::after {
+.section-title{
+  font-size:29px;
 
-      content: "";
+  letter-spacing:-.5px;
+}
 
-      position: absolute;
+.section-text{
+  color:var(--muted);
 
-      inset: 0;
+  font-size:12px;
 
-      background:
+  margin-top:6px;
+}
 
-        linear-gradient(
-          90deg,
-          rgba(3,5,8,.99) 0%,
-          rgba(3,5,8,.94) 26%,
-          rgba(3,5,8,.65) 53%,
-          rgba(3,5,8,.20) 79%,
-          rgba(3,5,8,.03) 100%
-        ),
+.controls{
+  display:flex;
+  gap:8px;
+}
 
-        linear-gradient(
-          0deg,
-          rgba(0,0,0,.20),
-          transparent 55%
-        );
+.circle-btn{
+  width:44px;
+  height:44px;
 
-    }
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
+  padding:0;
 
-    .hero-content {
+  border-radius:50%;
 
-      position: relative;
+  background:#11161f;
 
-      z-index: 2;
+  border:
+    1px solid
+    #333c49;
 
-      width: 67%;
+  color:#fff;
 
-      height: 100%;
+  font-size:25px;
 
-      padding:
-        70px
-        56px;
+  line-height:1;
 
-      display:
-        flex;
+  transition:.2s;
+}
 
-      flex-direction:
-        column;
+.circle-btn:hover{
+  background:var(--orange);
 
-      align-items:
-        flex-start;
+  border-color:var(--orange);
 
-    }
+  color:#111;
 
+  transform:translateY(-2px);
+}
 
-    .badge {
+.circle-btn:active{
+  transform:scale(.94);
+}
 
-      display:
-        inline-block;
 
-      padding:
-        7px
-        13px;
+/* =========================================================
+   CATALOGO
+========================================================= */
 
-      border-radius:
-        30px;
+.catalog-window{
+  width:100%;
 
-      background:
-        var(--orange);
+  overflow:hidden;
 
-      color:
-        #111;
+  padding:
+    5px
+    3px
+    20px;
+}
 
-      font-size:
-        10px;
+.catalog-track{
+  display:flex;
 
-      font-weight:
-        900;
+  gap:18px;
 
-      margin-bottom:
-        16px;
+  width:max-content;
 
-    }
+  transition:
+    transform
+    .55s
+    cubic-bezier(
+      .22,
+      .61,
+      .36,
+      1
+    );
 
+  will-change:
+    transform;
+}
 
-    .hero-content h1 {
+.catalog-card{
+  position:relative;
 
-      max-width:
-        650px;
+  width:330px;
+  min-width:330px;
 
-      font-size:
-        clamp(
-          42px,
-          5vw,
-          76px
-        );
+  height:225px;
 
-      line-height:
-        .95;
+  overflow:hidden;
 
-      letter-spacing:
-        -2px;
+  border:
+    1px solid
+    var(--border);
 
-      margin-bottom:
-        13px;
+  border-radius:18px;
 
-    }
+  background:#11151d;
 
+  transition:.25s;
+}
 
-    .hero-subtitle {
+.catalog-card:hover{
+  transform:translateY(-5px);
 
-      color:
-        var(--orange);
+  border-color:
+    rgba(245,166,35,.72);
 
-      font-size:
-        17px;
+  box-shadow:
+    0 18px 40px
+    rgba(0,0,0,.42);
+}
 
-      font-weight:
-        900;
+.catalog-card img{
+  position:absolute;
+  inset:0;
 
-      margin-bottom:
-        13px;
+  width:100%;
+  height:100%;
 
-    }
+  object-fit:cover;
 
+  transition:.45s;
+}
 
-    .hero-description {
+.catalog-card:hover img{
+  transform:scale(1.05);
+}
 
-      max-width:
-        630px;
+.catalog-overlay{
+  position:absolute;
+  inset:0;
 
-      color:
-        #d6dbe3;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(3,5,8,.98),
+      rgba(3,5,8,.78) 42%,
+      rgba(3,5,8,.18) 100%
+    );
+}
 
-      font-size:
-        14px;
+.catalog-content{
+  position:relative;
+  z-index:2;
 
-      line-height:
-        1.6;
+  width:100%;
+  height:100%;
 
-    }
+  padding:21px;
 
+  display:flex;
+  flex-direction:column;
 
-    .hero-features {
+  align-items:flex-start;
+}
 
-      margin-top:
-        20px;
+.catalog-tag{
+  padding:
+    5px
+    10px;
 
-      display:
-        grid;
+  border-radius:20px;
 
-      grid-template-columns:
-        1fr 1fr;
+  background:var(--orange);
 
-      gap:
-        10px 28px;
+  color:#111;
 
-      max-width:
-        620px;
+  font-size:9px;
 
-    }
+  font-weight:900;
 
+  margin-bottom:9px;
+}
 
-    .hero-features span {
+.catalog-content h3{
+  font-size:25px;
 
-      color:
-        #e1e5ea;
+  margin-bottom:5px;
+}
 
-      font-size:
-        12px;
+.catalog-content h4{
+  color:var(--orange);
 
-    }
+  font-size:11px;
 
+  margin-bottom:8px;
+}
 
-    .hero-btn {
+.catalog-content p{
+  width:88%;
 
-      margin-top:
-        25px;
+  color:#d0d5dd;
 
-      padding:
-        14px
-        20px;
+  font-size:10.5px;
 
-      border:
-        0;
+  line-height:1.45;
+}
 
-      border-radius:
-        10px;
+.catalog-btn{
+  margin-top:auto;
 
-      background:
-        var(--orange);
+  padding:
+    9px
+    13px;
 
-      color:
-        #111;
+  border:0;
 
-      font-size:
-        12px;
+  border-radius:9px;
 
-      font-weight:
-        900;
+  background:var(--orange);
 
-      transition:
-        .2s ease;
+  color:#111;
 
-    }
+  font-size:10px;
 
+  font-weight:900;
 
-    .hero-btn:hover {
+  transition:.2s;
+}
 
-      background:
-        var(--orange-hover);
+.catalog-btn:hover{
+  background:var(--orange-hover);
+}
 
-      transform:
-        translateY(-2px);
 
-    }
+/* =========================================================
+   BENEFICIOS
+========================================================= */
 
+.benefits{
+  display:grid;
 
-    /* =====================================================
-       HERO CONTROLES
-    ===================================================== */
+  grid-template-columns:
+    repeat(3,1fr);
 
-    .hero-controls {
+  gap:16px;
+}
 
-      position:
-        absolute;
+.benefit{
+  padding:23px;
 
-      z-index: 10;
+  border:
+    1px solid
+    var(--border);
 
-      right:
-        18px;
+  border-radius:17px;
 
-      bottom:
-        18px;
+  background:
+    linear-gradient(
+      145deg,
+      #11161e,
+      #0c1016
+    );
 
-      display:
-        flex;
+  transition:.2s;
+}
 
-      align-items:
-        center;
+.benefit:hover{
+  transform:translateY(-3px);
 
-      gap:
-        8px;
+  border-color:
+    #3a4350;
+}
 
-      padding:
-        8px 12px;
+.benefit-icon{
+  width:41px;
+  height:41px;
 
-      border-radius:
-        30px;
+  display:grid;
+  place-items:center;
 
-      background:
-        rgba(3,5,8,.76);
+  border-radius:11px;
 
-      border:
-        1px solid
-        rgba(245,166,35,.26);
+  background:
+    rgba(245,166,35,.11);
 
-      backdrop-filter:
-        blur(10px);
+  color:var(--orange);
 
-    }
+  font-size:18px;
 
+  margin-bottom:14px;
+}
 
-    .hero-arrow {
+.benefit h3{
+  font-size:15px;
 
-      width:
-        24px;
+  margin-bottom:7px;
+}
 
-      height:
-        24px;
+.benefit p{
+  color:var(--muted);
 
-      display:
-        flex;
+  font-size:11px;
 
-      align-items:
-        center;
+  line-height:1.55;
+}
 
-      justify-content:
-        center;
 
-      border:
-        0;
+/* =========================================================
+   PASOS
+========================================================= */
 
-      background:
-        transparent;
+.steps{
+  display:grid;
 
-      color:
-        #fff;
+  grid-template-columns:
+    repeat(4,1fr);
 
-      font-size:
-        22px;
+  gap:15px;
+}
 
-      line-height:
-        1;
+.step{
+  padding:22px;
 
-    }
+  border:
+    1px solid
+    var(--border);
 
+  border-radius:16px;
 
-    .hero-arrow:hover {
+  background:#0d1219;
+}
 
-      color:
-        var(--orange);
+.step-number{
+  color:var(--orange);
 
-    }
+  font-size:10px;
 
+  font-weight:900;
 
-    .hero-dot {
+  margin-bottom:12px;
+}
 
-      width:
-        8px;
+.step h3{
+  font-size:14px;
 
-      height:
-        8px;
+  margin-bottom:7px;
+}
 
-      padding:
-        0;
+.step p{
+  color:var(--muted);
 
-      border:
-        0;
+  font-size:11px;
 
-      border-radius:
-        50%;
+  line-height:1.55;
+}
 
-      background:
-        #565f6c;
 
-      transition:
-        .25s ease;
+/* =========================================================
+   CTA
+========================================================= */
 
-    }
+.cta{
+  margin-top:45px;
 
+  padding:40px;
 
-    .hero-dot.active {
+  border:
+    1px solid
+    rgba(245,166,35,.2);
 
-      width:
-        19px;
+  border-radius:20px;
 
-      border-radius:
-        20px;
+  background:
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(245,166,35,.14),
+      transparent 35%
+    ),
+    linear-gradient(
+      135deg,
+      #121821,
+      #0b0e14
+    );
+}
 
-      background:
-        var(--orange);
+.cta h2{
+  font-size:30px;
 
-    }
+  margin-bottom:9px;
+}
 
+.cta p{
+  max-width:650px;
 
-    /* =====================================================
-       TOOLBAR
-    ===================================================== */
+  color:var(--muted);
 
-    .toolbar {
+  font-size:12px;
 
-      margin-top:
-        28px;
+  line-height:1.55;
+}
 
-      padding-bottom:
-        15px;
+.cta a{
+  display:inline-block;
 
-      border-bottom:
-        1px solid
-        var(--border);
+  margin-top:20px;
 
-      display:
-        flex;
+  padding:
+    12px
+    17px;
 
-      align-items:
-        center;
+  border-radius:9px;
 
-      justify-content:
-        space-between;
+  background:var(--orange);
 
-      gap:
-        20px;
+  color:#111;
 
-    }
+  font-size:11px;
 
+  font-weight:900;
+}
 
-    .search {
 
-      position:
-        relative;
+/* =========================================================
+   FOOTER
+========================================================= */
 
-      width:
-        350px;
+.footer{
+  margin-top:65px;
 
-    }
+  padding:
+    48px
+    0
+    25px;
 
+  background:#05070a;
 
-    .search-icon {
+  border-top:
+    1px solid
+    var(--border);
+}
 
-      position:
-        absolute;
+.footer-grid{
+  display:grid;
 
-      left:
-        13px;
+  grid-template-columns:
+    1.4fr
+    1fr
+    1fr;
 
-      top:
-        50%;
+  gap:40px;
+}
 
-      transform:
-        translateY(-50%);
+.footer-brand{
+  display:flex;
 
-      color:
-        #808998;
+  align-items:center;
 
-      pointer-events:
-        none;
+  gap:10px;
 
-    }
+  margin-bottom:14px;
+}
 
+.footer-brand img{
+  width:42px;
+  height:42px;
 
-    .search input {
+  object-fit:contain;
+}
 
-      width:
-        100%;
+.footer-brand strong{
+  font-size:15px;
+}
 
-      padding:
-        12px
-        14px
-        12px
-        38px;
+.footer-desc{
+  max-width:470px;
 
-      background:
-        #10151e;
+  color:#7d8694;
 
-      border:
-        1px solid
-        var(--border);
+  font-size:11px;
 
-      border-radius:
-        10px;
+  line-height:1.65;
+}
 
-      outline:
-        none;
+.footer-title{
+  color:#fff;
 
-      color:
-        #fff;
+  font-size:11px;
 
-      font-size:
-        12px;
+  font-weight:900;
 
-    }
+  text-transform:uppercase;
 
+  letter-spacing:.8px;
 
-    .search input:focus {
+  margin-bottom:14px;
+}
 
-      border-color:
-        var(--orange);
+.footer-links{
+  display:flex;
 
-    }
+  flex-direction:column;
 
+  gap:10px;
+}
 
-    .filters {
+.footer-links a{
+  color:#777f8d;
 
-      display:
-        flex;
+  font-size:11px;
 
-      align-items:
-        center;
+  transition:.2s;
+}
 
-      gap:
-        7px;
+.footer-links a:hover{
+  color:var(--orange);
+}
 
-    }
 
+/* =========================================================
+   WHATSAPP
+========================================================= */
 
-    .filter {
+.whatsapp{
+  display:flex;
 
-      padding:
-        9px
-        13px;
+  align-items:center;
 
-      border-radius:
-        9px;
+  gap:12px;
 
-      background:
-        #10151e;
+  padding:
+    13px
+    15px;
 
-      border:
-        1px solid
-        var(--border);
+  border-radius:13px;
 
-      color:
-        #9ba4b1;
+  background:#082018;
 
-      font-size:
-        11px;
+  border:
+    1px solid
+    #155b43;
 
-    }
+  transition:.2s;
+}
 
+.whatsapp:hover{
+  transform:translateY(-2px);
 
-    .filter.active,
-    .filter:hover {
+  border-color:
+    var(--green);
+}
 
-      background:
-        var(--orange);
+.whatsapp-icon{
+  width:40px;
+  height:40px;
 
-      border-color:
-        var(--orange);
+  display:grid;
+  place-items:center;
 
-      color:
-        #111;
+  flex-shrink:0;
 
-      font-weight:
-        900;
+  border-radius:11px;
 
-    }
+  background:#22d875;
 
+  color:#fff;
 
-    .counter {
+  font-size:18px;
+}
 
-      color:
-        #727c89;
+.whatsapp-text strong{
+  display:block;
 
-      font-size:
-        11px;
+  font-size:12px;
 
-      white-space:
-        nowrap;
+  color:#fff;
+}
 
-      margin-left:
-        5px;
+.whatsapp-text span{
+  display:block;
 
-    }
+  margin-top:3px;
 
+  color:#7e9a90;
 
-    /* =====================================================
-       TITULOS
-    ===================================================== */
+  font-size:10px;
+}
 
-    .section {
 
-      margin-top:
-        40px;
+/* =========================================================
+   CREDITOS
+========================================================= */
 
-    }
+.creator{
+  margin-top:35px;
 
+  padding-top:18px;
 
-    .section-head {
+  border-top:
+    1px solid
+    rgba(255,255,255,.05);
 
-      display:
-        flex;
+  display:flex;
 
-      justify-content:
-        space-between;
+  justify-content:space-between;
 
-      align-items:
-        flex-end;
+  align-items:center;
 
-      gap:
-        20px;
+  gap:20px;
 
-      margin-bottom:
-        18px;
+  color:#5e6774;
 
-    }
+  font-size:10px;
+}
 
+.creator strong{
+  color:#a4abb6;
+}
 
-    .eyebrow {
 
-      color:
-        var(--orange);
+/* =========================================================
+   TABLET
+========================================================= */
 
-      font-size:
-        10px;
+@media(max-width:1000px){
 
-      font-weight:
-        900;
+  .hero-content{
+    width:74%;
+  }
 
-      letter-spacing:
-        1.2px;
+  .benefits{
+    grid-template-columns:
+      1fr 1fr;
+  }
 
-      margin-bottom:
-        7px;
+  .steps{
+    grid-template-columns:
+      1fr 1fr;
+  }
 
-    }
+  .footer-grid{
+    grid-template-columns:
+      1fr 1fr;
+  }
 
+}
 
-    .section-title {
 
-      font-size:
-        29px;
+/* =========================================================
+   MOBILE
+========================================================= */
 
-      letter-spacing:
-        -.5px;
+@media(max-width:700px){
 
-    }
+  .container{
+    width:
+      calc(100% - 20px);
+  }
 
+  .nav-inner{
+    width:
+      calc(100% - 20px);
+  }
 
-    .section-text {
+  .brand-text{
+    display:none;
+  }
 
-      color:
-        var(--muted);
+  .navbar{
+    height:60px;
+  }
 
-      font-size:
-        12px;
+  .nav-actions{
+    gap:3px;
+  }
 
-      margin-top:
-        6px;
+  .country,
+  .login{
+    padding:
+      8px;
 
-    }
+    font-size:
+      10px;
+  }
 
+  .register{
+    padding:
+      9px
+      10px;
 
-    .controls {
+    font-size:
+      10px;
+  }
 
-      display:
-        flex;
 
-      gap:
-        8px;
+  /* HERO */
 
-    }
+  .hero{
+    height:500px;
 
+    border-radius:
+      18px;
+  }
 
-    .circle-btn {
+  .hero-content{
+    width:100%;
 
-      width:
-        44px;
+    padding:
+      34px
+      22px;
+  }
 
-      height:
-        44px;
+  .hero-content h1{
+    font-size:
+      39px;
 
-      display:
-        flex;
+    letter-spacing:
+      -1px;
+  }
 
-      align-items:
-        center;
+  .hero-subtitle{
+    font-size:
+      14px;
 
-      justify-content:
-        center;
+    line-height:
+      1.35;
+  }
 
-      padding:
-        0;
+  .hero-description{
+    font-size:
+      12px;
+  }
 
-      border-radius:
-        50%;
+  .hero-features{
+    gap:
+      9px
+      12px;
+  }
 
-      background:
-        #11161f;
+  .hero-features span{
+    font-size:
+      10px;
+  }
 
-      border:
-        1px solid
-        #333c49;
+  .hero-btn{
+    font-size:
+      10px;
+  }
 
-      color:
-        #fff;
 
-      font-size:
-        25px;
+  /* TOOLBAR */
 
-      line-height:
-        1;
+  .toolbar{
+    flex-direction:
+      column;
 
-      transition:
-        .2s ease;
+    align-items:
+      stretch;
+  }
 
-    }
+  .search{
+    width:
+      100%;
+  }
 
+  .filters{
+    overflow-x:
+      auto;
 
-    .circle-btn:hover {
+    padding-bottom:
+      3px;
+  }
 
-      background:
-        var(--orange);
+  .filter{
+    flex-shrink:
+      0;
+  }
 
-      border-color:
-        var(--orange);
 
-      color:
-        #111;
+  /* SECTION */
 
-      transform:
-        translateY(-2px);
+  .section-title{
+    font-size:
+      23px;
+  }
 
-    }
+  .controls{
+    display:none;
+  }
 
 
-    .circle-btn:active {
+  /* CARDS */
 
-      transform:
-        scale(.94);
+  .catalog-card{
+    width:
+      310px;
 
-    }
+    min-width:
+      310px;
 
+    height:
+      220px;
+  }
 
-    /* =====================================================
-       CATALOGO
-    ===================================================== */
 
-    .catalog-window {
+  /* OTHER */
 
-      width:
-        100%;
+  .benefits{
+    grid-template-columns:
+      1fr;
+  }
 
-      overflow:
-        hidden;
+  .steps{
+    grid-template-columns:
+      1fr;
+  }
 
-      padding:
-        5px
-        3px
-        20px;
+  .footer-grid{
+    grid-template-columns:
+      1fr;
+  }
 
-    }
+  .creator{
+    flex-direction:
+      column;
 
+    align-items:
+      flex-start;
+  }
 
-    .catalog-track {
+}
 
-      width:
-        max-content;
-
-      display:
-        flex;
-
-      gap:
-        18px;
-
-      transition:
-        transform
-        .65s
-        cubic-bezier(
-          .22,
-          .61,
-          .36,
-          1
-        );
-
-      will-change:
-        transform;
-
-    }
-
-
-    .catalog-card {
-
-      position:
-        relative;
-
-      width:
-        330px;
-
-      min-width:
-        330px;
-
-      height:
-        225px;
-
-      overflow:
-        hidden;
-
-      border-radius:
-        18px;
-
-      border:
-        1px solid
-        var(--border);
-
-      background:
-        #11151d;
-
-      transition:
-        .25s ease;
-
-    }
-
-
-    .catalog-card:hover {
-
-      transform:
-        translateY(-5px);
-
-      border-color:
-        rgba(245,166,35,.70);
-
-      box-shadow:
-        0 18px 40px
-        rgba(0,0,0,.38);
-
-    }
-
-
-    .catalog-card img {
-
-      position:
-        absolute;
-
-      inset:
-        0;
-
-      width:
-        100%;
-
-      height:
-        100%;
-
-      object-fit:
-        cover;
-
-      transition:
-        .45s ease;
-
-    }
-
-
-    .catalog-card:hover img {
-
-      transform:
-        scale(1.05);
-
-    }
-
-
-    .catalog-overlay {
-
-      position:
-        absolute;
-
-      inset:
-        0;
-
-      background:
-        linear-gradient(
-          90deg,
-          rgba(3,5,8,.98) 0%,
-          rgba(3,5,8,.80) 42%,
-          rgba(3,5,8,.20) 100%
-        );
-
-    }
-
-
-    .catalog-content {
-
-      position:
-        relative;
-
-      z-index:
-        2;
-
-      width:
-        100%;
-
-      height:
-        100%;
-
-      padding:
-        21px;
-
-      display:
-        flex;
-
-      flex-direction:
-        column;
-
-      align-items:
-        flex-start;
-
-    }
-
-
-    .catalog-tag {
-
-      background:
-        var(--orange);
-
-      color:
-        #111;
-
-      padding:
-        5px
-        10px;
-
-      border-radius:
-        20px;
-
-      font-size:
-        9px;
-
-      font-weight:
-        900;
-
-      margin-bottom:
-        9px;
-
-    }
-
-
-    .catalog-content h3 {
-
-      font-size:
-        25px;
-
-      margin-bottom:
-        5px;
-
-    }
-
-
-    .catalog-content h4 {
-
-      color:
-        var(--orange);
-
-      font-size:
-        11px;
-
-      margin-bottom:
-        8px;
-
-    }
-
-
-    .catalog-content p {
-
-      width:
-        88%;
-
-      color:
-        #d0d5dd;
-
-      font-size:
-        10.5px;
-
-      line-height:
-        1.45;
-
-    }
-
-
-    .catalog-btn {
-
-      margin-top:
-        auto;
-
-      padding:
-        9px
-        13px;
-
-      border:
-        0;
-
-      border-radius:
-        9px;
-
-      background:
-        var(--orange);
-
-      color:
-        #111;
-
-      font-size:
-        10px;
-
-      font-weight:
-        900;
-
-    }
-
-
-    /* =====================================================
-       BENEFICIOS
-    ===================================================== */
-
-    .benefits {
-
-      display:
-        grid;
-
-      grid-template-columns:
-        repeat(3,1fr);
-
-      gap:
-        16px;
-
-    }
-
-
-    .benefit {
-
-      padding:
-        23px;
-
-      border-radius:
-        17px;
-
-      background:
-        linear-gradient(
-          145deg,
-          #11161e,
-          #0c1016
-        );
-
-      border:
-        1px solid
-        var(--border);
-
-      transition:
-        .2s ease;
-
-    }
-
-
-    .benefit:hover {
-
-      transform:
-        translateY(-3px);
-
-      border-color:
-        #3a4350;
-
-    }
-
-
-    .benefit-icon {
-
-      width:
-        41px;
-
-      height:
-        41px;
-
-      display:
-        grid;
-
-      place-items:
-        center;
-
-      border-radius:
-        11px;
-
-      background:
-        rgba(245,166,35,.11);
-
-      color:
-        var(--orange);
-
-      font-size:
-        18px;
-
-      margin-bottom:
-        14px;
-
-    }
-
-
-    .benefit h3 {
-
-      font-size:
-        15px;
-
-      margin-bottom:
-        7px;
-
-    }
-
-
-    .benefit p {
-
-      color:
-        var(--muted);
-
-      font-size:
-        11px;
-
-      line-height:
-        1.55;
-
-    }
-
-
-    /* =====================================================
-       COMO COMPRAR
-    ===================================================== */
-
-    .steps {
-
-      display:
-        grid;
-
-      grid-template-columns:
-        repeat(4,1fr);
-
-      gap:
-        15px;
-
-    }
-
-
-    .step {
-
-      padding:
-        22px;
-
-      border-radius:
-        16px;
-
-      background:
-        #0d1219;
-
-      border:
-        1px solid
-        var(--border);
-
-    }
-
-
-    .step-number {
-
-      color:
-        var(--orange);
-
-      font-size:
-        10px;
-
-      font-weight:
-        900;
-
-      margin-bottom:
-        12px;
-
-    }
-
-
-    .step h3 {
-
-      font-size:
-        14px;
-
-      margin-bottom:
-        7px;
-
-    }
-
-
-    .step p {
-
-      color:
-        var(--muted);
-
-      font-size:
-        11px;
-
-      line-height:
-        1.55;
-
-    }
-
-
-    /* =====================================================
-       CTA
-    ===================================================== */
-
-    .cta {
-
-      margin-top:
-        45px;
-
-      padding:
-        40px;
-
-      border-radius:
-        20px;
-
-      border:
-        1px solid
-        rgba(245,166,35,.20);
-
-      background:
-        radial-gradient(
-          circle at 80% 20%,
-          rgba(245,166,35,.14),
-          transparent 35%
-        ),
-        linear-gradient(
-          135deg,
-          #121821,
-          #0b0e14
-        );
-
-    }
-
-
-    .cta h2 {
-
-      font-size:
-        30px;
-
-      margin-bottom:
-        9px;
-
-    }
-
-
-    .cta p {
-
-      max-width:
-        650px;
-
-      color:
-        var(--muted);
-
-      font-size:
-        12px;
-
-      line-height:
-        1.55;
-
-    }
-
-
-    .cta a {
-
-      display:
-        inline-block;
-
-      margin-top:
-        20px;
-
-      padding:
-        12px
-        17px;
-
-      border-radius:
-        9px;
-
-      background:
-        var(--orange);
-
-      color:
-        #111;
-
-      font-size:
-        11px;
-
-      font-weight:
-        900;
-
-    }
-
-
-    /* =====================================================
-       FOOTER
-    ===================================================== */
-
-    .footer {
-
-      margin-top:
-        65px;
-
-      padding:
-        48px
-        0
-        25px;
-
-      background:
-        #05070a;
-
-      border-top:
-        1px solid
-        var(--border);
-
-    }
-
-
-    .footer-grid {
-
-      display:
-        grid;
-
-      grid-template-columns:
-        1.4fr
-        1fr
-        1fr;
-
-      gap:
-        40px;
-
-    }
-
-
-    .footer-brand {
-
-      display:
-        flex;
-
-      align-items:
-        center;
-
-      gap:
-        10px;
-
-      margin-bottom:
-        14px;
-
-    }
-
-
-    .footer-brand img {
-
-      width:
-        42px;
-
-      height:
-        42px;
-
-      object-fit:
-        contain;
-
-    }
-
-
-    .footer-brand strong {
-
-      font-size:
-        15px;
-
-    }
-
-
-    .footer-desc {
-
-      max-width:
-        470px;
-
-      color:
-        #7d8694;
-
-      font-size:
-        11px;
-
-      line-height:
-        1.65;
-
-    }
-
-
-    .footer-title {
-
-      color:
-        #fff;
-
-      font-size:
-        11px;
-
-      font-weight:
-        900;
-
-      text-transform:
-        uppercase;
-
-      letter-spacing:
-        .8px;
-
-      margin-bottom:
-        14px;
-
-    }
-
-
-    .footer-links {
-
-      display:
-        flex;
-
-      flex-direction:
-        column;
-
-      gap:
-        10px;
-
-    }
-
-
-    .footer-links a {
-
-      color:
-        #777f8d;
-
-      font-size:
-        11px;
-
-      transition:
-        .2s ease;
-
-    }
-
-
-    .footer-links a:hover {
-
-      color:
-        var(--orange);
-
-    }
-
-
-    /* =====================================================
-       WHATSAPP
-    ===================================================== */
-
-    .whatsapp {
-
-      display:
-        flex;
-
-      align-items:
-        center;
-
-      gap:
-        12px;
-
-      padding:
-        13px
-        15px;
-
-      border-radius:
-        13px;
-
-      background:
-        #082018;
-
-      border:
-        1px solid
-        #155b43;
-
-      transition:
-        .2s ease;
-
-    }
-
-
-    .whatsapp:hover {
-
-      transform:
-        translateY(-2px);
-
-      border-color:
-        var(--green);
-
-    }
-
-
-    .whatsapp-icon {
-
-      width:
-        40px;
-
-      height:
-        40px;
-
-      display:
-        grid;
-
-      place-items:
-        center;
-
-      flex-shrink:
-        0;
-
-      border-radius:
-        11px;
-
-      background:
-        #22d875;
-
-      color:
-        #fff;
-
-      font-size:
-        18px;
-
-    }
-
-
-    .whatsapp-text strong {
-
-      display:
-        block;
-
-      color:
-        #fff;
-
-      font-size:
-        12px;
-
-    }
-
-
-    .whatsapp-text span {
-
-      display:
-        block;
-
-      margin-top:
-        3px;
-
-      color:
-        #7e9a90;
-
-      font-size:
-        10px;
-
-    }
-
-
-    /* =====================================================
-       CREDITOS
-    ===================================================== */
-
-    .creator {
-
-      margin-top:
-        35px;
-
-      padding-top:
-        18px;
-
-      border-top:
-        1px solid
-        rgba(255,255,255,.05);
-
-      display:
-        flex;
-
-      align-items:
-        center;
-
-      justify-content:
-        space-between;
-
-      gap:
-        20px;
-
-    }
-
-
-    .creator span {
-
-      color:
-        #5e6774;
-
-      font-size:
-        10px;
-
-    }
-
-
-    .creator strong {
-
-      color:
-        #a4abb6;
-
-    }
-
-
-    /* =====================================================
-       TABLET
-    ===================================================== */
-
-    @media(max-width:1000px){
-
-      .hero-content {
-
-        width:
-          75%;
-
-      }
-
-
-      .benefits {
-
-        grid-template-columns:
-          1fr 1fr;
-
-      }
-
-
-      .steps {
-
-        grid-template-columns:
-          1fr 1fr;
-
-      }
-
-
-      .footer-grid {
-
-        grid-template-columns:
-          1fr 1fr;
-
-      }
-
-    }
-
-
-    /* =====================================================
-       MOBILE
-    ===================================================== */
-
-    @media(max-width:700px){
-
-      .container {
-
-        width:
-          calc(100% - 24px);
-
-      }
-
-
-      .nav-inner {
-
-        width:
-          calc(100% - 20px);
-
-      }
-
-
-      .brand-text {
-
-        display:
-          none;
-
-      }
-
-
-      .navbar {
-
-        height:
-          60px;
-
-      }
-
-
-      .nav-actions {
-
-        gap:
-          3px;
-
-      }
-
-
-      .country,
-      .login {
-
-        padding:
-          8px;
-
-        font-size:
-          10px;
-
-      }
-
-
-      .register {
-
-        padding:
-          9px
-          10px;
-
-        font-size:
-          10px;
-
-      }
-
-
-      /* HERO */
-
-      .hero {
-
-        height:
-          500px;
-
-        border-radius:
-          18px;
-
-      }
-
-
-      .hero-content {
-
-        width:
-          100%;
-
-        padding:
-          34px
-          22px;
-
-      }
-
-
-      .hero-content h1 {
-
-        font-size:
-          39px;
-
-        letter-spacing:
-          -1px;
-
-      }
-
-
-      .hero-subtitle {
-
-        font-size:
-          14px;
-
-        line-height:
-          1.35;
-
-      }
-
-
-      .hero-description {
-
-        font-size:
-          12px;
-
-      }
-
-
-      .hero-features {
-
-        gap:
-          9px
-          12px;
-
-      }
-
-
-      .hero-features span {
-
-        font-size:
-          10px;
-
-      }
-
-
-      .hero-btn {
-
-        font-size:
-          10px;
-
-      }
-
-
-      /* TOOLBAR */
-
-      .toolbar {
-
-        flex-direction:
-          column;
-
-        align-items:
-          stretch;
-
-      }
-
-
-      .search {
-
-        width:
-          100%;
-
-      }
-
-
-      .filters {
-
-        overflow-x:
-          auto;
-
-        padding-bottom:
-          3px;
-
-      }
-
-
-      .filter {
-
-        flex-shrink:
-          0;
-
-      }
-
-
-      /* SECTIONS */
-
-      .section-title {
-
-        font-size:
-          23px;
-
-      }
-
-
-      .controls {
-
-        display:
-          none;
-
-      }
-
-
-      /* CARDS */
-
-      .catalog-card {
-
-        width:
-          310px;
-
-        min-width:
-          310px;
-
-        height:
-          220px;
-
-      }
-
-
-      /* BENEFITS */
-
-      .benefits {
-
-        grid-template-columns:
-          1fr;
-
-      }
-
-
-      /* STEPS */
-
-      .steps {
-
-        grid-template-columns:
-          1fr;
-
-      }
-
-
-      /* FOOTER */
-
-      .footer-grid {
-
-        grid-template-columns:
-          1fr;
-
-      }
-
-
-      .creator {
-
-        flex-direction:
-          column;
-
-        align-items:
-          flex-start;
-
-      }
-
-    }
-
-  </style>
-
+</style>
 </head>
 
 
 <body>
 
 
-<!-- =====================================================
+<!-- ========================================================
      NAVBAR
-===================================================== -->
+======================================================== -->
 
 <header class="navbar">
 
@@ -2433,9 +1630,9 @@
 
 
 
-<!-- =====================================================
+<!-- ========================================================
      TICKER
-===================================================== -->
+======================================================== -->
 
 <div class="ticker">
 
@@ -2475,8 +1672,6 @@
     </span>
 
 
-    <!-- REPETICIÓN -->
-
     <span class="ticker-item">
       <span class="ticker-dot">●</span>
       <strong>Wiliam</strong>
@@ -2498,21 +1693,15 @@
     </span>
 
 
-    <span class="ticker-item">
-      <span class="ticker-dot">●</span>
-      Soporte NEXORA activo
-    </span>
-
-
   </div>
 
 </div>
 
 
 
-<!-- =====================================================
+<!-- ========================================================
      HERO
-===================================================== -->
+======================================================== -->
 
 <section class="hero-section">
 
@@ -2521,9 +1710,9 @@
     <div class="hero">
 
 
-      <!-- =====================
+      <!-- ================================================
            BIENVENIDA
-      ====================== -->
+      ================================================= -->
 
       <article
         class="hero-slide active"
@@ -2531,7 +1720,7 @@
 
         <img
           src="hero-free-fire.png"
-          alt="NEXORA STORE"
+          alt="Bienvenidos a NEXORA STORE"
         >
 
 
@@ -2597,9 +1786,9 @@
 
 
 
-      <!-- =====================
+      <!-- ================================================
            FREE FIRE
-      ====================== -->
+      ================================================= -->
 
       <article class="hero-slide">
 
@@ -2659,9 +1848,9 @@
 
           <button
             class="hero-btn"
-            onclick="goCatalog()"
+            onclick="openGame('free-fire')"
           >
-            Ver paquetes →
+            Ver productos →
           </button>
 
 
@@ -2671,9 +1860,9 @@
 
 
 
-      <!-- =====================
+      <!-- ================================================
            BLOOD STRIKE
-      ====================== -->
+      ================================================= -->
 
       <article class="hero-slide">
 
@@ -2733,7 +1922,7 @@
 
           <button
             class="hero-btn"
-            onclick="goCatalog()"
+            onclick="openGame('blood-strike')"
           >
             Ver productos →
           </button>
@@ -2745,9 +1934,9 @@
 
 
 
-      <!-- =====================
+      <!-- ================================================
            MOBILE LEGENDS
-      ====================== -->
+      ================================================= -->
 
       <article class="hero-slide">
 
@@ -2776,9 +1965,8 @@
 
           <p class="hero-description">
 
-            Obtén tus diamantes y pases
-            directamente mediante tu
-            ID + Zone ID.
+            Obtén tus diamantes directamente
+            mediante tu ID + Server ID.
             Procesamiento en menos de 24 horas.
 
           </p>
@@ -2787,7 +1975,7 @@
           <div class="hero-features">
 
             <span>
-              ✓ ID + Zone ID
+              ✓ ID + Server ID
             </span>
 
             <span>
@@ -2807,7 +1995,7 @@
 
           <button
             class="hero-btn"
-            onclick="goCatalog()"
+            onclick="openGame('mobile-legends')"
           >
             Ver paquetes →
           </button>
@@ -2819,9 +2007,9 @@
 
 
 
-      <!-- =====================
+      <!-- ================================================
            ROBLOX
-      ====================== -->
+      ================================================= -->
 
       <article class="hero-slide">
 
@@ -2844,7 +2032,7 @@
 
 
           <div class="hero-subtitle">
-            Robux &amp; Membresías Premium
+            Robux &amp; Productos digitales
           </div>
 
 
@@ -2852,7 +2040,7 @@
 
             Adquiere productos digitales
             para Roblox de forma sencilla
-            y segura.
+            y confiable.
             Entrega en menos de 24 horas.
 
           </p>
@@ -2869,7 +2057,7 @@
             </span>
 
             <span>
-              ✓ Productos digitales
+              ✓ Productos seguros
             </span>
 
             <span>
@@ -2881,7 +2069,7 @@
 
           <button
             class="hero-btn"
-            onclick="goCatalog()"
+            onclick="openGame('roblox')"
           >
             Ver productos →
           </button>
@@ -2893,9 +2081,9 @@
 
 
 
-      <!-- =====================
+      <!-- ================================================
            FC MOBILE
-      ====================== -->
+      ================================================= -->
 
       <article class="hero-slide">
 
@@ -2918,16 +2106,16 @@
 
 
           <div class="hero-subtitle">
-            FC Points &amp; Productos
+            FC Points, Silver &amp; Pase Estelar
           </div>
 
 
           <p class="hero-description">
 
             Encuentra productos para
-            FC Mobile y realiza tu pedido
-            de forma sencilla.
-            Procesamiento en menos de 24 horas.
+            FC Mobile.
+            Tu pedido será procesado
+            en menos de 24 horas.
 
           </p>
 
@@ -2935,15 +2123,15 @@
           <div class="hero-features">
 
             <span>
-              ✓ Productos digitales
+              ✓ FC Points
             </span>
 
             <span>
-              ✓ Compra sencilla
+              ✓ Silver
             </span>
 
             <span>
-              ✓ Procesamiento seguro
+              ✓ Pase Estelar
             </span>
 
             <span>
@@ -2955,7 +2143,7 @@
 
           <button
             class="hero-btn"
-            onclick="goCatalog()"
+            onclick="openGame('fc-mobile')"
           >
             Ver productos →
           </button>
@@ -2967,9 +2155,9 @@
 
 
 
-      <!-- =====================
-           CONTROLES HERO
-      ====================== -->
+      <!-- ================================================
+           CONTROLES
+      ================================================= -->
 
       <div class="hero-controls">
 
@@ -2986,49 +2174,37 @@
         <button
           class="hero-dot active"
           data-index="0"
-          aria-label="Slide 1"
-        >
-        </button>
+        ></button>
 
 
         <button
           class="hero-dot"
           data-index="1"
-          aria-label="Slide 2"
-        >
-        </button>
+        ></button>
 
 
         <button
           class="hero-dot"
           data-index="2"
-          aria-label="Slide 3"
-        >
-        </button>
+        ></button>
 
 
         <button
           class="hero-dot"
           data-index="3"
-          aria-label="Slide 4"
-        >
-        </button>
+        ></button>
 
 
         <button
           class="hero-dot"
           data-index="4"
-          aria-label="Slide 5"
-        >
-        </button>
+        ></button>
 
 
         <button
           class="hero-dot"
           data-index="5"
-          aria-label="Slide 6"
-        >
-        </button>
+        ></button>
 
 
         <button
@@ -3051,9 +2227,9 @@
 
 
 
-<!-- =====================================================
+<!-- ========================================================
      BUSCADOR
-===================================================== -->
+======================================================== -->
 
 <div class="container">
 
@@ -3122,9 +2298,9 @@
 
 
 
-<!-- =====================================================
-     CATALOGO
-===================================================== -->
+<!-- ========================================================
+     CATÁLOGO
+======================================================== -->
 
 <section
   class="section"
@@ -3154,6 +2330,7 @@
         </p>
 
       </div>
+
 
 
       <div class="controls">
@@ -3193,16 +2370,13 @@
       >
 
 
-        <!-- ====================
-             FREE FIRE
-        ===================== -->
+        <!-- FREE FIRE -->
 
         <article
           class="catalog-card"
           data-game="free fire"
           data-category="mobile"
         >
-
 
           <img
             src="card-free-fire.png"
@@ -3239,7 +2413,7 @@
 
             <button
               class="catalog-btn"
-              onclick="selectGame('Free Fire')"
+              onclick="openGame('free-fire')"
             >
               Ver productos →
             </button>
@@ -3247,21 +2421,17 @@
 
           </div>
 
-
         </article>
 
 
 
-        <!-- ====================
-             BLOOD STRIKE
-        ===================== -->
+        <!-- BLOOD STRIKE -->
 
         <article
           class="catalog-card"
           data-game="blood strike"
           data-category="mobile"
         >
-
 
           <img
             src="card-blood-strike.png"
@@ -3298,7 +2468,7 @@
 
             <button
               class="catalog-btn"
-              onclick="selectGame('Blood Strike')"
+              onclick="openGame('blood-strike')"
             >
               Ver productos →
             </button>
@@ -3306,21 +2476,17 @@
 
           </div>
 
-
         </article>
 
 
 
-        <!-- ====================
-             MOBILE LEGENDS
-        ===================== -->
+        <!-- MOBILE LEGENDS -->
 
         <article
           class="catalog-card"
           data-game="mobile legends"
           data-category="mobile"
         >
-
 
           <img
             src="card-mobile-legends.png"
@@ -3350,14 +2516,14 @@
 
 
             <p>
-              Recarga mediante ID + Zone ID.
+              Recarga mediante ID + Server ID.
               Procesamiento en menos de 24 horas.
             </p>
 
 
             <button
               class="catalog-btn"
-              onclick="selectGame('Mobile Legends')"
+              onclick="openGame('mobile-legends')"
             >
               Ver productos →
             </button>
@@ -3365,21 +2531,17 @@
 
           </div>
 
-
         </article>
 
 
 
-        <!-- ====================
-             ROBLOX
-        ===================== -->
+        <!-- ROBLOX -->
 
         <article
           class="catalog-card"
           data-game="roblox"
           data-category="digital"
         >
-
 
           <img
             src="card-roblox.png"
@@ -3416,7 +2578,7 @@
 
             <button
               class="catalog-btn"
-              onclick="selectGame('Roblox')"
+              onclick="openGame('roblox')"
             >
               Ver productos →
             </button>
@@ -3424,21 +2586,17 @@
 
           </div>
 
-
         </article>
 
 
 
-        <!-- ====================
-             FC MOBILE
-        ===================== -->
+        <!-- FC MOBILE -->
 
         <article
           class="catalog-card"
           data-game="fc mobile"
           data-category="mobile"
         >
-
 
           <img
             src="card-fc-mobile.png"
@@ -3475,14 +2633,13 @@
 
             <button
               class="catalog-btn"
-              onclick="selectGame('FC Mobile')"
+              onclick="openGame('fc-mobile')"
             >
               Ver productos →
             </button>
 
 
           </div>
-
 
         </article>
 
@@ -3497,9 +2654,9 @@
 
 
 
-<!-- =====================================================
+<!-- ========================================================
      BENEFICIOS
-===================================================== -->
+======================================================== -->
 
 <section class="section">
 
@@ -3521,7 +2678,7 @@
 
 
         <p class="section-text">
-          Una experiencia pensada para que comprar sea sencillo.
+          Una experiencia pensada para comprar fácilmente.
         </p>
 
       </div>
@@ -3535,68 +2692,54 @@
 
       <article class="benefit">
 
-
         <div class="benefit-icon">
           ⚡
         </div>
 
-
         <h3>
           Menos de 24 horas
         </h3>
-
 
         <p>
           Tus pedidos serán procesados
           en menos de 24 horas.
         </p>
 
-
       </article>
 
 
-
       <article class="benefit">
-
 
         <div class="benefit-icon">
           🔐
         </div>
 
-
         <h3>
           Compra segura
         </h3>
-
 
         <p>
           No necesitamos tu contraseña
           del juego para procesar tus pedidos.
         </p>
 
-
       </article>
 
 
-
       <article class="benefit">
-
 
         <div class="benefit-icon">
           💬
         </div>
 
-
         <h3>
           Soporte NEXORA
         </h3>
-
 
         <p>
           Recibe atención y ayuda
           con tus pedidos.
         </p>
-
 
       </article>
 
@@ -3609,9 +2752,9 @@
 
 
 
-<!-- =====================================================
+<!-- ========================================================
      COMO COMPRAR
-===================================================== -->
+======================================================== -->
 
 <section class="section">
 
@@ -3619,7 +2762,6 @@
 
 
     <div class="section-head">
-
 
       <div>
 
@@ -3639,7 +2781,6 @@
 
       </div>
 
-
     </div>
 
 
@@ -3649,88 +2790,69 @@
 
       <article class="step">
 
-
         <div class="step-number">
           PASO 01
         </div>
-
 
         <h3>
           Elige tu juego
         </h3>
 
-
         <p>
           Selecciona el juego que deseas.
         </p>
 
-
       </article>
 
 
-
       <article class="step">
-
 
         <div class="step-number">
           PASO 02
         </div>
 
-
         <h3>
           Elige el producto
         </h3>
-
 
         <p>
           Revisa el producto y la cantidad.
         </p>
 
-
       </article>
 
 
-
       <article class="step">
-
 
         <div class="step-number">
           PASO 03
         </div>
 
-
         <h3>
           Completa el pedido
         </h3>
-
 
         <p>
           Ingresa los datos necesarios.
         </p>
 
-
       </article>
 
 
-
       <article class="step">
-
 
         <div class="step-number">
           PASO 04
         </div>
 
-
         <h3>
           Recibe tu producto
         </h3>
-
 
         <p>
           Tu pedido será procesado
           en menos de 24 horas.
         </p>
-
 
       </article>
 
@@ -3743,12 +2865,11 @@
 
 
 
-<!-- =====================================================
+<!-- ========================================================
      CTA
-===================================================== -->
+======================================================== -->
 
 <div class="container">
-
 
   <section class="cta">
 
@@ -3771,17 +2892,15 @@
 
   </section>
 
-
 </div>
 
 
 
-<!-- =====================================================
+<!-- ========================================================
      FOOTER
-===================================================== -->
+======================================================== -->
 
 <footer class="footer">
-
 
   <div class="container">
 
@@ -3815,7 +2934,7 @@
 
           Plataforma de recargas para videojuegos,
           membresías y productos digitales.
-          Compra, administra tus pedidos y recibe
+          Compra de forma sencilla y recibe
           soporte desde un solo lugar.
 
         </p>
@@ -3825,7 +2944,7 @@
 
 
 
-      <!-- INFORMACIÓN -->
+      <!-- INFORMACION -->
 
       <div>
 
@@ -3917,16 +3036,13 @@
           style="margin-top:14px;"
         >
 
-
           <a href="#">
             Instagram
           </a>
 
-
           <a href="#">
             TikTok
           </a>
-
 
         </div>
 
@@ -3939,7 +3055,6 @@
 
 
     <!-- CREDITOS -->
-
 
     <div class="creator">
 
@@ -3962,21 +3077,15 @@
 
   </div>
 
-
 </footer>
 
 
 
-<!-- =====================================================
-     JAVASCRIPT
-===================================================== -->
-
 <script>
 
-
-/* =====================================================
+/* =========================================================
    HERO
-===================================================== */
+========================================================= */
 
 const heroSlides =
   document.querySelectorAll(
@@ -3998,32 +3107,20 @@ const heroPrev =
     "heroPrev"
   );
 
-
 let heroIndex = 0;
 
 let heroTimer = null;
 
 
-/* Mostrar slide */
-
 function showHero(index){
 
-  if(
-    index < 0
-  ){
-
+  if(index < 0){
     index =
       heroSlides.length - 1;
-
   }
 
-
-  if(
-    index >= heroSlides.length
-  ){
-
+  if(index >= heroSlides.length){
     index = 0;
-
   }
 
 
@@ -4056,8 +3153,6 @@ function showHero(index){
 }
 
 
-/* Siguiente */
-
 function nextHero(){
 
   showHero(
@@ -4067,8 +3162,6 @@ function nextHero(){
 }
 
 
-/* Anterior */
-
 function prevHero(){
 
   showHero(
@@ -4077,8 +3170,6 @@ function prevHero(){
 
 }
 
-
-/* Botón siguiente */
 
 heroNext.addEventListener(
   "click",
@@ -4092,8 +3183,6 @@ heroNext.addEventListener(
 );
 
 
-/* Botón anterior */
-
 heroPrev.addEventListener(
   "click",
   ()=>{
@@ -4105,8 +3194,6 @@ heroPrev.addEventListener(
   }
 );
 
-
-/* Puntos */
 
 heroDots.forEach(
   dot=>{
@@ -4129,8 +3216,6 @@ heroDots.forEach(
   }
 );
 
-
-/* Automático */
 
 function startHero(){
 
@@ -4158,9 +3243,17 @@ startHero();
 
 
 
-/* =====================================================
-   IR AL CATÁLOGO
-===================================================== */
+/* =========================================================
+   IR A JUEGO
+========================================================= */
+
+function openGame(game){
+
+  window.location.href =
+    `juego.html?game=${game}`;
+
+}
+
 
 function goCatalog(){
 
@@ -4169,12 +3262,10 @@ function goCatalog(){
       "catalogo"
     );
 
-
   if(catalog){
 
     catalog.scrollIntoView({
-      behavior:
-        "smooth"
+      behavior:"smooth"
     });
 
   }
@@ -4183,9 +3274,9 @@ function goCatalog(){
 
 
 
-/* =====================================================
-   CARRUSEL DEL CATÁLOGO
-===================================================== */
+/* =========================================================
+   CATALOGO
+========================================================= */
 
 const catalogTrack =
   document.getElementById(
@@ -4208,23 +3299,27 @@ let catalogIndex = 0;
 let catalogTimer = null;
 
 
-/* Obtener tarjetas visibles */
-
-function getVisibleCards(){
+function getAllCards(){
 
   return Array.from(
     catalogTrack.querySelectorAll(
       ".catalog-card"
     )
-  ).filter(
-    card =>
-      card.style.display !== "none"
   );
 
 }
 
 
-/* Tamaño del movimiento */
+function getVisibleCards(){
+
+  return getAllCards()
+    .filter(
+      card =>
+        card.style.display !== "none"
+    );
+
+}
+
 
 function getCatalogStep(){
 
@@ -4233,47 +3328,35 @@ function getCatalogStep(){
       ".catalog-card"
     );
 
-
   if(!card){
 
     return 0;
 
   }
 
-
   return (
-    card.offsetWidth
-    + 18
+    card.offsetWidth +
+    18
   );
 
 }
 
 
-/* Posición máxima */
-
 function getCatalogMax(){
 
   return Math.max(
     0,
-    catalogTrack.scrollWidth
-    -
+    catalogTrack.scrollWidth -
     catalogTrack.parentElement.clientWidth
   );
 
 }
 
 
-/* Aplicar posición */
-
 function updateCatalogPosition(){
 
   const step =
     getCatalogStep();
-
-
-  const max =
-    getCatalogMax();
-
 
   if(!step){
 
@@ -4282,16 +3365,17 @@ function updateCatalogPosition(){
   }
 
 
+  const max =
+    getCatalogMax();
+
+
   let position =
     catalogIndex * step;
 
 
-  if(
-    position > max
-  ){
+  if(position > max){
 
-    position =
-      max;
+    position = max;
 
   }
 
@@ -4302,17 +3386,12 @@ function updateCatalogPosition(){
 }
 
 
-/* SIGUIENTE */
-
 function catalogNextSlide(){
 
   const cards =
     getVisibleCards();
 
-
-  if(
-    cards.length === 0
-  ){
+  if(!cards.length){
 
     return;
 
@@ -4322,35 +3401,22 @@ function catalogNextSlide(){
   const step =
     getCatalogStep();
 
-
   const max =
     getCatalogMax();
 
 
-  const currentPosition =
+  const current =
     catalogIndex * step;
 
 
-  /*
-    Si todavía podemos
-    avanzar, avanzamos.
-  */
-
   if(
-    currentPosition <
-    max - 4
+    current <
+    max - 5
   ){
 
     catalogIndex++;
 
   }
-
-
-  /*
-    Llegamos al final:
-    volvemos al primero.
-  */
-
   else{
 
     catalogIndex = 0;
@@ -4363,46 +3429,30 @@ function catalogNextSlide(){
 }
 
 
-/* ANTERIOR */
-
 function catalogPrevSlide(){
 
   const cards =
     getVisibleCards();
 
-
-  if(
-    cards.length === 0
-  ){
+  if(!cards.length){
 
     return;
 
   }
 
 
-  if(
-    catalogIndex > 0
-  ){
+  if(catalogIndex > 0){
 
     catalogIndex--;
 
   }
-
-
   else{
-
-    /*
-      Calculamos la última
-      posición disponible.
-    */
 
     const step =
       getCatalogStep();
 
-
     const max =
       getCatalogMax();
-
 
     catalogIndex =
       Math.floor(
@@ -4417,8 +3467,6 @@ function catalogPrevSlide(){
 }
 
 
-/* Botón derecha */
-
 catalogNext.addEventListener(
   "click",
   ()=>{
@@ -4430,8 +3478,6 @@ catalogNext.addEventListener(
   }
 );
 
-
-/* Botón izquierda */
 
 catalogPrev.addEventListener(
   "click",
@@ -4445,22 +3491,15 @@ catalogPrev.addEventListener(
 );
 
 
-/* Automático */
-
 function startCatalog(){
 
   clearInterval(
     catalogTimer
   );
 
-
   catalogTimer =
     setInterval(
-      ()=>{
-
-        catalogNextSlide();
-
-      },
+      catalogNextSlide,
       4200
     );
 
@@ -4474,16 +3513,12 @@ function restartCatalog(){
 }
 
 
-/* Pausar con mouse */
-
 catalogTrack.addEventListener(
   "mouseenter",
   ()=>{
-
     clearInterval(
       catalogTimer
     );
-
   }
 );
 
@@ -4491,29 +3526,25 @@ catalogTrack.addEventListener(
 catalogTrack.addEventListener(
   "mouseleave",
   ()=>{
-
     startCatalog();
-
   }
 );
 
-
-/* Iniciar */
 
 startCatalog();
 
 
 
-/* =====================================================
-   BUSCADOR + FILTROS
-===================================================== */
+/* =========================================================
+   BUSCADOR
+========================================================= */
 
 const searchInput =
   document.getElementById(
     "searchInput"
   );
 
-const filterButtons =
+const filters =
   document.querySelectorAll(
     ".filter"
   );
@@ -4541,8 +3572,7 @@ function updateCatalog(){
       .toLowerCase();
 
 
-  let visible =
-    0;
+  let visible = 0;
 
 
   catalogCards.forEach(
@@ -4550,7 +3580,6 @@ function updateCatalog(){
 
       const game =
         card.dataset.game;
-
 
       const category =
         card.dataset.category;
@@ -4573,13 +3602,11 @@ function updateCatalog(){
         filterMatch
       ){
 
-        card.style.display =
-          "";
+        card.style.display = "";
 
         visible++;
 
       }
-
       else{
 
         card.style.display =
@@ -4595,11 +3622,6 @@ function updateCatalog(){
     `${visible} juegos disponibles`;
 
 
-  /*
-    Al buscar o filtrar,
-    volvemos al principio.
-  */
-
   catalogIndex = 0;
 
   catalogTrack.style.transform =
@@ -4614,28 +3636,28 @@ searchInput.addEventListener(
 );
 
 
-filterButtons.forEach(
-  button=>{
+filters.forEach(
+  filter=>{
 
-    button.addEventListener(
+    filter.addEventListener(
       "click",
       ()=>{
 
-        filterButtons.forEach(
-          btn=>
-            btn.classList.remove(
+        filters.forEach(
+          f =>
+            f.classList.remove(
               "active"
             )
         );
 
 
-        button.classList.add(
+        filter.classList.add(
           "active"
         );
 
 
         activeFilter =
-          button.dataset.filter;
+          filter.dataset.filter;
 
 
         updateCatalog();
@@ -4647,26 +3669,9 @@ filterButtons.forEach(
 );
 
 
-
-/* =====================================================
-   BOTONES DE PRODUCTOS
-===================================================== */
-
-function selectGame(game){
-
-  alert(
-    `Has seleccionado ${game}.\n\n` +
-    `La sección de productos y precios ` +
-    `la conectaremos en el siguiente paso.`
-  );
-
-}
-
-
-
-/* =====================================================
+/* =========================================================
    RESPONSIVE
-===================================================== */
+========================================================= */
 
 window.addEventListener(
   "resize",
@@ -4680,10 +3685,7 @@ window.addEventListener(
   }
 );
 
-
 </script>
 
-
 </body>
-
 </html>
