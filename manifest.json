@@ -1,0 +1,11 @@
+{
+  "name": "NEXORA STORE SF",
+  "short_name": "NEXORA",
+  "description": "Tienda digital de recargas y productos para videojuegos.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#07090e",
+  "theme_color": "#07090e",
+  "orientation": "portrait-primary"
+}
