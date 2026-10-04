@@ -17,9 +17,15 @@ h2{margin:0 0 6px;font-size:22px;overflow-wrap:anywhere}.detail{font-size:13px;c
 label{display:block;font-size:14px;margin:20px 0 9px}input{width:100%;padding:15px;border:1px solid #353e4d;border-radius:10px;background:#090d14;color:#fff;font:inherit}input:focus{outline:2px solid #f5a623;outline-offset:2px}input[readonly]{color:#aeb7c5}
 button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}.primary{background:#f5a623;color:#111}.secondary,.shop{background:#1b2330;color:#fff;border:1px solid #353e4d}button:disabled{opacity:.6;cursor:wait}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
 #message{min-height:24px;margin:16px 0 0;font-size:14px}#message[data-error="true"]{color:#ff9b9b}#message[data-error="false"]{color:#83e1b9}
-@media(max-width:480px){main{margin-top:30px}.card{padding:22px}h1{font-size:30px}.actions>*{width:100%;text-align:center}}
+.dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0}
+.stat{background:linear-gradient(145deg,#121924,#0b1017);border:1px solid #2b3441;border-radius:16px;padding:16px}
+.stat strong{display:block;font-size:22px;margin-bottom:5px;color:#fff}.stat span{font-size:11px;color:#8f99a8}.stat.highlight strong{color:#f5a623}
+.account-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.meta-pill{font-size:11px;color:#aeb7c5;border:1px solid #303947;background:#0b1017;border-radius:999px;padding:7px 10px}
 .avatar{overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}
-.order-item{padding:16px 0;border-bottom:1px solid #353e4d}.order-item p{margin:6px 0;font-size:14px}.order-status{color:#f5a623}.photo-actions{margin-bottom:24px}.photo-actions label{margin-top:0}
+.order-item{padding:18px;border:1px solid #2b3441;border-radius:14px;background:#0b1017;margin-top:12px}.order-item p{margin:6px 0;font-size:14px}.order-item h3{margin:0 0 8px;font-size:16px}.order-status{display:inline-block;font-weight:800;font-size:11px;padding:7px 10px;border-radius:999px;background:rgba(245,166,35,.10);border:1px solid rgba(245,166,35,.24);color:#f5a623}.order-status.completed{color:#76e2b7;background:rgba(32,217,155,.08);border-color:rgba(32,217,155,.22)}.order-status.cancelled{color:#ff9b9b;background:rgba(255,98,98,.08);border-color:rgba(255,98,98,.22)}
+.photo-actions{margin-bottom:24px}.photo-actions label{margin-top:0}
+@media(max-width:700px){.dashboard{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){main{margin-top:30px}.card{padding:22px}h1{font-size:30px}.actions>*{width:100%;text-align:center}.dashboard{grid-template-columns:1fr 1fr}.stat{padding:14px}.stat strong{font-size:19px}}
 </style>
 </head>
 <body>
@@ -29,8 +35,18 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
 <h1>Mi perfil</h1>
 <p>Personaliza tu nombre y administra tu sesión.</p>
 <p id="loading" role="status">Cargando tu perfil…</p>
+
+<section id="accountDashboard" hidden aria-label="Resumen de mi cuenta">
+  <div class="dashboard">
+    <div class="stat highlight"><strong id="statOrders">0</strong><span>Pedidos registrados</span></div>
+    <div class="stat"><strong id="statCompleted">0</strong><span>Completados</span></div>
+    <div class="stat"><strong id="statPending">0</strong><span>Pendientes</span></div>
+    <div class="stat"><strong id="statMember">—</strong><span>Cuenta desde</span></div>
+  </div>
+</section>
+
 <section class="card" id="profile" hidden aria-label="Datos de mi cuenta">
-<div class="identity"><div class="avatar" id="avatar" aria-hidden="true"></div><div><h2 id="profileName"></h2><div class="detail" id="profileEmail"></div></div></div>
+<div class="identity"><div class="avatar" id="avatar" aria-hidden="true"></div><div><h2 id="profileName"></h2><div class="detail" id="profileEmail"></div><div class="account-meta"><span class="meta-pill">Cuenta NEXORA</span><span class="meta-pill" id="memberSince">Miembro</span></div></div></div>
 <div class="photo-actions">
 <label for="photoFile">Foto de perfil</label>
 <input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="photoHint">
@@ -76,6 +92,14 @@ function showPhoto() {
 }
 function render(user) {
   const name = user.displayName || "Mi cuenta";
+  const created = user.metadata?.creationTime ? new Date(user.metadata.creationTime) : null;
+  const memberText = created && !Number.isNaN(created.getTime())
+    ? created.toLocaleDateString("es-PE", { month:"short", year:"numeric" })
+    : "Miembro";
+  document.getElementById("memberSince").textContent = "Desde " + memberText;
+  document.getElementById("statMember").textContent = created && !Number.isNaN(created.getTime())
+    ? created.toLocaleDateString("es-PE", { month:"short", year:"numeric" })
+    : "—";
   document.getElementById("profileName").textContent = name;
   document.getElementById("profileEmail").textContent = user.email || "";
   document.getElementById("email").value = user.email || "";
@@ -106,6 +130,11 @@ try {
       if (auth.currentUser?.uid !== user.uid || result.uid !== user.uid) return;
       savedPhoto = result.photo;
       render(user);
+      const completedCount = result.orders.filter(order => order.status === "completed").length;
+      const pendingCount = result.orders.filter(order => !["completed","cancelled"].includes(order.status)).length;
+      document.getElementById("statOrders").textContent = String(result.orders.length);
+      document.getElementById("statCompleted").textContent = String(completedCount);
+      document.getElementById("statPending").textContent = String(pendingCount);
       ordersStatus.textContent = result.orders.length ? "Últimos " + result.orders.length + " pedidos." : "Todavía no tienes pedidos registrados en tu cuenta.";
       for (const order of result.orders) {
         const item = document.createElement("article");
@@ -117,7 +146,15 @@ try {
         detail.textContent = "S/ " + Number(order.price).toFixed(2) + (date ? " · " + date.toLocaleString("es-PE") : "");
         const status = document.createElement("p");
         status.className = "order-status";
-        status.textContent = ({pending:"Pendiente de verificación",completed:"Completado",cancelled:"Cancelado"})[order.status] || "En revisión";
+        if (order.status === "completed") status.classList.add("completed");
+        if (order.status === "cancelled") status.classList.add("cancelled");
+        status.textContent = ({
+          pending:"Pendiente de verificación",
+          processing:"En proceso",
+          verified:"Pago verificado",
+          completed:"Completado",
+          cancelled:"Cancelado"
+        })[order.status] || "En revisión";
         const code = document.createElement("p");
         code.className = "detail";
         code.textContent = "Pedido: " + order.id;
@@ -184,6 +221,7 @@ try {
     if (!user) {
       savedPhoto = "";
       document.getElementById("ordersSection").hidden = true;
+      document.getElementById("accountDashboard").hidden = true;
       document.getElementById("ordersList").replaceChildren();
       document.getElementById("avatar").replaceChildren();
       panel.hidden = true;
@@ -195,6 +233,7 @@ try {
     savedPhoto = "";
     render(user);
     document.getElementById("ordersSection").hidden = false;
+    document.getElementById("accountDashboard").hidden = false;
     refreshAccount(user);
     loading.hidden = true;
     panel.hidden = false;
