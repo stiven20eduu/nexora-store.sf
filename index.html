@@ -3687,5 +3687,26 @@ window.addEventListener(
 
 </script>
 
+
+<script type="module">
+import { auth } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+const loginLink = document.querySelector(".nav-actions .login");
+const registerLink = document.querySelector(".nav-actions .register");
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    loginLink.textContent = "Mi perfil";
+    loginLink.href = "perfil.html";
+    loginLink.title = user.displayName || "Mi cuenta";
+    registerLink.hidden = true;
+  } else {
+    loginLink.textContent = "Ingresar";
+    loginLink.href = "login.html";
+    loginLink.removeAttribute("title");
+    registerLink.hidden = false;
+  }
+});
+</script>
+
 </body>
 </html>
