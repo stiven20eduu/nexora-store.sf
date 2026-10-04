@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi perfil | NEXORA STORE</title>
+<link rel="icon" href="nexora-logo.png">
+<style>
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,#332012 0,transparent 45%),#07090e;color:#fff;font-family:Arial,Helvetica,sans-serif;min-height:100vh}
+[hidden]{display:none!important}a{color:inherit;text-decoration:none}
+header{border-bottom:1px solid #272f3b;padding:18px max(20px,calc((100% - 1000px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px}.brand img{width:38px;height:38px;object-fit:contain}
+.back{color:#b8beca;font-size:13px}main{max-width:720px;margin:48px auto;padding:0 20px 40px}.eyebrow{color:#f5a623;font-weight:bold;font-size:12px;letter-spacing:2px}h1{font-size:36px;margin:12px 0}p{color:#aeb7c5;line-height:1.6}
+.card{background:#10151e;border:1px solid #272f3b;border-radius:22px;padding:28px;margin-top:24px}
+.identity{display:flex;align-items:center;gap:18px;margin-bottom:28px}.avatar{display:grid;place-items:center;flex-shrink:0;width:72px;height:72px;border-radius:50%;background:#f5a623;color:#111;font-size:28px;font-weight:800}
+h2{margin:0 0 6px;font-size:22px;overflow-wrap:anywhere}.detail{font-size:13px;color:#aeb7c5;overflow-wrap:anywhere}
+label{display:block;font-size:14px;margin:20px 0 9px}input{width:100%;padding:15px;border:1px solid #353e4d;border-radius:10px;background:#090d14;color:#fff;font:inherit}input:focus{outline:2px solid #f5a623;outline-offset:2px}input[readonly]{color:#aeb7c5}
+button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}.primary{background:#f5a623;color:#111}.secondary,.shop{background:#1b2330;color:#fff;border:1px solid #353e4d}button:disabled{opacity:.6;cursor:wait}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+#message{min-height:24px;margin:16px 0 0;font-size:14px}#message[data-error="true"]{color:#ff9b9b}#message[data-error="false"]{color:#83e1b9}
+@media(max-width:480px){main{margin-top:30px}.card{padding:22px}h1{font-size:30px}.actions>*{width:100%;text-align:center}}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html"><img src="nexora-logo.png" alt="">NEXORA STORE</a><a class="back" href="index.html">Volver a la tienda</a></header>
+<main>
+<div class="eyebrow">TU CUENTA NEXORA</div>
+<h1>Mi perfil</h1>
+<p>Personaliza tu nombre y administra tu sesión.</p>
+<p id="loading" role="status">Cargando tu perfil…</p>
+<section class="card" id="profile" hidden aria-label="Datos de mi cuenta">
+<div class="identity"><div class="avatar" id="avatar" aria-hidden="true"></div><div><h2 id="profileName"></h2><div class="detail" id="profileEmail"></div></div></div>
+<form id="profileForm">
+<label for="displayName">Nombre de perfil</label>
+<input id="displayName" name="displayName" autocomplete="name" maxlength="60" required>
+<label for="email">Correo de tu cuenta</label>
+<input id="email" type="email" readonly>
+<div class="actions"><button class="primary" id="save" type="submit">Guardar cambios</button><a class="shop" href="index.html#catalogo">Ir a comprar</a></div>
+</form>
+<div class="actions"><button class="secondary" id="logout" type="button">Cerrar sesión</button></div>
+</section>
+<p id="message" role="status" aria-live="polite"></p>
+<noscript><p>Activa JavaScript para acceder a tu perfil.</p></noscript>
+</main>
+<script type="module">
+const panel = document.getElementById("profile");
+const loading = document.getElementById("loading");
+const message = document.getElementById("message");
+const nameInput = document.getElementById("displayName");
+const save = document.getElementById("save");
+const logout = document.getElementById("logout");
+function notify(text, error = false) {
+  message.textContent = text;
+  message.dataset.error = String(error);
+}
+function render(user) {
+  const name = user.displayName || "Mi cuenta";
+  document.getElementById("profileName").textContent = name;
+  document.getElementById("profileEmail").textContent = user.email || "";
+  document.getElementById("email").value = user.email || "";
+  nameInput.value = user.displayName || "";
+  document.getElementById("avatar").textContent = name.trim().split(/\s+/).slice(0, 2).map(part => Array.from(part)[0]).join("").toUpperCase();
+}
+try {
+  const [{ auth }, { onAuthStateChanged, updateProfile, signOut }] = await Promise.all([
+    import("./firebase.js"),
+    import("https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js")
+  ]);
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      panel.hidden = true;
+      nameInput.value = "";
+      document.getElementById("email").value = "";
+      window.location.replace("login.html");
+      return;
+    }
+    render(user);
+    loading.hidden = true;
+    panel.hidden = false;
+  }, () => {
+    panel.hidden = true;
+    loading.hidden = true;
+    notify("No pudimos cargar tu sesión. Recarga la página para intentarlo de nuevo.", true);
+  });
+  document.getElementById("profileForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const user = auth.currentUser;
+    if (!user) { window.location.replace("login.html"); return; }
+    const name = nameInput.value.trim();
+    if (!name || name.length > 60) {
+      notify("Escribe un nombre de entre 1 y 60 caracteres.", true);
+      nameInput.focus();
+      return;
+    }
+    save.disabled = true;
+    logout.disabled = true;
+    save.textContent = "Guardando…";
+    notify("");
+    try {
+      await updateProfile(user, { displayName: name });
+      if (auth.currentUser?.uid === user.uid) {
+        render(user);
+        notify("Tu perfil se guardó correctamente.");
+      }
+    } catch (error) {
+      notify(error.code === "auth/network-request-failed"
+        ? "No hay conexión. Revisa tu internet e inténtalo de nuevo."
+        : "No pudimos guardar tu perfil. Inténtalo de nuevo.", true);
+    } finally {
+      save.disabled = false;
+      logout.disabled = false;
+      save.textContent = "Guardar cambios";
+    }
+  });
+  logout.addEventListener("click", async () => {
+    logout.disabled = true;
+    save.disabled = true;
+    try {
+      await signOut(auth);
+      window.location.replace("login.html");
+    } catch {
+      notify("No pudimos cerrar la sesión. Inténtalo de nuevo.", true);
+      logout.disabled = false;
+      save.disabled = false;
+    }
+  });
+} catch {
+  loading.hidden = true;
+  notify("No pudimos conectar. Revisa tu internet y recarga la página.", true);
+}
+</script>
+</body>
+</html>
