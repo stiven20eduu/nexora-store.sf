@@ -10,6 +10,16 @@
 
 <title>NEXORA STORE | Recargas de videojuegos</title>
 
+<meta
+  name="description"
+  content="NEXORA STORE: recargas y productos digitales para tus videojuegos favoritos. Compra fácil, métodos de pago locales y soporte NEXORA."
+>
+
+<meta
+  name="theme-color"
+  content="#07090e"
+>
+
 <link
   rel="icon"
   type="image/png"
@@ -1371,6 +1381,385 @@ a{
 }
 
 
+
+/* =========================================================
+   MEJORAS PREMIUM NEXORA
+========================================================= */
+
+.nav-menu{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  margin-left:auto;
+  margin-right:16px;
+}
+
+.nav-menu a{
+  padding:9px 11px;
+  border-radius:9px;
+  color:#8e97a5;
+  font-size:11px;
+  font-weight:700;
+  transition:.2s ease;
+}
+
+.nav-menu a:hover{
+  color:#fff;
+  background:rgba(255,255,255,.05);
+}
+
+.service-status{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 10px;
+  border:1px solid rgba(32,217,155,.2);
+  border-radius:999px;
+  background:rgba(32,217,155,.06);
+  color:#94ddc5;
+  font-size:10px;
+  font-weight:800;
+}
+
+.status-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:
+    0 0 0 4px rgba(32,217,155,.09),
+    0 0 12px rgba(32,217,155,.5);
+}
+
+.hero{
+  isolation:isolate;
+}
+
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:5;
+  pointer-events:none;
+  border-radius:24px;
+  border:1px solid rgba(245,166,35,.14);
+  box-shadow:
+    inset 0 0 45px rgba(245,166,35,.025);
+}
+
+.hero-btn,
+.catalog-btn,
+.register,
+.cta-primary{
+  box-shadow:
+    0 8px 24px rgba(245,166,35,.16);
+}
+
+.hero-btn:active,
+.catalog-btn:active,
+.register:active{
+  transform:translateY(0) scale(.98);
+}
+
+.trust-strip{
+  margin-top:18px;
+}
+
+.trust-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+
+.trust-item{
+  min-height:78px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:15px 17px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:15px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18,24,33,.92),
+      rgba(10,14,20,.92)
+    );
+  box-shadow:0 10px 28px rgba(0,0,0,.16);
+  transition:.22s ease;
+}
+
+.trust-item:hover{
+  transform:translateY(-3px);
+  border-color:rgba(245,166,35,.28);
+}
+
+.trust-icon{
+  width:39px;
+  height:39px;
+  flex:0 0 39px;
+  display:grid;
+  place-items:center;
+  border-radius:11px;
+  background:rgba(245,166,35,.08);
+  border:1px solid rgba(245,166,35,.14);
+  font-size:17px;
+}
+
+.trust-item strong{
+  display:block;
+  color:#eef1f5;
+  font-size:12px;
+  margin-bottom:4px;
+}
+
+.trust-item span{
+  color:#747f8e;
+  font-size:9.5px;
+}
+
+.catalog-card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:3;
+  pointer-events:none;
+  background:
+    linear-gradient(
+      110deg,
+      transparent 20%,
+      rgba(255,255,255,.09) 42%,
+      transparent 62%
+    );
+  transform:translateX(-120%);
+  transition:transform .65s ease;
+}
+
+.catalog-card:hover::after{
+  transform:translateX(120%);
+}
+
+.catalog-content{
+  z-index:4;
+}
+
+.cta{
+  position:relative;
+  overflow:hidden;
+}
+
+.cta::after{
+  content:"NEXORA";
+  position:absolute;
+  right:-8px;
+  bottom:-24px;
+  color:rgba(255,255,255,.025);
+  font-size:92px;
+  font-weight:900;
+  letter-spacing:-5px;
+  pointer-events:none;
+}
+
+.cta-actions{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:20px;
+}
+
+.cta-actions a{
+  margin-top:0;
+}
+
+.cta-secondary{
+  background:transparent !important;
+  color:#d4dae3 !important;
+  border:1px solid #343d4a;
+}
+
+.cta-secondary:hover{
+  border-color:var(--orange);
+  color:#fff !important;
+}
+
+.founder-credits{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+}
+
+.gold-name{
+  background:
+    linear-gradient(
+      90deg,
+      #ffd66b,
+      #fff1ad,
+      #f5a623,
+      #ffe28a
+    );
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent !important;
+  font-weight:900;
+  text-shadow:0 0 14px rgba(245,166,35,.13);
+}
+
+.credit-separator{
+  color:#39414d;
+}
+
+.floating-support{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:1100;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:9px 12px 9px 9px;
+  border:1px solid rgba(245,166,35,.32);
+  border-radius:14px;
+  background:rgba(10,13,18,.92);
+  backdrop-filter:blur(15px);
+  box-shadow:0 14px 35px rgba(0,0,0,.36);
+  transition:.22s ease;
+}
+
+.floating-support:hover{
+  transform:translateY(-3px);
+  border-color:rgba(245,166,35,.65);
+}
+
+.floating-support-icon{
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:var(--orange);
+  color:#121212;
+  font-weight:900;
+}
+
+.floating-support-text strong,
+.floating-support-text small{
+  display:block;
+}
+
+.floating-support-text strong{
+  color:#fff;
+  font-size:10px;
+}
+
+.floating-support-text small{
+  margin-top:2px;
+  color:#7f8997;
+  font-size:8.5px;
+}
+
+.reveal{
+  opacity:0;
+  transform:translateY(18px);
+  transition:
+    opacity .55s ease,
+    transform .55s ease;
+}
+
+.reveal.visible{
+  opacity:1;
+  transform:none;
+}
+
+.navbar.scrolled{
+  box-shadow:0 12px 30px rgba(0,0,0,.24);
+  border-bottom-color:rgba(245,166,35,.08);
+}
+
+@media(max-width:1100px){
+  .nav-menu{
+    display:none;
+  }
+
+  .trust-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:700px){
+  .service-status{
+    display:none;
+  }
+
+  .trust-grid{
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+
+  .trust-item{
+    min-height:72px;
+    padding:12px;
+  }
+
+  .trust-icon{
+    width:34px;
+    height:34px;
+    flex-basis:34px;
+  }
+
+  .cta-actions{
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .cta-actions a{
+    text-align:center;
+  }
+
+  .founder-credits{
+    justify-content:flex-start;
+  }
+
+  .credit-separator{
+    display:none;
+  }
+
+  .founder-credits span{
+    width:100%;
+  }
+
+  .floating-support{
+    right:10px;
+    bottom:10px;
+    padding:8px;
+    border-radius:12px;
+  }
+
+  .floating-support-text{
+    display:none;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    scroll-behavior:auto !important;
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+
+  .reveal{
+    opacity:1;
+    transform:none;
+  }
+}
+
+
 /* =========================================================
    TABLET
 ========================================================= */
@@ -1624,7 +2013,18 @@ a{
     </a>
 
 
+    <nav class="nav-menu" aria-label="Navegación principal">
+      <a href="#catalogo">Catálogo</a>
+      <a href="#como-comprar">Cómo comprar</a>
+      <a href="#soporte">Soporte</a>
+    </nav>
+
     <div class="nav-actions">
+
+      <span class="service-status" title="NEXORA STORE disponible">
+        <span class="status-dot"></span>
+        Operativo
+      </span>
 
       <button class="country">
         🇵🇪 Perú
@@ -2303,6 +2703,50 @@ a{
 
 
 
+
+<!-- ========================================================
+     RESUMEN NEXORA
+======================================================== -->
+
+<section class="trust-strip" aria-label="Información rápida de NEXORA STORE">
+  <div class="container trust-grid">
+
+    <div class="trust-item">
+      <div class="trust-icon">🎮</div>
+      <div>
+        <strong>5 juegos</strong>
+        <span>Catálogo disponible</span>
+      </div>
+    </div>
+
+    <div class="trust-item">
+      <div class="trust-icon">⚡</div>
+      <div>
+        <strong>Menos de 24 h</strong>
+        <span>Procesamiento de pedidos</span>
+      </div>
+    </div>
+
+    <div class="trust-item">
+      <div class="trust-icon">💳</div>
+      <div>
+        <strong>Yape &amp; Plin</strong>
+        <span>Métodos de pago</span>
+      </div>
+    </div>
+
+    <div class="trust-item">
+      <div class="trust-icon">🛡</div>
+      <div>
+        <strong>Soporte NEXORA</strong>
+        <span>Atención y seguimiento</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
 <!-- ========================================================
      BUSCADOR
 ======================================================== -->
@@ -2322,6 +2766,7 @@ a{
       <input
         id="searchInput"
         type="search"
+        aria-label="Buscar juego"
         placeholder="Buscar juego..."
         autocomplete="off"
       >
@@ -2832,7 +3277,7 @@ a{
      COMO COMPRAR
 ======================================================== -->
 
-<section class="section">
+<section class="section" id="como-comprar">
 
   <div class="container">
 
@@ -2961,9 +3406,20 @@ a{
     </p>
 
 
-    <a href="#catalogo">
-      Explorar catálogo →
-    </a>
+    <div class="cta-actions">
+      <a href="#catalogo" class="cta-primary">
+        Explorar catálogo →
+      </a>
+
+      <a
+        href="https://whatsapp.com/channel/0029Vb8pdP7HwXbDQSnkL13u"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="cta-secondary"
+      >
+        Canal oficial ↗
+      </a>
+    </div>
 
 
   </section>
@@ -2976,7 +3432,7 @@ a{
      FOOTER
 ======================================================== -->
 
-<footer class="footer">
+<footer class="footer" id="soporte">
 
   <div class="container">
 
@@ -3134,19 +3590,27 @@ a{
 
     <div class="creator">
 
-
       <span>
         © 2026 NEXORA STORE · Todos los derechos reservados.
       </span>
 
+      <div class="founder-credits">
+        <span>
+          DESARROLLO:
+          <strong class="gold-name">MVP stiven20eduu</strong>
+        </span>
 
-      <span>
-        Creado por
-        <strong>
-          stiven20edu
-        </strong>
-      </span>
+        <span class="credit-separator">•</span>
 
+        <span>
+          ADMINISTRACIÓN E INVERSIÓN:
+          <strong class="gold-name">NEXORA</strong>
+        </span>
+
+        <span class="credit-separator">•</span>
+
+        <span>VERSIÓN 1.0</span>
+      </div>
 
     </div>
 
@@ -3155,6 +3619,21 @@ a{
 
 </footer>
 
+
+
+<a
+  class="floating-support"
+  href="https://whatsapp.com/channel/0029Vb8pdP7HwXbDQSnkL13u"
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Abrir canal oficial de NEXORA en WhatsApp"
+>
+  <span class="floating-support-icon">✦</span>
+  <span class="floating-support-text">
+    <strong>NEXORA</strong>
+    <small>Canal oficial</small>
+  </span>
+</a>
 
 
 <script>
@@ -3743,6 +4222,87 @@ filters.forEach(
 
   }
 );
+
+
+
+/* =========================================================
+   EXPERIENCIA NEXORA
+========================================================= */
+
+document
+  .querySelectorAll(
+    ".catalog-card img"
+  )
+  .forEach(
+    img=>{
+      img.loading = "lazy";
+      img.decoding = "async";
+    }
+  );
+
+
+const revealTargets =
+  document.querySelectorAll(
+    ".trust-item, .benefit, .step, .catalog-card, .cta"
+  );
+
+revealTargets.forEach(
+  element =>
+    element.classList.add(
+      "reveal"
+    )
+);
+
+const revealObserver =
+  new IntersectionObserver(
+    entries=>{
+      entries.forEach(
+        entry=>{
+          if(entry.isIntersecting){
+            entry.target.classList.add(
+              "visible"
+            );
+            revealObserver.unobserve(
+              entry.target
+            );
+          }
+        }
+      );
+    },
+    {
+      threshold:.08
+    }
+  );
+
+revealTargets.forEach(
+  element =>
+    revealObserver.observe(
+      element
+    )
+);
+
+
+const mainNavbar =
+  document.querySelector(
+    ".navbar"
+  );
+
+function updateNavbarState(){
+  mainNavbar.classList.toggle(
+    "scrolled",
+    window.scrollY > 12
+  );
+}
+
+window.addEventListener(
+  "scroll",
+  updateNavbarState,
+  {
+    passive:true
+  }
+);
+
+updateNavbarState();
 
 
 /* =========================================================
