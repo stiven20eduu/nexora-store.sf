@@ -2729,7 +2729,7 @@ function selectProduct(
 
 
   continueBtn.textContent =
-    "Continuar con el pedido";
+    "Finalizar compra";
 
 
   updateSummary();
@@ -2843,7 +2843,7 @@ mlServerId.addEventListener(
 
 
 /* ==========================================================
-   CONTINUAR
+   FINALIZAR COMPRA
 ========================================================== */
 
 continueBtn.addEventListener(
@@ -2851,17 +2851,26 @@ continueBtn.addEventListener(
   function(){
 
     if(!selectedProduct){
-
       return;
-
     }
+
+
+    let orderPlayerId = "";
+    let orderServerId = "";
 
 
     if(game.mobileLegends){
 
+      orderPlayerId =
+        mlPlayerId.value.trim();
+
+      orderServerId =
+        mlServerId.value.trim();
+
+
       if(
-        !mlPlayerId.value.trim() ||
-        !mlServerId.value.trim()
+        !orderPlayerId ||
+        !orderServerId
       ){
 
         alert(
@@ -2869,40 +2878,65 @@ continueBtn.addEventListener(
         );
 
         return;
-
       }
 
     }
     else
     if(!game.roblox){
 
-      if(
-        !playerId.value.trim()
-      ){
+      orderPlayerId =
+        playerId.value.trim();
+
+
+      if(!orderPlayerId){
 
         alert(
           "Ingresa tu ID de jugador antes de continuar."
         );
 
         return;
-
       }
 
     }
 
 
-    /*
-      Por ahora mostramos una confirmación.
-      Después conectaremos este botón
-      al sistema real de pedidos/saldo.
-    */
+    const order = {
 
-    alert(
-      `Pedido preparado correctamente.\n\n` +
-      `Juego: ${game.title}\n` +
-      `Producto: ${selectedProduct.name}\n` +
-      `Total: S/ ${selectedProduct.price.toFixed(2)}`
+      gameKey:
+        gameKey,
+
+      game:
+        game.title,
+
+      product:
+        selectedProduct.name,
+
+      price:
+        selectedProduct.price,
+
+      playerId:
+        orderPlayerId,
+
+      serverId:
+        orderServerId,
+
+      delivery:
+        "Menos de 24 horas",
+
+      createdAt:
+        new Date().toISOString()
+
+    };
+
+
+    sessionStorage.setItem(
+      "nexoraOrder",
+      JSON.stringify(order)
     );
+
+
+    window.location.href =
+      "pago.html";
 
   }
 );
