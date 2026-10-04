@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel MVP | NEXORA STORE</title>
+<link rel="icon" href="Emblema%20Nexora%20Store%20SF%20con%20corona.png">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#07090e;color:#fff;font-family:Arial,Helvetica,sans-serif}
+[hidden]{display:none!important}a{color:inherit;text-decoration:none}
+header{padding:16px 5%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #29313d;background:#090c12;position:sticky;top:0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900}.brand img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+main{max-width:1100px;margin:32px auto;padding:0 18px 60px}.eyebrow{color:#f5a623;font-size:11px;font-weight:900;letter-spacing:1.4px}
+h1{font-size:40px;margin:8px 0}.muted{color:#8e98a7}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}
+.stat,.panel{background:#10151e;border:1px solid #29313d;border-radius:16px}.stat{padding:18px}.stat strong{display:block;font-size:26px;color:#f5a623}.stat span{font-size:11px;color:#8e98a7}
+.panel{padding:20px;margin-top:18px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+button,input{font:inherit}.btn{border:0;border-radius:10px;padding:11px 14px;font-weight:800;cursor:pointer;background:#f5a623;color:#111}.btn.secondary{background:#171e29;color:#fff;border:1px solid #344052}
+.search{width:320px;max-width:100%;padding:12px;border-radius:10px;border:1px solid #344052;background:#090d14;color:#fff}
+.users{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.user{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #2b3441;border-radius:14px;background:#0a0f16}
+.avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#f5a623;color:#111;font-weight:900;overflow:hidden;flex:0 0 48px}.avatar img{width:100%;height:100%;object-fit:cover}
+.user-main{min-width:0;flex:1}.user-main strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.user-main span{display:block;font-size:10px;color:#8792a1;margin-top:4px}
+.detail-card{padding:16px;border:1px solid #2b3441;border-radius:14px;background:#0a0f16}.orders{display:grid;gap:10px;margin-top:14px}.order{padding:13px;border:1px solid #2b3441;border-radius:12px;background:#0c1118}.order h3{margin:0 0 5px;font-size:14px}.order p{margin:0;color:#8792a1;font-size:11px}
+#gate{text-align:center;padding:80px 15px}.error{color:#ff9292}.ok{color:#7ee0b5}
+@media(max-width:760px){.stats{grid-template-columns:1fr 1fr}.users{grid-template-columns:1fr}.panel-head{align-items:stretch;flex-direction:column}.search{width:100%}h1{font-size:32px}}
+</style>
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><img src="Emblema%20Nexora%20Store%20SF%20con%20corona.png" alt="">NEXORA MVP</a>
+<a class="btn secondary" href="perfil.html">Mi perfil</a>
+</header>
+<main>
+<section id="gate">
+<div class="eyebrow">ACCESO MVP</div>
+<h1>Verificando acceso…</h1>
+<p class="muted" id="gateText">Espera un momento.</p>
+</section>
+
+<section id="dashboard" hidden>
+<div class="eyebrow">ADMINISTRACIÓN NEXORA</div>
+<h1>Panel MVP</h1>
+<p class="muted">Resumen de miembros y pedidos registrados en NEXORA.</p>
+
+<div class="stats">
+<div class="stat"><strong id="usersCount">0</strong><span>Usuarios registrados</span></div>
+<div class="stat"><strong id="ordersCount">0</strong><span>Pedidos registrados</span></div>
+<div class="stat"><strong id="pendingCount">0</strong><span>Pendientes</span></div>
+<div class="stat"><strong id="salesTotal">S/ 0.00</strong><span>Ventas completadas</span></div>
+</div>
+
+<section class="panel">
+<div class="panel-head">
+<div><h2>Miembros</h2><div class="muted" id="usersStatus">Cargando…</div></div>
+<input id="search" class="search" type="search" placeholder="Buscar usuario">
+</div>
+<div class="users" id="users"></div>
+</section>
+
+<section class="panel" id="detailPanel" hidden>
+<div class="panel-head">
+<h2>Perfil seleccionado</h2>
+<button class="btn secondary" id="closeDetail" type="button">Cerrar</button>
+</div>
+<div id="profileDetail"></div>
+<div class="orders" id="orders"></div>
+</section>
+
+<p id="message"></p>
+</section>
+</main>
+
+<script type="module">
+import { auth } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+const MVP_EMAILS=new Set(["nexora.store.sf@gmail.com","stiven20eduu@gmail.com"]);
+const db=getFirestore(auth.app);
+const gate=document.getElementById("gate");
+const dashboard=document.getElementById("dashboard");
+const usersBox=document.getElementById("users");
+const search=document.getElementById("search");
+const detailPanel=document.getElementById("detailPanel");
+const profileDetail=document.getElementById("profileDetail");
+const ordersBox=document.getElementById("orders");
+let members=[];
+
+function isMvp(user){return !!user?.email&&MVP_EMAILS.has(user.email.toLowerCase())}
+function initials(name){return String(name||"N").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()||"N"}
+function money(v){return "S/ "+Number(v||0).toFixed(2)}
+function dateText(v){if(!v)return "Sin fecha";const d=new Date(v);return Number.isNaN(d.getTime())?"Sin fecha":d.toLocaleDateString("es-PE")}
+
+async function loadMember(snap){
+ const uid=snap.id,data=snap.data()||{};
+ const [profile,orders]=await Promise.all([
+   getDoc(doc(db,"users",uid,"profile","main")),
+   getDocs(collection(db,"users",uid,"orders"))
+ ]);
+ return {uid,name:data.displayName||"Usuario NEXORA",joinedAt:data.joinedAt||"",photo:profile.data()?.photo||"",orders:orders.docs.map(x=>({id:x.id,...x.data()}))};
+}
+
+function avatar(name,photo){
+ const el=document.createElement("div");el.className="avatar";
+ if(photo&&/^data:image\/jpeg;base64,/.test(photo)){const img=document.createElement("img");img.src=photo;img.alt="";el.append(img)}
+ else el.textContent=initials(name);
+ return el;
+}
+
+function renderStats(){
+ const all=members.flatMap(m=>m.orders);
+ const pending=all.filter(o=>!["completed","cancelled"].includes(o.status)).length;
+ const total=all.filter(o=>o.status==="completed").reduce((s,o)=>s+Number(o.price||0),0);
+ document.getElementById("usersCount").textContent=members.length;
+ document.getElementById("ordersCount").textContent=all.length;
+ document.getElementById("pendingCount").textContent=pending;
+ document.getElementById("salesTotal").textContent=money(total);
+}
+
+function renderUsers(){
+ const q=search.value.trim().toLowerCase();
+ const list=members.filter(m=>m.name.toLowerCase().includes(q));
+ usersBox.replaceChildren();
+ for(const m of list){
+   const card=document.createElement("article");card.className="user";
+   const main=document.createElement("div");main.className="user-main";
+   const name=document.createElement("strong");name.textContent=m.name;
+   const meta=document.createElement("span");meta.textContent="Desde "+dateText(m.joinedAt)+" · "+m.orders.length+" pedido(s)";
+   main.append(name,meta);
+   const btn=document.createElement("button");btn.className="btn secondary";btn.type="button";btn.textContent="Ver perfil";btn.addEventListener("click",()=>showMember(m.uid));
+   card.append(avatar(m.name,m.photo),main,btn);usersBox.append(card);
+ }
+ document.getElementById("usersStatus").textContent=list.length+" de "+members.length+" usuarios";
+}
+
+function showMember(uid){
+ const m=members.find(x=>x.uid===uid);if(!m)return;
+ profileDetail.replaceChildren();ordersBox.replaceChildren();
+ const box=document.createElement("div");box.className="detail-card";
+ const title=document.createElement("h2");title.textContent=m.name;
+ const meta=document.createElement("p");meta.className="muted";meta.textContent="Miembro desde "+dateText(m.joinedAt)+" · "+m.orders.length+" pedido(s)";
+ box.append(title,meta);profileDetail.append(box);
+ for(const o of m.orders){
+   const item=document.createElement("article");item.className="order";
+   const h=document.createElement("h3");h.textContent=(o.game||"Juego")+" · "+(o.product||"Producto");
+   const p=document.createElement("p");const d=o.createdAt?.toDate?.();p.textContent=money(o.price)+" · "+(o.status||"pending")+(d?" · "+d.toLocaleString("es-PE"):"");
+   item.append(h,p);ordersBox.append(item);
+ }
+ if(!m.orders.length){const p=document.createElement("p");p.className="muted";p.textContent="Este usuario todavía no tiene pedidos registrados.";ordersBox.append(p)}
+ detailPanel.hidden=false;detailPanel.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+async function load(){
+ const snap=await getDocs(collection(db,"users"));
+ members=[];
+ for(const s of snap.docs)members.push(await loadMember(s));
+ renderStats();renderUsers();
+}
+
+search.addEventListener("input",renderUsers);
+document.getElementById("closeDetail").addEventListener("click",()=>detailPanel.hidden=true);
+
+onAuthStateChanged(auth,async user=>{
+ if(!user){location.replace("login.html");return}
+ if(!isMvp(user)){document.querySelector("#gate h1").textContent="Acceso no autorizado";document.getElementById("gateText").textContent="Esta cuenta no tiene permisos MVP.";document.getElementById("gateText").className="error";return}
+ gate.hidden=true;dashboard.hidden=false;
+ try{await load();document.getElementById("message").textContent="Panel actualizado.";document.getElementById("message").className="ok"}
+ catch(e){console.error(e);document.getElementById("message").textContent="No se pudieron cargar los datos. Verifica las reglas de Firestore.";document.getElementById("message").className="error"}
+});
+</script>
+</body>
+</html>
