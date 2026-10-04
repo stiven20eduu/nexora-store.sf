@@ -384,7 +384,7 @@ button{cursor:pointer}
     <div class="eyebrow">FINALIZAR COMPRA</div>
     <h1>Completa tu pago con Yape</h1>
     <p>
-      Revisa tu pedido, yapea exactamente el total mostrado y adjunta una captura de tu comprobante.
+      Revisa tu pedido, yapea exactamente el total mostrado y luego escríbenos por WhatsApp para enviar el comprobante.
     </p>
   </div>
 
@@ -401,7 +401,7 @@ button{cursor:pointer}
         <div class="steps">
           <div class="step active"><b>1</b> Pedido</div>
           <div class="step active"><b>2</b> Yape</div>
-          <div class="step"><b>3</b> Comprobante</div>
+          <div class="step"><b>3</b> WhatsApp</div>
         </div>
 
         <div class="order-box">
@@ -473,33 +473,25 @@ button{cursor:pointer}
           <strong id="payAmount">S/ 0.00</strong>
         </div>
 
-        <h3 class="upload-title">Adjunta tu comprobante</h3>
+        <h3 class="upload-title">Envía tu comprobante por WhatsApp</h3>
 
         <p class="upload-desc">
-          Elige una captura donde se vean claramente el monto y la operación.
+          Después de realizar el Yape, pulsa el botón. Se abrirá nuestro WhatsApp con los datos de tu pedido listos. Allí envía la captura de tu comprobante.
         </p>
 
-        <label class="upload-box">
-          <input
-            type="file"
-            id="proofInput"
-            accept="image/png,image/jpeg,image/webp"
-          >
-
-          <div class="upload-placeholder" id="uploadPlaceholder">
-            <b>📷 Elegir comprobante</b>
-            PNG, JPG o WEBP
+        <div class="upload-box" style="min-height:105px;cursor:default;">
+          <div class="upload-placeholder">
+            <b>💬 Último paso</b>
+            Escríbenos por WhatsApp y envía tu comprobante en el chat.
           </div>
+        </div>
 
-          <img id="proofPreview" alt="Vista previa del comprobante">
-        </label>
-
-        <button class="whatsapp-btn" id="sendWhatsApp" disabled>
-          Adjunta tu comprobante
+        <button class="whatsapp-btn" id="sendWhatsApp">
+          Escribir por WhatsApp y enviar comprobante
         </button>
 
         <p class="help">
-          En celulares compatibles intentaremos enviar el comprobante y el mensaje juntos. Si tu navegador no lo permite, se abrirá WhatsApp con el mensaje listo y solo tendrás que adjuntar la captura.
+          El comprobante ya no se sube a la página. Debes enviarlo directamente por WhatsApp para que podamos revisar tu pago.
         </p>
 
       </div>
@@ -785,113 +777,31 @@ document.getElementById(
 );
 
 
-const proofInput =
-  document.getElementById(
-    "proofInput"
-  );
-
-const proofPreview =
-  document.getElementById(
-    "proofPreview"
-  );
-
-const uploadPlaceholder =
-  document.getElementById(
-    "uploadPlaceholder"
-  );
-
 const sendWhatsApp =
   document.getElementById(
     "sendWhatsApp"
   );
 
 
-proofInput.addEventListener(
-  "change",
-  function(){
-
-    const file =
-      this.files &&
-      this.files[0];
-
-    if(!file){
-      return;
-    }
-
-    if(
-      !file.type.startsWith(
-        "image/"
-      )
-    ){
-
-      alert(
-        "Selecciona una imagen válida."
-      );
-
-      this.value = "";
-
-      return;
-    }
-
-    if(
-      file.size >
-      8 * 1024 * 1024
-    ){
-
-      alert(
-        "La imagen es demasiado grande. Máximo 8 MB."
-      );
-
-      this.value = "";
-
-      return;
-    }
-
-    const url =
-      URL.createObjectURL(
-        file
-      );
-
-    proofPreview.src =
-      url;
-
-    proofPreview.style.display =
-      "block";
-
-    uploadPlaceholder.style.display =
-      "none";
-
-    sendWhatsApp.disabled =
-      false;
-
-    sendWhatsApp.textContent =
-      "Enviar comprobante + pedido";
-
-  }
-);
-
-
 sendWhatsApp.addEventListener(
   "click",
-  async function(){
+  function(){
 
-    if(
-      !order ||
-      !proofInput.files ||
-      !proofInput.files[0]
-    ){
+    if(!order){
       return;
     }
 
 
     if (!order.historyId) {
       order.historyId = crypto.randomUUID();
-      sessionStorage.setItem("nexoraOrder", JSON.stringify(order));
+      sessionStorage.setItem(
+        "nexoraOrder",
+        JSON.stringify(order)
+      );
     }
-    // Guarda solo un pedido pendiente; WhatsApp no confirma pagos ni entregas.
+
+    // Guarda el pedido como pendiente en el historial si el usuario inició sesión.
     window.saveNexoraOrder(order);
-    const proofFile =
-      proofInput.files[0];
 
 
     const lines = [
@@ -935,68 +845,13 @@ sendWhatsApp.addEventListener(
       Number(order.price).toFixed(2),
       "PAGO: YAPE",
       "",
-      "COMPROBANTE ADJUNTO."
+      "COMPROBANTE: lo enviaré en este chat."
     );
 
 
-    const plainMessage =
-      lines.join("\n");
-
-
-    /*
-      En celulares/navegadores compatibles usamos Web Share:
-      permite compartir la imagen del comprobante junto al texto.
-      El usuario elige WhatsApp y el chat de destino.
-    */
-
-    try{
-
-      if(
-        navigator.share &&
-        navigator.canShare &&
-        navigator.canShare({
-          files:[proofFile]
-        })
-      ){
-
-        await navigator.share({
-          title:
-            "NUEVO PEDIDO NEXORA STORE",
-
-          text:
-            plainMessage,
-
-          files:
-            [proofFile]
-        });
-
-        return;
-      }
-
-    }
-    catch(error){
-
-      /*
-        Si el usuario cancela o el navegador no permite
-        compartir archivos, continuamos con el plan B.
-      */
-
-    }
-
-
-    /*
-      PLAN B:
-      WhatsApp no permite que una web adjunte automáticamente
-      un archivo local mediante wa.me. Abrimos el chat con el
-      mensaje ya escrito para que solo se adjunte la captura.
-    */
-
     const message =
       encodeURIComponent(
-        plainMessage.replace(
-          "COMPROBANTE ADJUNTO.",
-          "COMPROBANTE: adjuntaré la captura en este chat."
-        )
+        lines.join("\n")
       );
 
 
@@ -1007,7 +862,8 @@ sendWhatsApp.addEventListener(
 
     window.open(
       url,
-      "_blank"
+      "_blank",
+      "noopener,noreferrer"
     );
 
   }
