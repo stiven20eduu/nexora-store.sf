@@ -1,4 +1,4 @@
-const CACHE_NAME = "nexora-store-v2";
+const CACHE_NAME = "nexora-store-v3";
 
 const APP_SHELL = [
   "./",
