@@ -499,7 +499,7 @@ button{cursor:pointer}
         </button>
 
         <p class="help">
-          Al continuar se abrirá WhatsApp con el resumen del pedido. Adjunta allí la misma captura del comprobante para enviarla a NEXORA.
+          En celulares compatibles intentaremos enviar el comprobante y el mensaje juntos. Si tu navegador no lo permite, se abrirá WhatsApp con el mensaje listo y solo tendrás que adjuntar la captura.
         </p>
 
       </div>
@@ -840,7 +840,7 @@ proofInput.addEventListener(
       false;
 
     sendWhatsApp.textContent =
-      "Enviar pedido por WhatsApp";
+      "Enviar comprobante + pedido";
 
   }
 );
@@ -848,7 +848,7 @@ proofInput.addEventListener(
 
 sendWhatsApp.addEventListener(
   "click",
-  function(){
+  async function(){
 
     if(
       !order ||
@@ -858,47 +858,120 @@ sendWhatsApp.addEventListener(
       return;
     }
 
-    const orderCode =
-      "NX-" +
-      Date.now()
-        .toString()
-        .slice(-8);
+
+    const proofFile =
+      proofInput.files[0];
+
 
     const lines = [
-      "🛒 NUEVO PEDIDO NEXORA",
+      "NUEVO PEDIDO NEXORA STORE",
       "",
-      "Código: " + orderCode,
-      "Juego: " + order.game,
-      "Producto: " + order.product,
-      "Total: S/ " + Number(order.price).toFixed(2)
+      "JUEGO: " + order.game,
+      "PRODUCTO: " + order.product
     ];
 
+
     if(order.playerId){
+
+      let accountData =
+        order.playerId;
+
+      if(order.serverId){
+        accountData +=
+          " | SERVER ID: " +
+          order.serverId;
+      }
+
       lines.push(
-        "ID: " + order.playerId
+        "ID / DATOS DE LA CUENTA: " +
+        accountData
       );
+
+    }
+    else if(order.serverId){
+
+      lines.push(
+        "DATOS DE LA CUENTA: SERVER ID " +
+        order.serverId
+      );
+
     }
 
-    if(order.serverId){
-      lines.push(
-        "Server ID: " + order.serverId
-      );
-    }
 
     lines.push(
+      "TOTAL: S/ " +
+      Number(order.price).toFixed(2),
+      "PAGO: YAPE",
       "",
-      "Pago realizado por Yape.",
-      "Adjuntaré mi comprobante en este chat."
+      "COMPROBANTE ADJUNTO."
     );
+
+
+    const plainMessage =
+      lines.join("\n");
+
+
+    /*
+      En celulares/navegadores compatibles usamos Web Share:
+      permite compartir la imagen del comprobante junto al texto.
+      El usuario elige WhatsApp y el chat de destino.
+    */
+
+    try{
+
+      if(
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({
+          files:[proofFile]
+        })
+      ){
+
+        await navigator.share({
+          title:
+            "NUEVO PEDIDO NEXORA STORE",
+
+          text:
+            plainMessage,
+
+          files:
+            [proofFile]
+        });
+
+        return;
+      }
+
+    }
+    catch(error){
+
+      /*
+        Si el usuario cancela o el navegador no permite
+        compartir archivos, continuamos con el plan B.
+      */
+
+    }
+
+
+    /*
+      PLAN B:
+      WhatsApp no permite que una web adjunte automáticamente
+      un archivo local mediante wa.me. Abrimos el chat con el
+      mensaje ya escrito para que solo se adjunte la captura.
+    */
 
     const message =
       encodeURIComponent(
-        lines.join("\n")
+        plainMessage.replace(
+          "COMPROBANTE ADJUNTO.",
+          "COMPROBANTE: adjuntaré la captura en este chat."
+        )
       );
+
 
     const url =
       "https://wa.me/51992515200?text=" +
       message;
+
 
     window.open(
       url,
@@ -907,6 +980,7 @@ sendWhatsApp.addEventListener(
 
   }
 );
+
 </script>
 
 </body>
