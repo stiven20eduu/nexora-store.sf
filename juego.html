@@ -14,7 +14,7 @@
 <link
   rel="icon"
   type="image/png"
-  href="nexora-logo.png"
+  href="nexora-logo.png?v=2"
 >
 
 <style>
@@ -135,10 +135,21 @@ a{
 }
 
 .brand img{
-  width:44px;
-  height:44px;
+  width:50px;
+  height:50px;
+  object-fit:cover;
+  border-radius:50%;
+  background:#05070a;
+  border:1px solid rgba(255,45,45,.38);
+  box-shadow:
+    0 0 0 3px rgba(255,35,35,.05),
+    0 0 18px rgba(255,25,25,.24);
+  transition:.25s ease;
+}
 
-  object-fit:contain;
+.brand:hover img{
+  transform:scale(1.05);
+  border-color:rgba(255,70,70,.7);
 }
 
 .brand-name{
@@ -1322,7 +1333,7 @@ a{
     >
 
       <img
-        src="nexora-logo.png"
+        src="nexora-logo.png?v=2"
         alt="NEXORA STORE"
       >
 
@@ -2522,7 +2533,7 @@ function getProductImage(categoryName, productName){
   }
 
 
-  return "nexora-logo.png";
+  return "nexora-logo.png?v=2";
 }
 
 
