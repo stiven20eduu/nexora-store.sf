@@ -162,7 +162,23 @@
     .login-link a:hover {
       text-decoration: underline;
     }
-  </style>
+  
+    /* Mostrar u ocultar la contraseña */
+    .password-field { position: relative; }
+    .password-field input { display: block; padding-right: 54px; margin-bottom: 0; }
+    .password-toggle {
+      position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+      width: 44px; height: 44px; padding: 0; border: 0; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent; color: #b8beca; cursor: pointer;
+    }
+    .password-toggle:hover { color: white; background: rgba(255,255,255,.06); }
+    .password-toggle:focus-visible { outline: 2px solid #b8beca; outline-offset: -2px; }
+    .password-toggle .eye-slash { display: none; }
+    .password-toggle[aria-pressed="true"] .eye-slash { display: block; }
+    .password-field input::-ms-reveal { display: none; }
+    .password-field { margin-bottom: 17px; }
+</style>
 </head>
 
 <body>
@@ -195,21 +211,27 @@
 
     <!-- Contraseña -->
     <label for="password">Contraseña</label>
-    <input
+    <div class="password-field">
+<input
       type="password"
       id="password"
       placeholder="Mínimo 6 caracteres"
       autocomplete="new-password"
     >
+<button type="button" class="password-toggle" aria-controls="password" aria-label="Mostrar contraseña" title="Mostrar contraseña" aria-pressed="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m3 3 18 18"/></svg></button>
+</div>
 
     <!-- Confirmar contraseña -->
     <label for="confirmPassword">Confirmar contraseña</label>
-    <input
+    <div class="password-field">
+<input
       type="password"
       id="confirmPassword"
       placeholder="Repite tu contraseña"
       autocomplete="new-password"
     >
+<button type="button" class="password-toggle" aria-controls="confirmPassword" aria-label="Mostrar confirmación de contraseña" title="Mostrar confirmación de contraseña" aria-pressed="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m3 3 18 18"/></svg></button>
+</div>
 
     <!-- Crear cuenta -->
     <button class="btn register-btn" id="registerBtn">
@@ -491,6 +513,22 @@
 
     });
 
+  </script>
+
+
+  <script>
+    document.querySelectorAll(".password-toggle").forEach((button) => {
+      const input = document.getElementById(button.getAttribute("aria-controls"));
+      button.addEventListener("click", () => {
+        const show = input.type === "password";
+        input.type = show ? "text" : "password";
+        button.setAttribute("aria-pressed", String(show));
+        const label = (show ? "Ocultar " : "Mostrar ") +
+          (input.id === "confirmPassword" ? "confirmación de contraseña" : "contraseña");
+        button.setAttribute("aria-label", label);
+        button.title = label;
+      });
+    });
   </script>
 
 </body>
