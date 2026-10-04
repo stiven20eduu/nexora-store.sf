@@ -3,434 +3,792 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NEXORA STORE</title>
-<link rel="icon" type="image/png" href="nexora-logo.png">
+
+  <title>NEXORA STORE - Recargas de videojuegos</title>
+  <link rel="icon" type="image/png" href="nexora-logo.png">
+
   <style>
+    :root {
+      --bg: #080a10;
+      --bg2: #0d1018;
+      --card: #11141d;
+      --border: #292f3a;
+      --text: #ffffff;
+      --muted: #9299a7;
+      --orange: #f5a623;
+      --orange2: #ffb52e;
+      --green: #22d3a0;
+    }
+
     * {
-      box-sizing: border-box;
-      margin: 0;  
+      margin: 0;
       padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
+      background:
+        radial-gradient(circle at top right, rgba(245,166,35,.06), transparent 30%),
+        var(--bg);
+      color: var(--text);
       font-family: Arial, Helvetica, sans-serif;
-      background: #090b12;
-      color: white;
+      min-height: 100vh;
     }
 
     a {
-      text-decoration: none;
       color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
     }
 
     /* =========================
        NAVBAR
-    ========================== */
+    ========================= */
 
-.navbar {
-  height: 68px;
-  background: #0b0d12;
-  border-bottom: 1px solid #252933;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 7%;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      background: rgba(13,16,24,.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
 
-.logo-area {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  font-weight: 800;
-  font-size: 20px;
-  color: #ffffff;
-}
+    .nav-inner {
+      width: min(1450px, calc(100% - 40px));
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
 
-.logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  flex-shrink: 0;
-  border: 1px solid #303540;
-}
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .brand strong {
+      font-size: 15px;
+      letter-spacing: .3px;
+    }
+
     .nav-actions {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .country {
-      padding: 10px 14px;
-      border: 1px solid #303541;
+    .country-btn {
+      border: 1px solid var(--border);
+      background: #131720;
+      color: #fff;
+      padding: 10px 13px;
       border-radius: 10px;
-      background: #121620;
+      cursor: pointer;
+    }
+
+    .login-link {
+      color: #c6cad3;
+      padding: 10px 12px;
+      font-weight: 700;
       font-size: 14px;
     }
 
-    .login {
-      color: #ddd;
-      padding: 10px 14px;
-      font-weight: 600;
-    }
-
-    .signup {
-      background: #f4aa32;
+    .register-link {
+      background: var(--orange);
       color: #111;
-      padding: 12px 18px;
+      padding: 11px 18px;
       border-radius: 10px;
       font-weight: 800;
+      font-size: 14px;
+      transition: .2s;
+    }
+
+    .register-link:hover {
+      background: var(--orange2);
+      transform: translateY(-1px);
     }
 
     /* =========================
-       COMPRAS RECIENTES
-    ========================== */
+       TICKER
+    ========================= */
 
     .ticker {
-      height: 34px;
-      background: #070910;
-      border-bottom: 1px solid #1f2330;
+      height: 30px;
       overflow: hidden;
-      display: flex;
-      align-items: center;
+      white-space: nowrap;
+      background: #07090e;
+      border-bottom: 1px solid #171b23;
     }
 
-.welcome-message {
-  width: 100%;
-  text-align: center;
-  color: #d9dde5;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: .3px;
-}
+    .ticker-track {
+      display: inline-flex;
+      align-items: center;
+      min-width: max-content;
+      height: 100%;
+      animation: tickerMove 26s linear infinite;
+    }
 
-.welcome-dot {
-  color: #f4aa32;
-  margin-right: 8px;
-}
+    .ticker-item {
+      color: #969daa;
+      font-size: 11px;
+      margin-right: 55px;
+    }
 
-.welcome-separator {
-  color: #596171;
-  margin: 0 12px;
-}
+    .ticker-item strong {
+      color: #cbd0da;
+    }
+
+    @keyframes tickerMove {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
     /* =========================
        HERO
-    ========================== */
+    ========================= */
 
-    .container {
-      width: 86%;
-      max-width: 1250px;
-      margin: auto;
+    .hero-wrap {
+      width: min(1410px, calc(100% - 44px));
+      margin: 24px auto 0;
     }
 
     .hero {
-      margin-top: 30px;
-      min-height: 410px;
-      border-radius: 22px;
-      overflow: hidden;
       position: relative;
-      background:
-        radial-gradient(circle at 80% 20%, rgba(255, 150, 40, .25), transparent 35%),
-        linear-gradient(110deg, #080a10 15%, #171a24 48%, #30343e 100%);
-      border: 1px solid #2b303c;
+      height: 458px;
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid #2b303a;
+      background: #10131b;
     }
 
-    .hero::after {
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .7s ease;
+    }
+
+    .hero-slide.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .hero-slide img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-slide::after {
       content: "";
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(90deg, rgba(7,9,14,.98) 0%, rgba(7,9,14,.78) 38%, rgba(7,9,14,.10) 75%),
-        repeating-linear-gradient(
-          135deg,
-          transparent 0,
-          transparent 50px,
-          rgba(255,255,255,.025) 51px,
-          transparent 52px
+        linear-gradient(
+          90deg,
+          rgba(4,6,10,.98) 0%,
+          rgba(4,6,10,.88) 30%,
+          rgba(4,6,10,.50) 58%,
+          rgba(4,6,10,.05) 100%
         );
-      pointer-events: none;
     }
 
     .hero-content {
       position: relative;
       z-index: 2;
-      padding: 70px 60px;
-      max-width: 680px;
+      height: 100%;
+      width: min(650px, 60%);
+      padding: 70px 55px;
     }
 
-    .badge {
+    .hero-badge {
       display: inline-block;
-      background: #f4aa32;
-      color: #17100a;
-      padding: 7px 13px;
-      border-radius: 999px;
-      font-size: 12px;
+      background: var(--orange);
+      color: #111;
+      font-size: 11px;
       font-weight: 900;
-      margin-bottom: 18px;
+      padding: 8px 13px;
+      border-radius: 30px;
+      margin-bottom: 15px;
     }
 
-    .hero h1 {
-      font-size: clamp(42px, 6vw, 70px);
-      margin-bottom: 10px;
-      letter-spacing: -2px;
+    .hero-content h1 {
+      font-size: clamp(42px, 5vw, 72px);
+      line-height: .95;
+      margin-bottom: 12px;
     }
 
-    .hero .subtitle {
-      color: #f4aa32;
-      font-size: 19px;
+    .hero-subtitle {
+      color: var(--orange);
+      font-size: 18px;
       font-weight: 800;
-      margin-bottom: 14px;
+      margin-bottom: 13px;
     }
 
-    .hero p {
-      color: #c9ced8;
-      font-size: 17px;
-      line-height: 1.6;
-      margin-bottom: 25px;
+    .hero-description {
+      color: #d7dbe2;
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 600px;
     }
 
-    .features {
+    .hero-points {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 28px;
+      gap: 10px 25px;
+      margin-top: 20px;
+      max-width: 570px;
     }
 
-    .feature {
-      color: #d9dde5;
-      font-size: 14px;
+    .hero-points span {
+      font-size: 13px;
+      color: #e2e5eb;
     }
 
-    .feature span {
-      color: #27d98b;
-      margin-right: 7px;
+    .hero-points span::first-letter {
+      color: var(--green);
     }
 
-    .hero-btn {
-      display: inline-block;
-      padding: 15px 23px;
-      background: #f4aa32;
+    .hero-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 24px;
+      background: var(--orange);
       color: #111;
-      border-radius: 11px;
+      padding: 14px 20px;
+      border-radius: 10px;
       font-weight: 900;
+      border: 0;
+      cursor: pointer;
       transition: .2s;
     }
 
-    .hero-btn:hover {
+    .hero-button:hover {
+      background: var(--orange2);
       transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(244,170,50,.25);
+    }
+
+    .hero-controls {
+      position: absolute;
+      z-index: 5;
+      right: 20px;
+      bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(5,7,10,.7);
+      border: 1px solid rgba(245,166,35,.35);
+      padding: 8px 12px;
+      border-radius: 30px;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-arrow {
+      background: transparent;
+      border: 0;
+      color: #fff;
+      cursor: pointer;
+      font-size: 22px;
+      width: 24px;
+    }
+
+    .hero-dot {
+      width: 8px;
+      height: 8px;
+      background: #555c69;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 0;
+    }
+
+    .hero-dot.active {
+      width: 18px;
+      border-radius: 10px;
+      background: var(--orange);
     }
 
     /* =========================
-       SEARCH
-    ========================== */
+       SEARCH + FILTER
+    ========================= */
 
-    .search-row {
-      margin-top: 24px;
+    .catalog-toolbar {
+      width: min(1410px, calc(100% - 44px));
+      margin: 30px auto 0;
+      padding-bottom: 13px;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      gap: 15px;
-      border-bottom: 1px solid #272c38;
-      padding-bottom: 22px;
+      justify-content: space-between;
+      gap: 20px;
     }
 
-    .search {
-      flex: 1;
+    .search-box {
+      width: 320px;
       position: relative;
     }
 
-    .search input {
-      width: 100%;
-      height: 48px;
-      border-radius: 11px;
-      border: 1px solid #2b313e;
-      background: #111521;
-      color: white;
-      padding: 0 18px 0 46px;
-      outline: none;
-      font-size: 14px;
+    .search-box span {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #8c94a2;
     }
 
-    .search-icon {
-      position: absolute;
-      left: 17px;
-      top: 14px;
-      color: #8d94a4;
+    .search-box input {
+      width: 100%;
+      background: #121620;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 12px 14px 12px 38px;
+      outline: none;
+      border-radius: 9px;
+    }
+
+    .search-box input:focus {
+      border-color: var(--orange);
     }
 
     .filters {
       display: flex;
-      gap: 8px;
+      align-items: center;
+      gap: 7px;
     }
 
-    .filter {
-      border: 1px solid #2d3340;
-      background: #111521;
-      color: #aeb5c3;
-      padding: 11px 15px;
+    .filter-btn {
+      border: 1px solid var(--border);
+      background: #121620;
+      color: #9da4b1;
+      padding: 9px 13px;
       border-radius: 9px;
       cursor: pointer;
-      font-weight: 700;
+      font-size: 12px;
     }
 
-    .filter.active {
-      background: #f4aa32;
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: var(--orange);
+      border-color: var(--orange);
       color: #111;
-      border-color: #f4aa32;
+      font-weight: 800;
+    }
+
+    .game-count {
+      color: #7f8795;
+      font-size: 12px;
     }
 
     /* =========================
-       CATALOGO
-    ========================== */
+       SECTION
+    ========================= */
 
-    .section-title {
-      margin: 30px 0 18px;
-      font-size: 18px;
-      font-weight: 900;
+    .section {
+      width: min(1410px, calc(100% - 44px));
+      margin: 34px auto 0;
     }
 
-    .section-title span {
-      color: #f4aa32;
-    }
-
-    .catalog {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-      padding-bottom: 50px;
-    }
-
-    .card {
-      background: #111521;
-      border: 1px solid #272d39;
-      border-radius: 15px;
-      overflow: hidden;
-      transition: .2s;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-      border-color: #f4aa32;
-    }
-
-    .card-image {
-      height: 180px;
+    .section-head {
       display: flex;
-      align-items: flex-end;
-      padding: 18px;
-      font-size: 24px;
+      align-items: end;
+      justify-content: space-between;
+      margin-bottom: 17px;
+    }
+
+    .section-title small {
+      display: inline-block;
+      color: var(--orange);
       font-weight: 900;
-      background: linear-gradient(135deg, #172039, #10131b);
+      font-size: 10px;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
     }
 
-    .freefire {
-      background: linear-gradient(135deg, #151515, #47200d, #e85a11);
+    .section-title h2 {
+      font-size: 29px;
     }
 
-    .roblox {
-      background: linear-gradient(135deg, #101010, #263e1c, #52a93e);
+    .section-title p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
     }
 
-    .bloodstrike {
-      background: linear-gradient(135deg, #101216, #243446, #8b9ba8);
+    /* =========================
+       HORIZONTAL GAMES
+    ========================= */
+
+    .games-viewport {
+      overflow: hidden;
+      width: 100%;
     }
 
-    .mobilelegends {
-      background: linear-gradient(135deg, #131523, #3b4165, #7e9fe0);
+    .games-track {
+      display: flex;
+      gap: 18px;
+      width: max-content;
+      transition: transform .65s cubic-bezier(.22,.61,.36,1);
     }
 
-    .card-body {
-      padding: 16px;
+    .game-card {
+      position: relative;
+      width: 430px;
+      min-width: 430px;
+      height: 290px;
+      overflow: hidden;
+      border-radius: 19px;
+      border: 1px solid var(--border);
+      background: #11141a;
+      transition: .25s;
     }
 
-    .card-body h3 {
+    .game-card:hover {
+      border-color: var(--orange);
+      transform: translateY(-4px);
+    }
+
+    .game-card img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .game-card-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(
+          90deg,
+          rgba(3,5,8,.97),
+          rgba(3,5,8,.80) 40%,
+          rgba(3,5,8,.18) 100%
+        );
+    }
+
+    .game-card-content {
+      position: relative;
+      z-index: 2;
+      padding: 25px;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .game-tag {
+      background: var(--orange);
+      color: #111;
+      padding: 6px 11px;
+      border-radius: 30px;
+      font-size: 10px;
+      font-weight: 900;
+      margin-bottom: 11px;
+    }
+
+    .game-card-content h3 {
+      font-size: 32px;
       margin-bottom: 7px;
     }
 
-    .card-body p {
-      color: #9299a8;
+    .game-card-content h4 {
+      color: var(--orange);
       font-size: 13px;
-      margin-bottom: 15px;
+      margin-bottom: 9px;
     }
 
-    .card-btn {
-      display: block;
-      text-align: center;
-      background: #1b202d;
-      border: 1px solid #303747;
-      padding: 11px;
-      border-radius: 9px;
-      font-weight: 800;
-      font-size: 14px;
+    .game-card-content p {
+      width: 92%;
+      color: #d4d8e0;
+      line-height: 1.45;
+      font-size: 11.5px;
     }
 
-    .card-btn:hover {
-      background: #f4aa32;
+    .game-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px 15px;
+      margin-top: 12px;
+    }
+
+    .game-features span {
+      color: #dce0e7;
+      font-size: 10.5px;
+    }
+
+    .game-card-button {
+      margin-top: auto;
+      border: 0;
+      background: var(--orange);
       color: #111;
-      border-color: #f4aa32;
+      font-weight: 900;
+      font-size: 11px;
+      padding: 11px 14px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .slider-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .slider-control {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: #121620;
+      color: #fff;
+      cursor: pointer;
+      font-size: 22px;
+    }
+
+    .slider-control:hover {
+      background: var(--orange);
+      color: #111;
+    }
+
+    /* =========================
+       PRODUCTOS
+    ========================= */
+
+    .products-section {
+      margin-top: 50px;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .product-card {
+      background: linear-gradient(145deg, #121620, #0e1118);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 19px;
+      transition: .2s;
+    }
+
+    .product-card:hover {
+      border-color: #444b58;
+      transform: translateY(-3px);
+    }
+
+    .product-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .product-game {
+      color: #aeb4c0;
+      font-size: 11px;
+    }
+
+    .product-name {
+      margin-top: 8px;
+      font-size: 18px;
+    }
+
+    .product-description {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .product-bottom {
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .product-price {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--orange);
+    }
+
+    .buy-btn {
+      border: 0;
+      background: var(--orange);
+      color: #111;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 10px 13px;
+      border-radius: 9px;
+      cursor: pointer;
     }
 
     /* =========================
        FOOTER
-    ========================== */
+    ========================= */
 
     footer {
-      border-top: 1px solid #272c37;
-      background: #070910;
-      padding: 30px 7%;
-      color: #7f8797;
-      text-align: center;
-      font-size: 13px;
+      margin-top: 70px;
+      border-top: 1px solid var(--border);
+      padding: 35px 22px;
+      background: #06080d;
+    }
+
+    .footer-inner {
+      width: min(1410px, 100%);
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .footer-brand {
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .footer-text {
+      color: #707887;
+      font-size: 12px;
+    }
+
+    .support {
+      color: var(--orange);
+      font-weight: 800;
+      font-size: 12px;
     }
 
     /* =========================
        RESPONSIVE
-    ========================== */
+    ========================= */
 
     @media (max-width: 900px) {
-      .navbar {
-        padding: 0 4%;
+
+      .nav-inner {
+        width: calc(100% - 24px);
       }
 
-      .container {
-        width: 92%;
-      }
-
-      .catalog {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .search-row {
-        flex-direction: column;
-        align-items: stretch;
-      }
-    }
-
-    @media (max-width: 650px) {
-      .nav-actions .country,
-      .login {
+      .brand strong {
         display: none;
       }
 
+      .hero {
+        height: 420px;
+      }
+
       .hero-content {
-        padding: 45px 28px;
+        width: 72%;
+        padding: 55px 35px;
       }
 
-      .features {
-        grid-template-columns: 1fr;
+      .catalog-toolbar {
+        flex-direction: column;
+        align-items: stretch;
       }
 
-      .catalog {
-        grid-template-columns: 1fr;
+      .search-box {
+        width: 100%;
       }
 
       .filters {
-        overflow-x: auto;
+        flex-wrap: wrap;
+      }
+
+      .product-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+
+      .navbar {
+        height: 60px;
+      }
+
+      .nav-actions {
+        gap: 4px;
+      }
+
+      .country-btn,
+      .login-link {
+        font-size: 11px;
+        padding: 8px;
+      }
+
+      .register-link {
+        padding: 9px 10px;
+        font-size: 11px;
+      }
+
+      .hero-wrap,
+      .catalog-toolbar,
+      .section {
+        width: calc(100% - 24px);
+      }
+
+      .hero {
+        height: 470px;
+      }
+
+      .hero-content {
+        width: 100%;
+        padding: 35px 25px;
+      }
+
+      .hero-content h1 {
+        font-size: 48px;
+      }
+
+      .hero-points {
+        grid-template-columns: 1fr;
+      }
+
+      .game-card {
+        width: 320px;
+        min-width: 320px;
+        height: 300px;
+      }
+
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
@@ -438,212 +796,661 @@
 
 <body>
 
-  <!-- NAVBAR -->
+  <!-- =========================
+       NAVBAR
+  ========================= -->
+
   <header class="navbar">
 
-<div class="logo-area">
-  <img src="nexora-logo.png" alt="NEXORA STORE" class="logo">
-  <span>NEXORA STORE</span>
-</div>
+    <div class="nav-inner">
 
-    <div class="nav-actions">
-      <div class="country">🇵🇪 Perú</div>
-      <a href="login.html" class="login">Ingresar</a>
-      <a href="register.html" class="signup">Crear cuenta</a>
+      <a href="index.html" class="brand">
+        <img src="nexora-logo.png" alt="NEXORA STORE">
+        <strong>NEXORA STORE</strong>
+      </a>
+
+      <div class="nav-actions">
+
+        <button class="country-btn">
+          🇵🇪 Perú
+        </button>
+
+        <a href="login.html" class="login-link">
+          Ingresar
+        </a>
+
+        <a href="register.html" class="register-link">
+          Crear cuenta
+        </a>
+
+      </div>
+
     </div>
 
   </header>
 
 
-  <!-- COMPRAS RECIENTES -->
+  <!-- =========================
+       TICKER DE VENTAS
+  ========================= -->
+
   <div class="ticker">
-  <div class="welcome-message">
-    <span class="welcome-dot">●</span>
-    BIENVENIDOS A NEXORA STORE
-    <span class="welcome-separator">•</span>
-    TU CENTRO DE RECARGAS GAMER
-    <span class="welcome-separator">•</span>
-    RÁPIDO, SEGURO Y CONFIABLE
+    <div class="ticker-track">
+
+      <span class="ticker-item">
+        💎 <strong>Wiliam</strong> compró 310 + 31 Diamantes • ID: 853916****
+      </span>
+
+      <span class="ticker-item">
+        💎 <strong>Wiliam</strong> compró 100 + 10 Diamantes • ID: 853916****
+      </span>
+
+      <span class="ticker-item">
+        💎 <strong>Julio Luciano</strong> compró 2180 + 218 Diamantes • ID: 1178642****
+      </span>
+
+      <span class="ticker-item">
+        💎 <strong>Michael</strong> realizó una compra en NEXORA
+      </span>
+
+      <span class="ticker-item">
+        🎮 Nuevos productos disponibles próximamente
+      </span>
+
+      <!-- duplicado para mantener el movimiento -->
+
+      <span class="ticker-item">
+        💎 <strong>Wiliam</strong> compró 310 + 31 Diamantes • ID: 853916****
+      </span>
+
+      <span class="ticker-item">
+        💎 <strong>Wiliam</strong> compró 100 + 10 Diamantes • ID: 853916****
+      </span>
+
+      <span class="ticker-item">
+        💎 <strong>Julio Luciano</strong> compró 2180 + 218 Diamantes • ID: 1178642****
+      </span>
+
+    </div>
   </div>
-</div>
 
-  <main class="container">
 
-    <!-- HERO -->
-    <section class="hero">
+  <!-- =========================
+       HERO
+  ========================= -->
 
-      <div class="hero-content">
+  <main>
 
-        <span class="badge">MÁS POPULAR</span>
+    <section class="hero-wrap">
 
-        <h1>Free Fire</h1>
+      <div class="hero" id="hero">
 
-        <div class="subtitle">
-          Diamantes • Pases • Membresías
+        <!-- FREE FIRE -->
+
+        <article class="hero-slide active">
+
+          <img
+            src="freefire-naruto.png"
+            alt="Free Fire"
+          >
+
+          <div class="hero-content">
+
+            <span class="hero-badge">
+              MÁS POPULAR
+            </span>
+
+            <h1>Free Fire</h1>
+
+            <div class="hero-subtitle">
+              Diamantes, Pases Booyah &amp; Membresías
+            </div>
+
+            <p class="hero-description">
+              Recarga tu cuenta de forma rápida y segura con solo
+              tu ID de jugador. Tu pedido será procesado en
+              menos de 24 horas.
+            </p>
+
+            <div class="hero-points">
+              <span>✓ Solo necesitas tu ID de jugador</span>
+              <span>✓ Acreditación automática</span>
+              <span>✓ Pases Booyah y membresías</span>
+              <span>✓ Soporte NEXORA</span>
+            </div>
+
+            <button class="hero-button" onclick="goToGames()">
+              Ver paquetes de recarga →
+            </button>
+
+          </div>
+
+        </article>
+
+
+        <!-- MOBILE LEGENDS -->
+
+        <article class="hero-slide">
+
+          <img
+            src="mobile-legends.png"
+            alt="Mobile Legends"
+          >
+
+          <div class="hero-content">
+
+            <span class="hero-badge">
+              DISPONIBLE AHORA
+            </span>
+
+            <h1>Mobile Legends</h1>
+
+            <div class="hero-subtitle">
+              Diamantes, Pase Semanal &amp; Crepúsculo
+            </div>
+
+            <p class="hero-description">
+              Obtén tus diamantes y pases directamente en tu cuenta.
+              Solo necesitas tu ID + Zone ID y tu pedido será
+              procesado en menos de 24 horas.
+            </p>
+
+            <div class="hero-points">
+              <span>✓ ID + Zone ID</span>
+              <span>✓ 100% seguro</span>
+              <span>✓ Pase Semanal y diamantes</span>
+              <span>✓ Soporte NEXORA</span>
+            </div>
+
+            <button class="hero-button" onclick="goToGames()">
+              Ver paquetes de recarga →
+            </button>
+
+          </div>
+
+        </article>
+
+
+        <!-- ROBLOX -->
+
+        <article class="hero-slide">
+
+          <img
+            src="roblox.png"
+            alt="Roblox"
+          >
+
+          <div class="hero-content">
+
+            <span class="hero-badge">
+              PIN DIGITAL
+            </span>
+
+            <h1>Roblox</h1>
+
+            <div class="hero-subtitle">
+              Robux &amp; Membresías Premium
+            </div>
+
+            <p class="hero-description">
+              Adquiere códigos digitales para Roblox de forma sencilla.
+              Recibe tu código después de realizar tu compra,
+              con entrega en menos de 24 horas.
+            </p>
+
+            <div class="hero-points">
+              <span>✓ Códigos digitales seguros</span>
+              <span>✓ Canje directo en Roblox</span>
+              <span>✓ Válido según el código</span>
+              <span>✓ Soporte NEXORA</span>
+            </div>
+
+            <button class="hero-button" onclick="goToGames()">
+              Ver paquetes de recarga →
+            </button>
+
+          </div>
+
+        </article>
+
+
+        <!-- CONTROLES -->
+
+        <div class="hero-controls">
+
+          <button
+            class="hero-arrow"
+            id="heroPrev"
+          >
+            ‹
+          </button>
+
+          <button class="hero-dot active"></button>
+          <button class="hero-dot"></button>
+          <button class="hero-dot"></button>
+
+          <button
+            class="hero-arrow"
+            id="heroNext"
+          >
+            ›
+          </button>
+
         </div>
-
-        <p>
-          Recarga tus juegos favoritos de forma rápida, segura y sencilla.
-          Elige tu producto y realiza tu pedido en pocos pasos.
-        </p>
-
-        <div class="features">
-
-          <div class="feature">
-            <span>✓</span> Recargas rápidas
-          </div>
-
-          <div class="feature">
-            <span>✓</span> Atención segura
-          </div>
-
-          <div class="feature">
-            <span>✓</span> Diferentes cantidades
-          </div>
-
-          <div class="feature">
-            <span>✓</span> Soporte NEXORA
-          </div>
-
-        </div>
-
-        <a href="#catalogo" class="hero-btn">
-          Ver paquetes de recarga →
-        </a>
 
       </div>
 
     </section>
 
 
-    <!-- BUSCADOR -->
-    <section class="search-row">
+    <!-- =========================
+         BUSCADOR
+    ========================= -->
 
-      <div class="search">
-        <span class="search-icon">🔎</span>
+    <section class="catalog-toolbar">
+
+      <div class="search-box">
+
+        <span>⌕</span>
+
         <input
-          type="text"
+          type="search"
           id="searchInput"
           placeholder="Buscar juego..."
-          onkeyup="buscarJuego()"
+          autocomplete="off"
         >
+
       </div>
+
 
       <div class="filters">
 
-        <button class="filter active">
+        <button
+          class="filter-btn active"
+          data-filter="todos"
+        >
           Todos
         </button>
 
-        <button class="filter">
+        <button
+          class="filter-btn"
+          data-filter="moviles"
+        >
           Móviles
         </button>
 
-        <button class="filter">
+        <button
+          class="filter-btn"
+          data-filter="pines"
+        >
           Pines Digitales
         </button>
+
+        <span class="game-count" id="gameCount">
+          3 juegos disponibles
+        </span>
 
       </div>
 
     </section>
 
 
-    <!-- CATALOGO -->
-    <section id="catalogo">
+    <!-- =========================
+         JUEGOS
+    ========================= -->
 
-      <div class="section-title">
-        <span>●</span> CATÁLOGO DE JUEGOS
+    <section class="section" id="gamesSection">
+
+      <div class="section-head">
+
+        <div class="section-title">
+
+          <small>NEXORA STORE</small>
+
+          <h2>Juegos disponibles</h2>
+
+          <p>
+            Explora nuestras opciones de recarga.
+          </p>
+
+        </div>
+
+
+        <div class="slider-controls">
+
+          <button
+            class="slider-control"
+            id="gamesPrev"
+          >
+            ‹
+          </button>
+
+          <button
+            class="slider-control"
+            id="gamesNext"
+          >
+            ›
+          </button>
+
+        </div>
+
       </div>
 
-      <div class="catalog">
+
+      <div class="games-viewport">
+
+        <div
+          class="games-track"
+          id="gamesTrack"
+        >
 
 
-        <article class="card juego">
+          <!-- FREE FIRE -->
 
-          <div class="card-image freefire">
-            🔥 FREE FIRE
+          <article
+            class="game-card"
+            data-game="free fire"
+            data-category="moviles"
+          >
+
+            <img
+              src="freefire-naruto.png"
+              alt="Free Fire"
+            >
+
+            <div class="game-card-overlay"></div>
+
+            <div class="game-card-content">
+
+              <span class="game-tag">
+                MÁS POPULAR
+              </span>
+
+              <h3>Free Fire</h3>
+
+              <h4>
+                Diamantes, Pases Booyah &amp; Membresías
+              </h4>
+
+              <p>
+                Recarga tu cuenta de forma rápida y segura con
+                solo tu ID de jugador. Pedido procesado en
+                menos de 24 horas.
+              </p>
+
+              <div class="game-features">
+                <span>✓ Solo ID de jugador</span>
+                <span>✓ Acreditación automática</span>
+                <span>✓ Pases y membresías</span>
+                <span>✓ Soporte NEXORA</span>
+              </div>
+
+              <button
+                class="game-card-button"
+                onclick="selectGame('Free Fire')"
+              >
+                Ver paquetes →
+              </button>
+
+            </div>
+
+          </article>
+
+
+          <!-- MOBILE LEGENDS -->
+
+          <article
+            class="game-card"
+            data-game="mobile legends"
+            data-category="moviles"
+          >
+
+            <img
+              src="mobile-legends.png"
+              alt="Mobile Legends"
+            >
+
+            <div class="game-card-overlay"></div>
+
+            <div class="game-card-content">
+
+              <span class="game-tag">
+                DISPONIBLE AHORA
+              </span>
+
+              <h3>Mobile Legends</h3>
+
+              <h4>
+                Diamantes, Pase Semanal &amp; Crepúsculo
+              </h4>
+
+              <p>
+                Obtén tus diamantes y pases directamente en tu
+                cuenta mediante ID + Zone ID. Pedido procesado
+                en menos de 24 horas.
+              </p>
+
+              <div class="game-features">
+                <span>✓ ID + Zone ID</span>
+                <span>✓ 100% seguro</span>
+                <span>✓ Pase Semanal</span>
+                <span>✓ Soporte NEXORA</span>
+              </div>
+
+              <button
+                class="game-card-button"
+                onclick="selectGame('Mobile Legends')"
+              >
+                Ver paquetes →
+              </button>
+
+            </div>
+
+          </article>
+
+
+          <!-- ROBLOX -->
+
+          <article
+            class="game-card"
+            data-game="roblox"
+            data-category="pines"
+          >
+
+            <img
+              src="roblox.png"
+              alt="Roblox"
+            >
+
+            <div class="game-card-overlay"></div>
+
+            <div class="game-card-content">
+
+              <span class="game-tag">
+                PIN DIGITAL
+              </span>
+
+              <h3>Roblox</h3>
+
+              <h4>
+                Robux &amp; Membresías Premium
+              </h4>
+
+              <p>
+                Adquiere códigos digitales para Roblox.
+                Recibe tu código después de realizar tu compra,
+                con entrega en menos de 24 horas.
+              </p>
+
+              <div class="game-features">
+                <span>✓ Códigos seguros</span>
+                <span>✓ Canje directo</span>
+                <span>✓ Productos digitales</span>
+                <span>✓ Soporte NEXORA</span>
+              </div>
+
+              <button
+                class="game-card-button"
+                onclick="selectGame('Roblox')"
+              >
+                Ver productos →
+              </button>
+
+            </div>
+
+          </article>
+
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         PRODUCTOS DESTACADOS
+    ========================= -->
+
+    <section class="section products-section">
+
+      <div class="section-head">
+
+        <div class="section-title">
+
+          <small>CATÁLOGO</small>
+
+          <h2>Productos destacados</h2>
+
+          <p>
+            Algunos de nuestros productos disponibles.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="product-grid">
+
+
+        <article
+          class="product-card"
+          data-product-game="free fire"
+        >
+
+          <div class="product-top">
+
+            <span class="product-game">
+              FREE FIRE
+            </span>
+
+            <span>💎</span>
+
           </div>
 
-          <div class="card-body">
+          <h3 class="product-name">
+            Paquete de Diamantes
+          </h3>
 
-            <h3>Free Fire</h3>
+          <p class="product-description">
+            Recarga mediante tu ID de jugador.
+          </p>
 
-            <p>
-              Diamantes, pases y membresías.
-            </p>
+          <div class="product-bottom">
 
-            <a href="#" class="card-btn">
-              Ver recargas
-            </a>
+            <div class="product-price">
+              Desde S/ 3.00
+            </div>
+
+            <button
+              class="buy-btn"
+              onclick="selectGame('Free Fire')"
+            >
+              Comprar
+            </button>
 
           </div>
 
         </article>
 
 
-        <article class="card juego">
+        <article
+          class="product-card"
+          data-product-game="mobile legends"
+        >
 
-          <div class="card-image roblox">
-            🟩 ROBLOX
-          </div>
+          <div class="product-top">
 
-          <div class="card-body">
+            <span class="product-game">
+              MOBILE LEGENDS
+            </span>
 
-            <h3>Roblox</h3>
-
-            <p>
-              Robux y productos digitales.
-            </p>
-
-            <a href="#" class="card-btn">
-              Ver productos
-            </a>
+            <span>💎</span>
 
           </div>
 
-        </article>
+          <h3 class="product-name">
+            Diamantes
+          </h3>
 
+          <p class="product-description">
+            Recarga mediante ID + Zone ID.
+          </p>
 
-        <article class="card juego">
+          <div class="product-bottom">
 
-          <div class="card-image bloodstrike">
-            ⚡ BLOOD STRIKE
-          </div>
+            <div class="product-price">
+              Desde S/ 3.00
+            </div>
 
-          <div class="card-body">
-
-            <h3>Blood Strike</h3>
-
-            <p>
-              Recargas para tu cuenta.
-            </p>
-
-            <a href="#" class="card-btn">
-              Ver recargas
-            </a>
+            <button
+              class="buy-btn"
+              onclick="selectGame('Mobile Legends')"
+            >
+              Comprar
+            </button>
 
           </div>
 
         </article>
 
 
-        <article class="card juego">
+        <article
+          class="product-card"
+          data-product-game="roblox"
+        >
 
-          <div class="card-image mobilelegends">
-            🛡️ MOBILE LEGENDS
+          <div class="product-top">
+
+            <span class="product-game">
+              ROBLOX
+            </span>
+
+            <span>🟦</span>
+
           </div>
 
-          <div class="card-body">
+          <h3 class="product-name">
+            Robux
+          </h3>
 
-            <h3>Mobile Legends</h3>
+          <p class="product-description">
+            Código digital para canjear en Roblox.
+          </p>
 
-            <p>
-              Diamantes y contenido.
-            </p>
+          <div class="product-bottom">
 
-            <a href="#" class="card-btn">
-              Ver recargas
-            </a>
+            <div class="product-price">
+              Desde S/ 3.00
+            </div>
+
+            <button
+              class="buy-btn"
+              onclick="selectGame('Roblox')"
+            >
+              Comprar
+            </button>
 
           </div>
 
@@ -657,611 +1464,376 @@
   </main>
 
 
+  <!-- =========================
+       FOOTER
+  ========================= -->
+
   <footer>
-    © 2026 NEXORA STORE • Recargas y productos digitales
+
+    <div class="footer-inner">
+
+      <div>
+
+        <div class="footer-brand">
+          NEXORA STORE
+        </div>
+
+        <div class="footer-text">
+          Recargas de videojuegos y productos digitales.
+        </div>
+
+      </div>
+
+      <div class="support">
+        Soporte NEXORA
+      </div>
+
+    </div>
+
   </footer>
 
-  
+
   <script>
 
-    function buscarJuego() {
+    /* ==================================
+       HERO CAROUSEL
+    ================================== */
 
-      const texto =
-        document.getElementById("searchInput")
-        .value
-        .toLowerCase();
+    const heroSlides =
+      document.querySelectorAll(".hero-slide");
 
-      const juegos =
-        document.querySelectorAll(".juego");
+    const heroDots =
+      document.querySelectorAll(".hero-dot");
 
-      juegos.forEach(function(juego) {
+    const heroNext =
+      document.getElementById("heroNext");
 
-        const nombre =
-          juego.innerText.toLowerCase();
+    const heroPrev =
+      document.getElementById("heroPrev");
 
-        if (nombre.includes(texto)) {
-          juego.style.display = "";
+    let heroIndex = 0;
+    let heroTimer;
+
+
+    function showHero(index) {
+
+      heroSlides.forEach((slide, i) => {
+        slide.classList.toggle(
+          "active",
+          i === index
+        );
+      });
+
+      heroDots.forEach((dot, i) => {
+        dot.classList.toggle(
+          "active",
+          i === index
+        );
+      });
+
+      heroIndex = index;
+    }
+
+
+    function nextHero() {
+
+      showHero(
+        (heroIndex + 1) % heroSlides.length
+      );
+
+    }
+
+
+    function prevHero() {
+
+      showHero(
+        (heroIndex - 1 + heroSlides.length) %
+        heroSlides.length
+      );
+
+    }
+
+
+    heroNext.addEventListener(
+      "click",
+      nextHero
+    );
+
+    heroPrev.addEventListener(
+      "click",
+      prevHero
+    );
+
+
+    heroDots.forEach((dot, index) => {
+
+      dot.addEventListener(
+        "click",
+        () => showHero(index)
+      );
+
+    });
+
+
+    function startHeroAuto() {
+
+      clearInterval(heroTimer);
+
+      heroTimer = setInterval(
+        nextHero,
+        5000
+      );
+
+    }
+
+
+    startHeroAuto();
+
+
+    /* ==================================
+       CARRUSEL DE JUEGOS
+    ================================== */
+
+    const gamesTrack =
+      document.getElementById("gamesTrack");
+
+    const gamesNext =
+      document.getElementById("gamesNext");
+
+    const gamesPrev =
+      document.getElementById("gamesPrev");
+
+    let gamesPosition = 0;
+    let gamesTimer;
+
+
+    function getGameStep() {
+
+      const card =
+        gamesTrack.querySelector(".game-card");
+
+      if (!card) return 0;
+
+      return card.offsetWidth + 18;
+
+    }
+
+
+    function maxGamesPosition() {
+
+      return Math.max(
+        0,
+        gamesTrack.scrollWidth -
+        gamesTrack.parentElement.clientWidth
+      );
+
+    }
+
+
+    function moveGames(direction) {
+
+      const step = getGameStep();
+
+      if (!step) return;
+
+      gamesPosition +=
+        direction * step;
+
+      const max =
+        maxGamesPosition();
+
+      if (gamesPosition > max) {
+        gamesPosition = 0;
+      }
+
+      if (gamesPosition < 0) {
+        gamesPosition = max;
+      }
+
+      gamesTrack.style.transform =
+        `translateX(-${gamesPosition}px)`;
+
+    }
+
+
+    gamesNext.addEventListener(
+      "click",
+      () => {
+        moveGames(1);
+        restartGamesAuto();
+      }
+    );
+
+
+    gamesPrev.addEventListener(
+      "click",
+      () => {
+        moveGames(-1);
+        restartGamesAuto();
+      }
+    );
+
+
+    function startGamesAuto() {
+
+      clearInterval(gamesTimer);
+
+      gamesTimer = setInterval(
+        () => moveGames(1),
+        4500
+      );
+
+    }
+
+
+    function restartGamesAuto() {
+
+      startGamesAuto();
+
+    }
+
+
+    gamesTrack.addEventListener(
+      "mouseenter",
+      () => clearInterval(gamesTimer)
+    );
+
+
+    gamesTrack.addEventListener(
+      "mouseleave",
+      startGamesAuto
+    );
+
+
+    startGamesAuto();
+
+
+    /* ==================================
+       BUSCADOR + FILTROS
+    ================================== */
+
+    const searchInput =
+      document.getElementById("searchInput");
+
+    const filterButtons =
+      document.querySelectorAll(".filter-btn");
+
+    const gameCards =
+      document.querySelectorAll(".game-card");
+
+    const gameCount =
+      document.getElementById("gameCount");
+
+
+    let activeFilter = "todos";
+
+
+    function filterGames() {
+
+      const search =
+        searchInput.value
+          .trim()
+          .toLowerCase();
+
+      let visible = 0;
+
+
+      gameCards.forEach(card => {
+
+        const game =
+          card.dataset.game;
+
+        const category =
+          card.dataset.category;
+
+
+        const matchesSearch =
+          game.includes(search);
+
+        const matchesFilter =
+          activeFilter === "todos" ||
+          category === activeFilter;
+
+
+        if (
+          matchesSearch &&
+          matchesFilter
+        ) {
+
+          card.style.display = "";
+
+          visible++;
+
         } else {
-          juego.style.display = "none";
+
+          card.style.display = "none";
+
         }
 
       });
 
+
+      gameCount.textContent =
+        `${visible} juegos disponibles`;
+
+    }
+
+
+    searchInput.addEventListener(
+      "input",
+      filterGames
+    );
+
+
+    filterButtons.forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          filterButtons.forEach(btn => {
+            btn.classList.remove("active");
+          });
+
+          button.classList.add("active");
+
+          activeFilter =
+            button.dataset.filter;
+
+          filterGames();
+
+        }
+      );
+
+    });
+
+
+    /* ==================================
+       BOTONES DE PRODUCTOS
+    ================================== */
+
+    function selectGame(game) {
+
+      alert(
+        `Has seleccionado ${game}.\n\n` +
+        `La sección de productos de ${game} ` +
+        `la conectaremos a continuación.`
+      );
+
+    }
+
+
+    function goToGames() {
+
+      document
+        .getElementById("gamesSection")
+        .scrollIntoView({
+          behavior: "smooth"
+        });
+
     }
 
   </script>
-<!-- ================================
-     CARRUSEL DE JUEGOS - NEXORA
-================================= -->
-
-<section class="nexora-games">
-
-  <div class="nexora-games-header">
-    <div>
-      <span class="nexora-badge">CATÁLOGO</span>
-      <h2>Elige tu juego</h2>
-      <p>Recargas y productos digitales en NEXORA STORE.</p>
-    </div>
-
-    <div class="nexora-controls">
-      <button id="nexoraPrev" aria-label="Anterior">‹</button>
-      <button id="nexoraNext" aria-label="Siguiente">›</button>
-    </div>
-  </div>
-
-
-  <div class="nexora-carousel">
-    <div class="nexora-track" id="nexoraTrack">
-
-      <!-- FREE FIRE -->
-      <article class="nexora-card">
-
-        <img
-          src="freefire-naruto.png"
-          alt="Free Fire"
-        >
-
-        <div class="nexora-overlay"></div>
-
-        <div class="nexora-content">
-
-          <span class="nexora-tag">MÁS POPULAR</span>
-
-          <h3>Free Fire</h3>
-
-          <h4>Diamantes, Pases Booyah &amp; Membresías</h4>
-
-          <p>
-            Recarga tu cuenta de forma rápida y segura con solo tu
-            ID de jugador. Tu pedido será procesado en
-            <strong>menos de 24 horas</strong>.
-          </p>
-
-          <div class="nexora-features">
-
-            <span>✓ Solo necesitas tu ID de jugador</span>
-
-            <span>✓ Acreditación automática</span>
-
-            <span>✓ Pases Booyah y membresías</span>
-
-            <span>✓ Soporte NEXORA</span>
-
-          </div>
-
-          <button class="nexora-buy">
-            Ver paquetes de recarga
-            <span>→</span>
-          </button>
-
-        </div>
-
-      </article>
-
-
-      <!-- MOBILE LEGENDS -->
-      <article class="nexora-card">
-
-        <img
-          src="mobile-legends.png"
-          alt="Mobile Legends"
-        >
-
-        <div class="nexora-overlay"></div>
-
-        <div class="nexora-content">
-
-          <span class="nexora-tag">DISPONIBLE AHORA</span>
-
-          <h3>Mobile Legends</h3>
-
-          <h4>Diamantes, Pase Semanal &amp; Crepúsculo</h4>
-
-          <p>
-            Obtén tus diamantes y pases directamente en tu cuenta.
-            Solo necesitas tu <strong>ID + Zone ID</strong> y tu pedido
-            será procesado en <strong>menos de 24 horas</strong>.
-          </p>
-
-          <div class="nexora-features">
-
-            <span>✓ Recarga directa con ID + Zone ID</span>
-
-            <span>✓ 100% seguro</span>
-
-            <span>✓ Pase Semanal y diamantes</span>
-
-            <span>✓ Soporte NEXORA</span>
-
-          </div>
-
-          <button class="nexora-buy">
-            Ver paquetes de recarga
-            <span>→</span>
-          </button>
-
-        </div>
-
-      </article>
-
-
-      <!-- ROBLOX -->
-      <article class="nexora-card">
-
-        <img
-          src="roblox.png"
-          alt="Roblox"
-        >
-
-        <div class="nexora-overlay"></div>
-
-        <div class="nexora-content">
-
-          <span class="nexora-tag">PIN DIGITAL</span>
-
-          <h3>Roblox</h3>
-
-          <h4>Robux &amp; Membresías Premium</h4>
-
-          <p>
-            Adquiere códigos digitales para Roblox de forma sencilla.
-            Recibe tu código después de realizar tu compra,
-            con entrega en <strong>menos de 24 horas</strong>.
-          </p>
-
-          <div class="nexora-features">
-
-            <span>✓ Códigos digitales seguros</span>
-
-            <span>✓ Canje directo en Roblox</span>
-
-            <span>✓ Válido según las condiciones del código</span>
-
-            <span>✓ Soporte NEXORA</span>
-
-          </div>
-
-          <button class="nexora-buy">
-            Ver paquetes de recarga
-            <span>→</span>
-          </button>
-
-        </div>
-
-      </article>
-
-    </div>
-  </div>
-
-</section>
-
-
-<style>
-
-/* =================================
-   SECCIÓN
-================================= */
-
-.nexora-games {
-  width: 100%;
-  padding: 45px 22px;
-  overflow: hidden;
-}
-
-
-/* =================================
-   CABECERA
-================================= */
-
-.nexora-games-header {
-  max-width: 1450px;
-  margin: 0 auto 22px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 20px;
-}
-
-.nexora-badge {
-  display: inline-block;
-  padding: 7px 13px;
-  border-radius: 30px;
-  background: #f5a623;
-  color: #111;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .4px;
-  margin-bottom: 10px;
-}
-
-.nexora-games-header h2 {
-  margin: 0;
-  color: #fff;
-  font-size: 32px;
-  font-weight: 800;
-}
-
-.nexora-games-header p {
-  margin-top: 7px;
-  color: #9ca3af;
-  font-size: 14px;
-}
-
-
-/* =================================
-   BOTONES
-================================= */
-
-.nexora-controls {
-  display: flex;
-  gap: 9px;
-}
-
-.nexora-controls button {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 1px solid #30323b;
-  background: #15171d;
-  color: #fff;
-  font-size: 26px;
-  cursor: pointer;
-  transition: .25s ease;
-}
-
-.nexora-controls button:hover {
-  background: #f5a623;
-  color: #111;
-  border-color: #f5a623;
-}
-
-
-/* =================================
-   CARRUSEL
-================================= */
-
-.nexora-carousel {
-  width: 100%;
-  overflow: hidden;
-}
-
-.nexora-track {
-  display: flex;
-  gap: 20px;
-  width: max-content;
-  padding: 7px 0 18px;
-  transform: translateX(0);
-  transition: transform .65s cubic-bezier(.22,.61,.36,1);
-}
-
-
-/* =================================
-   TARJETAS
-================================= */
-
-.nexora-card {
-  position: relative;
-  width: 460px;
-  min-width: 460px;
-  height: 300px;
-  overflow: hidden;
-  border-radius: 20px;
-  background: #101218;
-  border: 1px solid #292d36;
-  box-shadow: 0 12px 35px rgba(0,0,0,.28);
-  transition: transform .25s ease, border-color .25s ease;
-}
-
-.nexora-card:hover {
-  transform: translateY(-5px);
-  border-color: #f5a623;
-}
-
-.nexora-card img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-
-/* =================================
-   OSCURECER IMAGEN
-================================= */
-
-.nexora-overlay {
-  position: absolute;
-  inset: 0;
-
-  background:
-    linear-gradient(
-      90deg,
-      rgba(4,6,10,.97) 0%,
-      rgba(4,6,10,.82) 34%,
-      rgba(4,6,10,.38) 67%,
-      rgba(4,6,10,.08) 100%
-    );
-
-  z-index: 1;
-}
-
-
-/* =================================
-   CONTENIDO
-================================= */
-
-.nexora-content {
-  position: absolute;
-  z-index: 2;
-  left: 24px;
-  right: 24px;
-  top: 22px;
-  bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.nexora-tag {
-  display: inline-block;
-  padding: 6px 11px;
-  border-radius: 30px;
-  background: #f5a623;
-  color: #111;
-  font-size: 10px;
-  font-weight: 800;
-  margin-bottom: 10px;
-}
-
-.nexora-content h3 {
-  margin: 0;
-  color: #fff;
-  font-size: 34px;
-  line-height: 1;
-  font-weight: 900;
-}
-
-.nexora-content h4 {
-  margin: 8px 0 8px;
-  color: #f5a623;
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.nexora-content p {
-  max-width: 390px;
-  margin: 0;
-  color: #d7d9df;
-  font-size: 12.5px;
-  line-height: 1.45;
-}
-
-
-/* =================================
-   CARACTERÍSTICAS
-================================= */
-
-.nexora-features {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 7px 20px;
-  margin-top: 13px;
-  max-width: 405px;
-}
-
-.nexora-features span {
-  color: #dce0e7;
-  font-size: 11.5px;
-  line-height: 1.35;
-}
-
-
-/* =================================
-   BOTÓN
-================================= */
-
-.nexora-buy {
-  margin-top: auto;
-  padding: 11px 17px;
-  border: none;
-  border-radius: 10px;
-  background: #f5a623;
-  color: #111;
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 7px 20px rgba(245,166,35,.22);
-  transition: .2s ease;
-}
-
-.nexora-buy span {
-  margin-left: 8px;
-  font-size: 16px;
-}
-
-.nexora-buy:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.08);
-}
-
-
-/* =================================
-   MÓVIL
-================================= */
-
-@media (max-width: 700px) {
-
-  .nexora-games {
-    padding: 35px 15px;
-  }
-
-  .nexora-games-header h2 {
-    font-size: 25px;
-  }
-
-  .nexora-games-header p {
-    font-size: 12px;
-  }
-
-  .nexora-controls {
-    display: none;
-  }
-
-  .nexora-card {
-    width: 330px;
-    min-width: 330px;
-    height: 290px;
-  }
-
-  .nexora-content {
-    left: 18px;
-    right: 18px;
-  }
-
-  .nexora-content h3 {
-    font-size: 28px;
-  }
-
-  .nexora-features {
-    gap: 6px 12px;
-  }
-
-}
-
-</style>
-
-
-<script>
-
-(function () {
-
-  const track = document.getElementById("nexoraTrack");
-  const next = document.getElementById("nexoraNext");
-  const prev = document.getElementById("nexoraPrev");
-
-  if (!track) return;
-
-  let currentIndex = 0;
-  let timer = null;
-
-  function getCardWidth() {
-
-    const card = track.querySelector(".nexora-card");
-
-    if (!card) return 0;
-
-    const gap = 20;
-
-    return card.offsetWidth + gap;
-  }
-
-
-  function moveTo(index) {
-
-    const cards = track.querySelectorAll(".nexora-card");
-
-    if (!cards.length) return;
-
-    if (index >= cards.length) {
-      index = 0;
-    }
-
-    if (index < 0) {
-      index = cards.length - 1;
-    }
-
-    currentIndex = index;
-
-    track.style.transform =
-      "translateX(-" +
-      (currentIndex * getCardWidth()) +
-      "px)";
-  }
-
-
-  function nextSlide() {
-    moveTo(currentIndex + 1);
-  }
-
-
-  function prevSlide() {
-    moveTo(currentIndex - 1);
-  }
-
-
-  if (next) {
-    next.addEventListener("click", function () {
-      nextSlide();
-      restartAuto();
-    });
-  }
-
-
-  if (prev) {
-    prev.addEventListener("click", function () {
-      prevSlide();
-      restartAuto();
-    });
-  }
-
-
-  function startAuto() {
-
-    clearInterval(timer);
-
-    timer = setInterval(function () {
-      nextSlide();
-    }, 4500);
-
-  }
-
-
-  function restartAuto() {
-    startAuto();
-  }
-
-
-  track.addEventListener("mouseenter", function () {
-    clearInterval(timer);
-  });
-
-
-  track.addEventListener("mouseleave", function () {
-    startAuto();
-  });
-
-
-  window.addEventListener("resize", function () {
-    moveTo(currentIndex);
-  });
-
-
-  startAuto();
-
-})();
-
-</script>
 
 </body>
-</html>
+</html>  
