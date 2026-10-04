@@ -1,9 +1,11 @@
-const CACHE_NAME = "nexora-store-v1";
+const CACHE_NAME = "nexora-store-v2";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
+  "./icon-192.png",
+  "./icon-512.png",
   "./Emblema%20Nexora%20Store%20SF%20con%20corona.png"
 ];
 
