@@ -530,6 +530,31 @@ button{cursor:pointer}
 </footer>
 
 <script>
+window.saveNexoraOrder = async function(order) {
+  let status = document.getElementById("historySaveStatus");
+  if (!status) {
+    status = document.createElement("p");
+    status.id = "historySaveStatus";
+    status.setAttribute("role","status");
+    document.getElementById("sendWhatsApp").after(status);
+  }
+  status.textContent = "Guardando pedido en tu historial…";
+  try {
+    const { auth } = await import("./firebase.js");
+    await auth.authStateReady();
+    if (!auth.currentUser) {
+      status.textContent = "Este pedido no se guardará en una cuenta porque no has iniciado sesión.";
+      return;
+    }
+    const { recordOrder } = await import("./account-data.js");
+    await recordOrder(order);
+    status.textContent = "Pedido guardado como pendiente de verificación. Completa el envío en WhatsApp.";
+  } catch {
+    status.textContent = "No se pudo guardar el historial. Puedes continuar enviando tu pedido por WhatsApp y reintentar después.";
+  }
+};
+</script>
+<script>
 const orderRaw =
   sessionStorage.getItem(
     "nexoraOrder"
@@ -859,6 +884,12 @@ sendWhatsApp.addEventListener(
     }
 
 
+    if (!order.historyId) {
+      order.historyId = crypto.randomUUID();
+      sessionStorage.setItem("nexoraOrder", JSON.stringify(order));
+    }
+    // Guarda solo un pedido pendiente; WhatsApp no confirma pagos ni entregas.
+    window.saveNexoraOrder(order);
     const proofFile =
       proofInput.files[0];
 
@@ -866,6 +897,7 @@ sendWhatsApp.addEventListener(
     const lines = [
       "NUEVO PEDIDO NEXORA STORE",
       "",
+      "PEDIDO: " + order.historyId,
       "JUEGO: " + order.game,
       "PRODUCTO: " + order.product
     ];
