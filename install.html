@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Instalar NEXORA</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<meta name="theme-color" content="#07090e">
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at top,#2a160b 0,transparent 35%),#07090e;color:#fff;font-family:Arial,Helvetica,sans-serif;padding:20px}.card{width:min(460px,100%);background:#10151e;border:1px solid #2d3642;border-radius:22px;padding:28px;text-align:center;box-shadow:0 22px 60px rgba(0,0,0,.45)}img{width:112px;height:112px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,45,45,.4);box-shadow:0 0 28px rgba(255,30,30,.22);margin-bottom:16px}h1{margin:0 0 10px;font-size:30px}p{color:#9aa4b2;line-height:1.55;font-size:14px}.btn{width:100%;border:0;border-radius:12px;padding:15px 18px;margin-top:16px;background:#f5a623;color:#111;font-weight:900;font-size:15px;cursor:pointer}.btn:disabled{opacity:.55;cursor:not-allowed}.secondary{display:block;margin-top:12px;padding:13px;border:1px solid #333d4a;border-radius:12px;background:#151b24;color:#fff;text-decoration:none;font-weight:700}.hint{margin-top:14px;font-size:12px;color:#7f8997}
+</style>
+</head>
+<body>
+<main class="card">
+<img src="Emblema%20Nexora%20Store%20SF%20con%20corona.png" alt="NEXORA STORE">
+<h1>Instalar NEXORA</h1>
+<p>Instala NEXORA STORE en tu celular y úsala como una aplicación desde tu pantalla de inicio.</p>
+<button class="btn" id="installBtn" disabled>Preparando instalación…</button>
+<a class="secondary" href="index.html">Volver a la tienda</a>
+<div class="hint" id="hint">Abre esta página en Chrome para instalar la app.</div>
+</main>
+<script>
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
+}
+let promptEvent=null;
+const btn=document.getElementById("installBtn");
+const hint=document.getElementById("hint");
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+const standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;
+
+function render(){
+  if(standalone){
+    btn.textContent="NEXORA ya está instalada";
+    btn.disabled=true;
+    hint.textContent="Ya puedes abrirla desde tu pantalla de inicio.";
+    return;
+  }
+  if(promptEvent){
+    btn.textContent="Instalar NEXORA";
+    btn.disabled=false;
+    hint.textContent="Toca el botón para instalar la aplicación.";
+    return;
+  }
+  if(ios){
+    btn.textContent="Instalar desde Safari";
+    btn.disabled=true;
+    hint.textContent="En iPhone: Safari > Compartir > Añadir a pantalla de inicio.";
+    return;
+  }
+  btn.textContent="Instalar NEXORA";
+  btn.disabled=true;
+  hint.textContent="Si no se activa, abre el menú de Chrome y toca “Instalar aplicación”.";
+}
+
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();
+  promptEvent=e;
+  render();
+});
+
+btn.addEventListener("click",async()=>{
+  if(!promptEvent)return;
+  promptEvent.prompt();
+  try{await promptEvent.userChoice}catch(e){}
+  promptEvent=null;
+  render();
+});
+
+window.addEventListener("appinstalled",()=>{
+  promptEvent=null;
+  btn.textContent="NEXORA instalada";
+  btn.disabled=true;
+  hint.textContent="Instalación completada.";
+});
+
+render();
+</script>
+</body>
+</html>
