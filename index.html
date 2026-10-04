@@ -1402,6 +1402,100 @@ a{
 
 
 /* =========================================================
+   REDES SOCIALES
+========================================================= */
+
+.social-community{
+  margin-top:34px;
+  padding-top:24px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+
+.social-community-head{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:14px;
+}
+
+.social-community-head h3{
+  font-size:18px;
+  margin-bottom:4px;
+}
+
+.social-community-head p{
+  color:#737d8b;
+  font-size:10px;
+  line-height:1.5;
+}
+
+.social-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.social-card{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:15px 16px;
+  border:1px solid #2a3340;
+  border-radius:14px;
+  background:#0d1219;
+  transition:.22s ease;
+}
+
+.social-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(245,166,35,.55);
+  background:#111823;
+}
+
+.social-icon{
+  width:43px;
+  height:43px;
+  flex:0 0 43px;
+  display:grid;
+  place-items:center;
+  border-radius:12px;
+  font-size:18px;
+  font-weight:900;
+  background:#171e28;
+  border:1px solid rgba(255,255,255,.07);
+}
+
+.social-card strong{
+  display:block;
+  color:#fff;
+  font-size:12px;
+  margin-bottom:3px;
+}
+
+.social-card span{
+  color:#7e8897;
+  font-size:10px;
+}
+
+.social-arrow{
+  margin-left:auto;
+  color:var(--orange);
+  font-size:17px;
+}
+
+@media(max-width:700px){
+  .social-community-head{
+    display:block;
+  }
+
+  .social-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+
+/* =========================================================
    WHATSAPP
 ========================================================= */
 
@@ -3749,6 +3843,52 @@ a{
 
 
     </div>
+
+
+    <section class="social-community" aria-label="Redes sociales de NEXORA STORE">
+
+      <div class="social-community-head">
+        <div>
+          <h3>Síguenos en redes</h3>
+          <p>Novedades, promociones y contenido oficial de NEXORA STORE.</p>
+        </div>
+      </div>
+
+      <div class="social-grid">
+
+        <a
+          class="social-card"
+          href="https://www.instagram.com/nexora.store.sf/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Abrir Instagram oficial de NEXORA STORE"
+        >
+          <div class="social-icon">IG</div>
+          <div>
+            <strong>Instagram</strong>
+            <span>@nexora.store.sf</span>
+          </div>
+          <span class="social-arrow">↗</span>
+        </a>
+
+        <a
+          class="social-card"
+          href="https://www.tiktok.com/@nexorastore.sf"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Abrir TikTok oficial de NEXORA STORE"
+        >
+          <div class="social-icon">TT</div>
+          <div>
+            <strong>TikTok</strong>
+            <span>@nexorastore.sf</span>
+          </div>
+          <span class="social-arrow">↗</span>
+        </a>
+
+      </div>
+
+    </section>
 
 
 
