@@ -1201,6 +1201,107 @@ a{
 }
 
 
+
+/* =========================================================
+   INSTALAR APP EN CELULAR
+========================================================= */
+
+.mobile-install{
+  margin-top:42px;
+}
+
+.install-card{
+  display:none;
+  position:relative;
+  overflow:hidden;
+  padding:22px;
+  border:1px solid rgba(245,166,35,.28);
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(245,166,35,.12), transparent 34%),
+    #0b0f16;
+  box-shadow:0 18px 42px rgba(0,0,0,.28);
+}
+
+.install-card::after{
+  content:"N";
+  position:absolute;
+  right:-8px;
+  bottom:-40px;
+  color:rgba(255,255,255,.025);
+  font-size:150px;
+  font-weight:900;
+  pointer-events:none;
+}
+
+.install-content{
+  position:relative;
+  z-index:2;
+}
+
+.install-badge{
+  display:inline-block;
+  margin-bottom:10px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(245,166,35,.12);
+  border:1px solid rgba(245,166,35,.22);
+  color:var(--orange);
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.7px;
+}
+
+.install-card h2{
+  font-size:23px;
+  margin-bottom:8px;
+}
+
+.install-card p{
+  max-width:560px;
+  color:#8f98a6;
+  font-size:11px;
+  line-height:1.6;
+}
+
+.install-app-btn{
+  width:100%;
+  margin-top:16px;
+  padding:13px 16px;
+  border:0;
+  border-radius:11px;
+  background:var(--orange);
+  color:#111;
+  font-size:12px;
+  font-weight:900;
+  box-shadow:0 10px 26px rgba(245,166,35,.18);
+  transition:.2s ease;
+}
+
+.install-app-btn:active{
+  transform:scale(.98);
+}
+
+.install-app-btn[disabled]{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.install-help{
+  display:block;
+  margin-top:10px;
+  color:#687281;
+  font-size:9px;
+  line-height:1.5;
+}
+
+@media(max-width:700px){
+  .install-card{
+    display:block;
+  }
+}
+
+
 /* =========================================================
    FOOTER
 ========================================================= */
@@ -3448,6 +3549,41 @@ a{
 
 
 
+
+<!-- ========================================================
+     INSTALAR NEXORA EN CELULAR
+======================================================== -->
+
+<section class="mobile-install">
+  <div class="container">
+    <div class="install-card" id="installCard">
+      <div class="install-content">
+        <span class="install-badge">APP NEXORA</span>
+
+        <h2>Instala NEXORA en tu celular</h2>
+
+        <p>
+          Agrega NEXORA STORE a tu pantalla de inicio y úsala como una aplicación,
+          sin tener que buscar la página cada vez.
+        </p>
+
+        <button
+          class="install-app-btn"
+          id="installAppBtn"
+          type="button"
+          disabled
+        >
+          Preparando instalación...
+        </button>
+
+        <small class="install-help" id="installHelp">
+          Si tu navegador permite instalar la app, el botón se activará automáticamente.
+        </small>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ========================================================
      FOOTER
 ======================================================== -->
@@ -4374,6 +4510,92 @@ if ("serviceWorker" in navigator) {
       });
   });
 }
+</script>
+
+
+<script>
+/* =========================================================
+   INSTALACION PWA
+========================================================= */
+
+let deferredInstallPrompt = null;
+
+const installCard = document.getElementById("installCard");
+const installAppBtn = document.getElementById("installAppBtn");
+const installHelp = document.getElementById("installHelp");
+
+function isIosDevice(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+function isStandaloneApp(){
+  return window.matchMedia("(display-mode: standalone)").matches
+    || window.navigator.standalone === true;
+}
+
+function updateInstallUi(){
+  if(!installCard || !installAppBtn || !installHelp){
+    return;
+  }
+
+  if(isStandaloneApp()){
+    installAppBtn.textContent = "NEXORA ya está instalada";
+    installAppBtn.disabled = true;
+    installHelp.textContent = "Ya puedes abrir NEXORA desde tu pantalla de inicio.";
+    return;
+  }
+
+  if(deferredInstallPrompt){
+    installAppBtn.textContent = "Instalar NEXORA";
+    installAppBtn.disabled = false;
+    installHelp.textContent = "Toca el botón para instalar la aplicación.";
+    return;
+  }
+
+  if(isIosDevice()){
+    installAppBtn.textContent = "Instalar desde Safari";
+    installAppBtn.disabled = true;
+    installHelp.textContent = "En iPhone: abre esta página en Safari, toca Compartir y luego “Añadir a pantalla de inicio”.";
+    return;
+  }
+
+  installAppBtn.textContent = "Instalar NEXORA";
+  installAppBtn.disabled = true;
+  installHelp.textContent = "Abre esta página en Chrome. Cuando el navegador permita instalarla, este botón se activará.";
+}
+
+window.addEventListener("beforeinstallprompt", event => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  updateInstallUi();
+});
+
+if(installAppBtn){
+  installAppBtn.addEventListener("click", async () => {
+    if(!deferredInstallPrompt){
+      updateInstallUi();
+      return;
+    }
+
+    deferredInstallPrompt.prompt();
+
+    try{
+      await deferredInstallPrompt.userChoice;
+    }catch(error){
+      console.log("Instalación cancelada o no disponible.");
+    }
+
+    deferredInstallPrompt = null;
+    updateInstallUi();
+  });
+}
+
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  updateInstallUi();
+});
+
+updateInstallUi();
 </script>
 
 </body>
