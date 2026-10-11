@@ -63,6 +63,13 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
 </form>
 <div class="actions"><a class="shop" id="mvpPanel" href="admin.html" hidden>Panel MVP</a><button class="secondary" id="logout" type="button">Cerrar sesión</button></div>
 </section>
+<section class="card" id="walletSection" hidden aria-label="Saldo de mi cuenta">
+<h2>Mi saldo NEXORA</h2>
+<p class="detail">Saldo confirmado disponible para futuras compras en la tienda.</p>
+<div id="walletBalance" style="color:#f5a623;font-size:32px;font-weight:900;margin:14px 0">Cargando…</div>
+<a class="shop" href="recargar-saldo.html">Recargar con Yape</a>
+<p class="detail">Las recargas solo se acreditan después de revisar el pago real.</p>
+</section>
 <section class="card" id="ordersSection" hidden>
 <h2>Mis compras</h2><p class="detail">Pedidos recientes iniciados desde tu cuenta. Enviar por WhatsApp no confirma el pago ni la entrega.</p>
 <p id="ordersStatus" role="status">Cargando historial…</p><div id="ordersList"></div>
@@ -124,6 +131,15 @@ try {
     if (!accountModule) accountModule = import("./account-data.js").catch(error => { accountModule = null; throw error; });
     return accountModule;
   }
+  async function refreshWallet() {
+    const el = document.getElementById("walletBalance");
+    try {
+      const { getMyWallet, formatSoles } = await import("./wallet-data.js");
+      el.textContent = formatSoles(await getMyWallet());
+    } catch {
+      el.textContent = "No disponible";
+    }
+  }
   async function refreshAccount(user) {
     ordersStatus.textContent = "Cargando historial…";
     document.getElementById("ordersList").replaceChildren();
@@ -171,6 +187,7 @@ try {
     if (!auth.currentUser) return;
     this.disabled = true;
     await refreshAccount(auth.currentUser);
+    await refreshWallet();
     this.disabled = false;
   });
   async function uploadPhoto(photo, user) {
@@ -224,6 +241,7 @@ try {
       savedPhoto = "";
       mvpPanel.hidden = true;
       document.getElementById("ordersSection").hidden = true;
+      document.getElementById("walletSection").hidden = true;
       document.getElementById("accountDashboard").hidden = true;
       document.getElementById("ordersList").replaceChildren();
       document.getElementById("avatar").replaceChildren();
@@ -237,6 +255,8 @@ try {
     mvpPanel.hidden = !user.email || !MVP_EMAILS.has(user.email.toLowerCase());
     render(user);
     document.getElementById("ordersSection").hidden = false;
+    document.getElementById("walletSection").hidden = false;
+    refreshWallet();
     document.getElementById("accountDashboard").hidden = false;
     refreshAccount(user);
     loading.hidden = true;
