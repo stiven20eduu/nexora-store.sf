@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Revisión de Yape | NEXORA MVP</title>
+<link rel="icon" href="nexora-logo.png">
+<style>
+:root{color-scheme:dark;--orange:#f5a623;--border:#2b3441;--muted:#a5afbd}*{box-sizing:border-box}
+body{margin:0;background:#07090e;color:#fff;font:14px Arial,sans-serif}
+header{padding:18px max(18px,calc((100% - 1120px)/2));border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:10px;align-items:center}
+a{color:inherit;text-decoration:none}.back{font-size:13px;color:var(--muted)}
+main{max-width:1120px;margin:38px auto;padding:0 18px 70px}h1{font-size:34px;margin:8px 0}.eyebrow{color:var(--orange);font-size:11px;letter-spacing:1.2px;font-weight:900}
+.muted{color:var(--muted);font-size:13px;line-height:1.6}.box{margin:20px 0;border:1px solid var(--border);background:#10151e;padding:22px;border-radius:16px}
+.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+button{font:inherit;border:0;border-radius:9px;padding:10px 14px;background:var(--orange);font-weight:800;color:#111;cursor:pointer}
+button:disabled{opacity:.5;cursor:wait}.secondary{color:#fff;background:#1b2430;border:1px solid #3b4658}.deny{color:#ffb5b5;background:#3c1b24}
+.item{padding:18px 0;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr auto;gap:14px}
+.item strong{font-size:20px;color:var(--orange)}.item small{display:block;color:var(--muted);line-height:1.7}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.status{font-size:12px;font-weight:900}.status.approved{color:#71e8aa}.status.rejected{color:#ff9c9c}.status.pending{color:#f5c377}
+.warning{padding:14px;background:#2a1d0e;border:1px solid #765020;border-radius:12px;line-height:1.6;font-size:13px}
+#message{min-height:20px}#message.error{color:#ff9898}
+@media(max-width:650px){h1{font-size:27px}.item{grid-template-columns:1fr}.actions{justify-content:flex-start}}
+</style>
+</head>
+<body>
+<header><a href="admin.html"><b>NEXORA MVP</b></a><a href="admin.html" class="back">← Panel principal</a></header>
+<main>
+<div class="eyebrow">ADMINISTRACIÓN · BILLETERA</div>
+<h1>Recargas de saldo por Yape</h1>
+<p class="muted">Las solicitudes se registran automáticamente, pero los pagos se confirman manualmente contra los movimientos reales de Yape.</p>
+<div class="box" id="gate"><p id="gateText">Comprobando acceso de administrador…</p></div>
+<div id="app" hidden>
+<div class="warning"><b>Antes de aprobar:</b> abre Yape, comprueba que recibiste el monto exacto, que el número de operación coincide y que el movimiento no fue devuelto. <b>Una captura o el número que escribe el cliente no son prueba suficiente.</b> Aprobar añadirá el saldo inmediatamente.</div>
+<section class="box">
+  <div class="controls"><div><h2>Solicitudes pendientes</h2><span id="pendingCount" class="muted"></span></div><button id="refresh">Actualizar</button></div>
+  <div id="pending"><p class="muted">Cargando…</p></div>
+</section>
+<section class="box">
+  <h2>Últimas solicitudes procesadas</h2><div id="reviewed"></div>
+</section>
+<p id="message" role="status" aria-live="polite"></p>
+</div>
+</main>
+<script type="module">
+import { auth } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getAdminTopups, getCustomerLabel, approveYapeTopup, rejectYapeTopup, formatSoles } from "./wallet-data.js";
+const ADMINS=new Set(["nexora.store.sf@gmail.com","stiven20eduu@gmail.com"]);
+const gate=document.getElementById("gate"),app=document.getElementById("app"),msg=document.getElementById("message");
+let requests=[],busy=false;
+const names=new Map();
+function inform(text,error=false){msg.textContent=text;msg.className=error?"error":"";}
+function dateText(value){try{return value?.toDate?.().toLocaleString("es-PE")||"Fecha reciente";}catch{return "Fecha reciente";}}
+async function label(uid){
+ if(!names.has(uid)){try{names.set(uid,await getCustomerLabel(uid));}catch{names.set(uid,uid);}}
+ return names.get(uid);
+}
+function makeItem(t){
+ const row=document.createElement("article");row.className="item";
+ const left=document.createElement("div");
+ const amount=document.createElement("strong");amount.textContent=formatSoles(t.amountCents);
+ const identity=document.createElement("small");identity.textContent="Cliente: "+(names.get(t.uid)||t.uid);
+ const operation=document.createElement("small");operation.textContent="Operación Yape: "+t.yapeOperation;
+ const payer=document.createElement("small");payer.textContent="Remitente declarado: "+(t.payerName||"No indicado");
+ const created=document.createElement("small");created.textContent="Solicitado: "+dateText(t.createdAt);
+ left.append(amount,identity,operation,payer,created);
+ const right=document.createElement("div");right.className="actions";
+ if(t.status==="pending"){
+   const approve=document.createElement("button");approve.type="button";approve.textContent="Aprobar y sumar saldo";
+   const reject=document.createElement("button");reject.type="button";reject.className="deny";reject.textContent="Rechazar";
+   approve.addEventListener("click",()=>process(t,"approve"));reject.addEventListener("click",()=>process(t,"reject"));
+   right.append(approve,reject);
+ }else{
+   const status=document.createElement("span");status.className="status "+t.status;
+   status.textContent=t.status==="approved"?"APROBADO · ACREDITADO":"RECHAZADO · SIN SALDO";
+   right.append(status);
+ }
+ row.append(left,right);return row;
+}
+function render(){
+ const pending=requests.filter(t=>t.status==="pending"),reviewed=requests.filter(t=>t.status!=="pending").slice(0,40);
+ document.getElementById("pendingCount").textContent=pending.length+" por verificar";
+ for(const [id,items] of [["pending",pending],["reviewed",reviewed]]){
+   const box=document.getElementById(id);box.replaceChildren();
+   if(!items.length){const p=document.createElement("p");p.className="muted";p.textContent=id==="pending"?"No hay recargas pendientes.":"Aún no hay revisiones.";box.append(p);}
+   for(const t of items)box.append(makeItem(t));
+ }
+}
+async function refresh(){
+ const btn=document.getElementById("refresh");btn.disabled=true;inform("Actualizando…");
+ try{
+   requests=await getAdminTopups();
+   await Promise.all([...new Set(requests.map(t=>t.uid))].map(uid=>label(uid)));
+   render();inform("Solicitudes actualizadas.");
+ }catch(e){console.error(e);inform(e.message||"No se pudo cargar la lista de recargas.",true);}
+ finally{btn.disabled=false;}
+}
+async function process(t,action){
+ if(busy)return;
+ const approve=action==="approve";
+ const prompt=approve
+   ? "¿VERIFICASTE EN TU APP YAPE el ingreso real de "+formatSoles(t.amountCents)+" con operación "+t.yapeOperation+"?\n\nAceptar sumará ese dinero al saldo del cliente. No te bases en capturas."
+   : "¿Quieres rechazar la solicitud "+t.yapeOperation+"? No se añadirá saldo.";
+ if(!window.confirm(prompt))return;
+ busy=true;document.querySelectorAll(".actions button").forEach(b=>b.disabled=true);inform("Procesando…");
+ try{
+   if(approve) await approveYapeTopup(t.id);else await rejectYapeTopup(t.id);
+   inform(approve?"Recarga aprobada y saldo acreditado una sola vez.":"Solicitud rechazada.");
+   await refresh();
+ }catch(e){console.error(e);inform(e.message==="Missing or insufficient permissions."?"Revisa que las reglas de Firebase estén desplegadas y el correo administrador verificado.":e.message||"Error al procesar la solicitud.",true);}
+ finally{busy=false;document.querySelectorAll(".actions button").forEach(b=>b.disabled=false);}
+}
+document.getElementById("refresh").addEventListener("click",refresh);
+onAuthStateChanged(auth,user=>{
+ if(!user){location.replace("login.html");return;}
+ if(!user.emailVerified||!ADMINS.has((user.email||"").toLowerCase())){
+   document.getElementById("gateText").textContent="Acceso denegado. Se requiere una cuenta administradora con correo verificado.";
+   return;
+ }
+ gate.hidden=true;app.hidden=false;refresh();
+});
+</script>
+</body>
+</html>
