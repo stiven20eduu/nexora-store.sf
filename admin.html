@@ -81,7 +81,7 @@ button,input{font:inherit}.btn{border:0;border-radius:10px;padding:11px 14px;fon
 <script type="module">
 import { auth } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 const MVP_EMAILS=new Set(["nexora.store.sf@gmail.com","stiven20eduu@gmail.com"]);
 const db=getFirestore(auth.app);
@@ -169,6 +169,14 @@ function showMember(uid){
    const status=document.createElement("span");status.className="order-status "+(o.status||"pending");
    status.textContent=ORDER_STATUS_LABELS[o.status]||"En revisión";
    item.append(h,p,id,status);
+   if(o.paymentMethod==="wallet"){
+    const paid=document.createElement("p");paid.className="ok";paid.textContent="Pagado con saldo NEXORA";item.append(paid);
+   }
+   if(o.playerId || o.serverId){
+    const destination=document.createElement("p");
+    destination.textContent="Cuenta: "+(o.playerId||"—")+(o.serverId?" · Servidor: "+o.serverId:"")+(o.playerName?" · "+o.playerName:"");
+    item.append(destination);
+   }
    if(!["completed","cancelled"].includes(o.status)){
      const actions=document.createElement("div");actions.className="order-actions";
      const completed=document.createElement("button");completed.className="btn complete";completed.type="button";completed.textContent="Marcar completado";
@@ -193,7 +201,7 @@ async function changeOrderStatus(uid,orderId,nextStatus){
  const isComplete=nextStatus==="completed";
  const question=isComplete
    ?"¿Confirmas que entregaste "+(order.product||"el producto")+" al cliente y que el pago real está verificado?\n\nEl pedido pasará a COMPLETADO."
-   :"¿Seguro que quieres CANCELAR el pedido "+(order.product||orderId)+"?\n\nNo se acreditará ni devolverá saldo automáticamente.";
+   :"¿Seguro que quieres CANCELAR el pedido "+(order.product||orderId)+"?\n\n"+(order.paymentMethod==="wallet"?"Se reembolsará el importe a la billetera del cliente.":"No se modificará su saldo NEXORA.")+"";
  if(!window.confirm(question))return;
  savingOrder=true;
  document.querySelectorAll(".order-actions button").forEach(button=>button.disabled=true);
@@ -205,11 +213,24 @@ async function changeOrderStatus(uid,orderId,nextStatus){
      if(!snap.exists())throw new Error("El pedido ya no existe.");
      if(!["pending","processing","verified"].includes(snap.data().status))
        throw new Error("Este pedido ya fue completado o cancelado. Actualiza el panel.");
+     const current=snap.data();
+     if(nextStatus==="cancelled" && current.paymentMethod==="wallet"){
+       if(!auth.currentUser?.emailVerified)throw new Error("Verifica tu correo de administrador antes de reembolsar.");
+       const cost=current.priceCents;
+       if(!Number.isSafeInteger(cost)||cost<100)throw new Error("Precio original inválido: no se pudo reembolsar.");
+       const walletRef=doc(db,"users",uid,"wallet","main");
+       const walletSnap=await tx.get(walletRef);
+       if(!walletSnap.exists())throw new Error("No se encontró la billetera del cliente.");
+       const balance=walletSnap.data().balanceCents;
+       if(!Number.isSafeInteger(balance)||balance<0||balance+cost>100000000)
+         throw new Error("No es posible calcular el saldo a devolver.");
+       tx.update(walletRef,{balanceCents:balance+cost,updatedAt:serverTimestamp()});
+     }
      tx.update(ref,{status:nextStatus});
    });
    order.status=nextStatus;
    renderStats();
-   message(isComplete?"Pedido marcado como COMPLETADO. El cliente verá el cambio en su historial.":"Pedido CANCELADO. El cliente verá el cambio en su historial.");
+   message(isComplete?"Pedido marcado como COMPLETADO. El cliente verá el cambio en su historial.":order.paymentMethod==="wallet"?"Pedido CANCELADO y saldo reembolsado.":"Pedido CANCELADO. El cliente verá el cambio en su historial.");
  }catch(error){
    console.error(error);
    message(error.code==="permission-denied"?"Firebase no permitió cambiar el estado. Revisa tu cuenta administradora.":error.message||"No pudimos actualizar el pedido.",true);
