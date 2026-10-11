@@ -124,3 +124,73 @@ export async function rejectYapeTopup(id) {
     tx.update(ref, { status: "rejected", processedBy: admin.uid, processedAt: serverTimestamp() });
   });
 }
+
+/**
+ * Paga un pedido con saldo acreditado. El precio se obtiene de Firestore,
+ * nunca del navegador, y la billetera y el pedido se modifican en una
+ * transacción atómica. Reintentar el mismo historyId no descuenta otra vez.
+ */
+export async function buyWithNexoraBalance(order) {
+  const user = await session();
+  const gameKey = String(order?.gameKey || "");
+  const game = String(order?.game || "");
+  const product = String(order?.product || "");
+  const historyId = String(order?.historyId || "");
+  if (!/^[a-z0-9-]{2,80}$/.test(gameKey) ||
+      !game || game.length > 100 || !product || product.length > 200 ||
+      !/^[A-Za-z0-9-]{1,80}$/.test(historyId)) {
+    throw new Error("El pedido no tiene los datos necesarios. Selecciona el producto nuevamente.");
+  }
+  const expected = Math.round(Number(order.price) * 100);
+  if (!Number.isSafeInteger(expected) || expected < 100) {
+    throw new Error("El precio del pedido no es válido.");
+  }
+  const clean = (value, max) => String(value || "").trim().slice(0, max);
+  const catalogId = encodeURIComponent(gameKey + "::" + product);
+  if (catalogId.length > 400) throw new Error("Producto no válido.");
+  const itemRef = doc(db, "catalogPrices", catalogId);
+  const walletRef = doc(db, "users", user.uid, "wallet", "main");
+  const orderRef = doc(db, "users", user.uid, "orders", historyId);
+  const result = await runTransaction(db, async tx => {
+    // Las lecturas ocurren antes de todas las escrituras.
+    const [existing, itemSnap, walletSnap] = await Promise.all([
+      tx.get(orderRef), tx.get(itemRef), tx.get(walletRef)
+    ]);
+    if (existing.exists()) {
+      if (existing.data().paymentMethod === "wallet") {
+        return { orderId: historyId, alreadyPaid: true,
+          balanceCents: walletSnap.exists() ? walletSnap.data().balanceCents : 0 };
+      }
+      throw new Error("Este pedido ya fue registrado con otro método de pago.");
+    }
+    if (!itemSnap.exists() || !itemSnap.data().enabled) {
+      throw new Error("El pago con saldo no está disponible para este producto.");
+    }
+    const item = itemSnap.data();
+    if (item.game !== game || item.product !== product ||
+        !Number.isSafeInteger(item.priceCents) || item.priceCents !== expected) {
+      throw new Error("El precio oficial cambió. Regresa al catálogo y elige el producto de nuevo.");
+    }
+    if (!walletSnap.exists()) {
+      throw new Error("No tienes saldo confirmado. Recarga con Yape primero.");
+    }
+    const balance = walletSnap.data().balanceCents;
+    if (!Number.isSafeInteger(balance) || balance < item.priceCents) {
+      throw new Error("Saldo insuficiente. Puedes recargar tu cuenta con Yape.");
+    }
+    const remaining = balance - item.priceCents;
+    tx.set(orderRef, {
+      game:item.game, product:item.product, price:item.priceCents/100,
+      priceCents:item.priceCents, currency:"PEN",
+      status:"verified", paymentMethod:"wallet", catalogId,
+      playerId:clean(order.playerId,100),serverId:clean(order.serverId,100),
+      playerName:clean(order.playerName,120),playerRegion:clean(order.playerRegion,100),
+      createdAt:serverTimestamp()
+    });
+    tx.update(walletRef, {
+      balanceCents:remaining, updatedAt:serverTimestamp(), lastPurchaseId:historyId
+    });
+    return { orderId: historyId, alreadyPaid:false, balanceCents:remaining };
+  });
+  return result;
+}
