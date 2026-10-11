@@ -32,17 +32,30 @@ export function parseSoles(input) {
   }
   return cents;
 }
-export async function requestYapeTopup({ amount, operation, payer }) {
+export async function requestYapeTopup({ amount, operation, payer, proofImage }) {
   const user = await session();
   const amountCents = parseSoles(amount);
   const yapeOperation = String(operation || "").replace(/\s/g, "");
   if (!/^\d{6,16}$/.test(yapeOperation)) throw new Error("Ingresa un número de operación de Yape válido (6 a 16 dígitos).");
   const payerName = String(payer || "").trim();
   if (payerName.length > 80) throw new Error("El nombre no puede superar 80 caracteres.");
-  const reference = await addDoc(collection(db, "yapeTopups"), {
+
+  // El navegador convertirá PNG/JPG a JPEG reducido antes de enviarlo.
+  // El comprobante nunca verifica el pago: el administrador revisa Yape.
+  const payload = {
     uid: user.uid, amountCents, yapeOperation, payerName,
     status: "pending", createdAt: serverTimestamp()
-  });
+  };
+  if (proofImage !== undefined && proofImage !== null && proofImage !== "") {
+    if (typeof proofImage !== "string" ||
+        proofImage.length > 180000 ||
+        !/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(proofImage)) {
+      throw new Error("Comprobante inválido o demasiado grande. Selecciona otra imagen.");
+    }
+    payload.proofImage = proofImage;
+    payload.proofUploadedAt = serverTimestamp();
+  }
+  const reference = await addDoc(collection(db, "yapeTopups"), payload);
   return reference.id;
 }
 export async function getMyWallet() {
