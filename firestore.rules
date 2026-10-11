@@ -53,10 +53,56 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // El cliente solo puede crear un pedido con saldo y precio validado,
+    // descontando exactamente el mismo importe en la misma transacción.
+    function validWalletOrder(uid, orderId) {
+      let walletPath = /databases/$(database)/documents/users/$(uid)/wallet/main;
+      let itemPath = /databases/$(database)/documents/catalogPrices/$(request.resource.data.catalogId);
+      let product = get(itemPath).data;
+      let walletBefore = get(walletPath).data;
+      let walletAfter = getAfter(walletPath).data;
+      return owner(uid)
+        && request.resource.data.keys().hasOnly([
+          'game', 'product', 'price', 'priceCents', 'currency',
+          'status', 'createdAt', 'paymentMethod', 'catalogId',
+          'playerId', 'serverId', 'playerName', 'playerRegion'
+        ])
+        && request.resource.data.keys().hasAll([
+          'game', 'product', 'price', 'priceCents', 'currency',
+          'status', 'createdAt', 'paymentMethod', 'catalogId',
+          'playerId', 'serverId', 'playerName', 'playerRegion'
+        ])
+        && request.resource.data.paymentMethod == 'wallet'
+        && request.resource.data.status == 'verified'
+        && request.resource.data.currency == 'PEN'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.catalogId is string
+        && request.resource.data.catalogId.size() > 0
+        && request.resource.data.catalogId.size() <= 400
+        && product.enabled == true
+        && product.priceCents is int
+        && request.resource.data.game == product.game
+        && request.resource.data.product == product.product
+        && request.resource.data.priceCents == product.priceCents
+        && request.resource.data.price == product.priceCents / 100.0
+        && request.resource.data.playerId is string
+        && request.resource.data.playerId.size() <= 100
+        && request.resource.data.serverId is string
+        && request.resource.data.serverId.size() <= 100
+        && request.resource.data.playerName is string
+        && request.resource.data.playerName.size() <= 120
+        && request.resource.data.playerRegion is string
+        && request.resource.data.playerRegion.size() <= 100
+        && walletBefore.balanceCents is int
+        && walletBefore.balanceCents >= product.priceCents
+        && walletAfter.balanceCents == walletBefore.balanceCents - product.priceCents
+        && walletAfter.lastPurchaseId == orderId;
+    }
+
     match /users/{uid}/orders/{orderId} {
       allow read: if owner(uid) || isMvp();
 
-      allow create: if owner(uid)
+      allow create: if (owner(uid)
         && request.resource.data.keys().hasOnly([
           'game',
           'product',
@@ -73,7 +119,8 @@ service cloud.firestore {
         && request.resource.data.price > 0
         && request.resource.data.currency == 'PEN'
         && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time;
+        && request.resource.data.createdAt == request.time)
+        || validWalletOrder(uid, orderId);
 
       allow update: if isMvp()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
@@ -139,10 +186,38 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Descuento solo si existe un pedido nuevo, pagado en el mismo commit.
+    function validWalletDebit(uid) {
+      let purchaseId = request.resource.data.lastPurchaseId;
+      let orderPath = /databases/$(database)/documents/users/$(uid)/orders/$(purchaseId);
+      let order = getAfter(orderPath).data;
+      return owner(uid)
+        && resource.data.balanceCents is int
+        && resource.data.balanceCents >= 0
+        && request.resource.data.keys().hasOnly(['balanceCents', 'updatedAt', 'lastPurchaseId'])
+        && request.resource.data.keys().hasAll(['balanceCents', 'updatedAt', 'lastPurchaseId'])
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['balanceCents', 'updatedAt', 'lastPurchaseId'])
+        && request.resource.data.balanceCents is int
+        && request.resource.data.balanceCents >= 0
+        && request.resource.data.balanceCents < resource.data.balanceCents
+        && request.resource.data.updatedAt == request.time
+        && purchaseId is string
+        && purchaseId.size() > 0
+        && purchaseId.size() <= 80
+        && purchaseId != resource.data.get('lastPurchaseId', '')
+        && !exists(orderPath)
+        && order.paymentMethod == 'wallet'
+        && order.status == 'verified'
+        && order.createdAt == request.time
+        && order.priceCents == resource.data.balanceCents - request.resource.data.balanceCents;
+    }
+
     match /users/{uid}/wallet/{walletId} {
       allow get: if walletId == 'main' && (owner(uid) || isWalletAdmin());
       allow list: if false;
-      allow create, update: if walletId == 'main'
+
+      allow create: if walletId == 'main'
         && isWalletAdmin()
         && request.resource.data.keys().hasOnly(['balanceCents', 'updatedAt'])
         && request.resource.data.keys().hasAll(['balanceCents', 'updatedAt'])
@@ -150,6 +225,17 @@ service cloud.firestore {
         && request.resource.data.balanceCents >= 0
         && request.resource.data.balanceCents <= 100000000
         && request.resource.data.updatedAt == request.time;
+
+      allow update: if walletId == 'main' && (
+        (isWalletAdmin()
+          && request.resource.data.keys().hasOnly(['balanceCents', 'updatedAt', 'lastPurchaseId'])
+          && request.resource.data.keys().hasAll(['balanceCents', 'updatedAt'])
+          && request.resource.data.balanceCents is int
+          && request.resource.data.balanceCents >= 0
+          && request.resource.data.balanceCents <= 100000000
+          && request.resource.data.updatedAt == request.time)
+        || validWalletDebit(uid)
+      );
       allow delete: if false;
     }
 
