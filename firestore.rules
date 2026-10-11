@@ -99,7 +99,8 @@ service cloud.firestore {
 
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly([
-          'uid', 'amountCents', 'yapeOperation', 'payerName', 'status', 'createdAt'
+          'uid', 'amountCents', 'yapeOperation', 'payerName', 'status', 'createdAt',
+          'proofImage', 'proofUploadedAt'
         ])
         && request.resource.data.keys().hasAll([
           'uid', 'amountCents', 'yapeOperation', 'payerName', 'status', 'createdAt'
@@ -113,7 +114,32 @@ service cloud.firestore {
         && request.resource.data.payerName is string
         && request.resource.data.payerName.size() <= 80
         && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time;
+        && request.resource.data.createdAt == request.time
+        // La imagen es opcional para no interrumpir versiones anteriores de la web.
+        // Debe ser un JPEG reducido (PNG se convertirá antes de enviarlo).
+        && (
+          !request.resource.data.keys().hasAny(['proofImage', 'proofUploadedAt'])
+          || (
+            request.resource.data.keys().hasAll(['proofImage', 'proofUploadedAt'])
+            && request.resource.data.proofImage is string
+            && request.resource.data.proofImage.size() <= 180000
+            && request.resource.data.proofImage.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+
+
+      allow update: if isWalletAdmin()
+        && resource.data.status == 'pending'
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'processedAt', 'processedBy'])
+        && request.resource.data.status in ['approved', 'rejected']
+        && request.resource.data.processedBy == request.auth.uid
+        && request.resource.data.processedAt == request.time;
+
+      allow delete: if false;
+    }
+
+)
+            && request.resource.data.proofUploadedAt == request.time
+          )
+        );
 
       allow update: if isWalletAdmin()
         && resource.data.status == 'pending'
