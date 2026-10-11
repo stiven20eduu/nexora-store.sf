@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Precios oficiales | NEXORA MVP</title>
+<link rel="icon" href="Emblema%20Nexora%20Store%20SF%20con%20corona.png">
+<style>
+:root{color-scheme:dark;--orange:#f5a623;--muted:#a5afbd}
+*{box-sizing:border-box}body{margin:0;background:#080b10;color:#fff;font:14px Arial,sans-serif}
+header{padding:18px max(18px,calc((100% - 1050px)/2));border-bottom:1px solid #293341;display:flex;justify-content:space-between;gap:12px}
+a{color:inherit;text-decoration:none}.back{color:var(--muted)}
+main{max-width:1050px;margin:34px auto;padding:0 18px 65px}h1{margin:6px 0 15px;font-size:32px}
+.eyebrow{color:var(--orange);letter-spacing:1px;font-size:11px;font-weight:900}
+.panel{background:#111721;border:1px solid #303a48;border-radius:16px;padding:20px;margin-top:18px}
+.notice{padding:14px;background:#272016;border:1px solid #684b29;border-radius:12px;line-height:1.7}
+.note{color:var(--muted);line-height:1.65}
+button{background:var(--orange);border:0;border-radius:10px;padding:13px 17px;font-weight:900;cursor:pointer;color:#15110b}
+button:disabled{opacity:.5;cursor:wait}
+#items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:16px}
+.item{border:1px solid #303a48;padding:12px;border-radius:10px;background:#0c1119;display:flex;justify-content:space-between;gap:12px}
+.item strong{color:var(--orange);white-space:nowrap}.item span{overflow-wrap:anywhere}
+#status{margin-top:16px;color:#77e6b7}#status.bad{color:#ff9494}
+@media(max-width:700px){#items{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><b>NEXORA MVP</b><a class="back" href="admin.html">← Panel principal</a></header>
+<main>
+<div class="eyebrow">ADMINISTRACIÓN · CATÁLOGO</div>
+<h1>Precios oficiales de NEXORA</h1>
+<p class="note">Los precios que ve el cliente están en la página de productos. Para pagar con saldo, Firestore debe tener una copia de confianza gestionada por el administrador. Esta página permite sincronizarla.</p>
+<section class="panel" id="gate"><p id="gateText">Comprobando acceso…</p></section>
+<section id="app" hidden>
+<div class="notice"><b>Antes de continuar:</b> revisa que los importes que aparecen abajo sean correctos. «Sincronizar precios» sobrescribe los precios anteriores del catálogo de Firebase. Esta acción no recarga saldo, no cobra a ningún cliente y no cambia pedidos existentes.</div>
+<section class="panel">
+<h2>Catálogo preparado</h2>
+<p id="count" class="note"></p>
+<button type="button" id="sync">Sincronizar precios oficiales con Firebase</button>
+<p id="status" role="status" aria-live="polite"></p>
+<div id="items"></div>
+</section>
+</section>
+</main>
+<script type="module">
+import {auth} from "./firebase.js";
+import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import {getFirestore,doc,writeBatch,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import {PRODUCTOS_NEXORA} from "./catalogo-oficial.js";
+const ADMINS=new Set(["nexora.store.sf@gmail.com","stiven20eduu@gmail.com"]);
+const db=getFirestore(auth.app),app=document.getElementById("app");
+const btn=document.getElementById("sync"),state=document.getElementById("status");
+function money(cents){return "S/ "+(cents/100).toFixed(2)}
+function status(text,bad=false){state.textContent=text;state.className=bad?"bad":""}
+const items=document.getElementById("items");
+document.getElementById("count").textContent=PRODUCTOS_NEXORA.length+" productos oficiales · revisa los precios antes de sincronizarlos.";
+for(const product of PRODUCTOS_NEXORA){
+ const div=document.createElement("div");div.className="item";
+ const label=document.createElement("span");label.textContent=product.game+" · "+product.product;
+ const price=document.createElement("strong");price.textContent=money(product.priceCents);
+ div.append(label,price);items.append(div);
+}
+onAuthStateChanged(auth,user=>{
+ const gate=document.getElementById("gate");
+ if(!user){location.replace("login.html");return;}
+ if(!user.emailVerified||!ADMINS.has((user.email||"").toLowerCase())){
+   document.getElementById("gateText").textContent="Acceso reservado a los administradores con correo verificado.";return;
+ }
+ gate.hidden=true;app.hidden=false;
+});
+btn.addEventListener("click",async()=>{
+ const user=auth.currentUser;
+ if(!user||!user.emailVerified||!ADMINS.has((user.email||"").toLowerCase()))return;
+ if(!confirm("¿Confirmas que revisaste los "+PRODUCTOS_NEXORA.length+" importes? Se guardarán como precios oficiales. No habrá cargos ni recargas de saldo."))return;
+ btn.disabled=true;status("Sincronizando los precios…");
+ try{
+   const batch=writeBatch(db);
+   for(const item of PRODUCTOS_NEXORA){
+     batch.set(doc(db,"catalogPrices",item.id),{
+       gameKey:item.gameKey,game:item.game,product:item.product,
+       priceCents:item.priceCents,enabled:true,updatedAt:serverTimestamp()
+     });
+   }
+   await batch.commit();
+   status("¡Precios sincronizados! "+PRODUCTOS_NEXORA.length+" productos quedaron registrados. Todavía no se han habilitado las compras con saldo.");
+ }catch(err){
+   console.error(err);status(err.code==="permission-denied"?"Firebase denegó la operación. Todavía debes publicar las reglas actualizadas.":"No se pudieron sincronizar los precios: "+(err.message||"Error desconocido"),true);
+ }finally{btn.disabled=false}
+});
+</script>
+</body>
+</html>
