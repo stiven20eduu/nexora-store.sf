@@ -123,7 +123,10 @@ service cloud.firestore {
             request.resource.data.keys().hasAll(['proofImage', 'proofUploadedAt'])
             && request.resource.data.proofImage is string
             && request.resource.data.proofImage.size() <= 180000
-            && request.resource.data.proofImage.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+
+            && request.resource.data.proofImage.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')
+            && request.resource.data.proofUploadedAt == request.time
+          )
+        );
 
       allow update: if isWalletAdmin()
         && resource.data.status == 'pending'
