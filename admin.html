@@ -19,7 +19,14 @@ button,input{font:inherit}.btn{border:0;border-radius:10px;padding:11px 14px;fon
 .users{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.user{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #2b3441;border-radius:14px;background:#0a0f16}
 .avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#f5a623;color:#111;font-weight:900;overflow:hidden;flex:0 0 48px}.avatar img{width:100%;height:100%;object-fit:cover}
 .user-main{min-width:0;flex:1}.user-main strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.user-main span{display:block;font-size:10px;color:#8792a1;margin-top:4px}
-.detail-card{padding:16px;border:1px solid #2b3441;border-radius:14px;background:#0a0f16}.orders{display:grid;gap:10px;margin-top:14px}.order{padding:13px;border:1px solid #2b3441;border-radius:12px;background:#0c1118}.order h3{margin:0 0 5px;font-size:14px}.order p{margin:0;color:#8792a1;font-size:11px}
+.detail-card{padding:16px;border:1px solid #2b3441;border-radius:14px;background:#0a0f16}.orders{display:grid;gap:10px;margin-top:14px}.order{padding:13px;border:1px solid #2b3441;border-radius:12px;background:#0c1118}.order h3{margin:0 0 5px;font-size:14px}.order p{margin:0;color:#8792a1;font-size:11px;line-height:1.6}
+.order-status{display:inline-block;font-size:11px;font-weight:800;margin:9px 0 3px;padding:6px 10px;border-radius:50px;background:#292111;color:#ffcc6a}
+.order-status.completed{background:#102b22;color:#81eabb}
+.order-status.cancelled{background:#351d23;color:#ff9a9a}
+.order-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
+.btn.complete{background:#27c995;color:#071810}
+.btn.cancel-order{background:#48212a;color:#ffb6bf;border:1px solid #733c48}
+.btn:disabled{opacity:.55;cursor:wait}
 #gate{text-align:center;padding:80px 15px}.error{color:#ff9292}.ok{color:#7ee0b5}
 @media(max-width:760px){.stats{grid-template-columns:1fr 1fr}.users{grid-template-columns:1fr}.panel-head{align-items:stretch;flex-direction:column}.search{width:100%}h1{font-size:32px}}
 </style>
@@ -73,7 +80,7 @@ button,input{font:inherit}.btn{border:0;border-radius:10px;padding:11px 14px;fon
 <script type="module">
 import { auth } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 const MVP_EMAILS=new Set(["nexora.store.sf@gmail.com","stiven20eduu@gmail.com"]);
 const db=getFirestore(auth.app);
@@ -85,6 +92,18 @@ const detailPanel=document.getElementById("detailPanel");
 const profileDetail=document.getElementById("profileDetail");
 const ordersBox=document.getElementById("orders");
 let members=[];
+let savingOrder=false;
+const ORDER_STATUS_LABELS={
+ pending:"Pendiente de verificación",
+ processing:"En proceso",
+ verified:"Pago verificado",
+ completed:"Completado",
+ cancelled:"Cancelado"
+};
+function message(text,error=false){
+ const element=document.getElementById("message");
+ element.textContent=text;element.className=error?"error":"ok";
+}
 
 function isMvp(user){return !!user?.email&&MVP_EMAILS.has(user.email.toLowerCase())}
 function initials(name){return String(name||"N").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()||"N"}
@@ -143,11 +162,60 @@ function showMember(uid){
  for(const o of m.orders){
    const item=document.createElement("article");item.className="order";
    const h=document.createElement("h3");h.textContent=(o.game||"Juego")+" · "+(o.product||"Producto");
-   const p=document.createElement("p");const d=o.createdAt?.toDate?.();p.textContent=money(o.price)+" · "+(o.status||"pending")+(d?" · "+d.toLocaleString("es-PE"):"");
-   item.append(h,p);ordersBox.append(item);
+   const p=document.createElement("p");const d=o.createdAt?.toDate?.();
+   p.textContent=money(o.price)+(d?" · "+d.toLocaleString("es-PE"):"");
+   const id=document.createElement("p");id.textContent="Pedido: "+o.id;
+   const status=document.createElement("span");status.className="order-status "+(o.status||"pending");
+   status.textContent=ORDER_STATUS_LABELS[o.status]||"En revisión";
+   item.append(h,p,id,status);
+   if(!["completed","cancelled"].includes(o.status)){
+     const actions=document.createElement("div");actions.className="order-actions";
+     const completed=document.createElement("button");completed.className="btn complete";completed.type="button";completed.textContent="Marcar completado";
+     const cancelled=document.createElement("button");cancelled.className="btn cancel-order";cancelled.type="button";cancelled.textContent="Cancelar pedido";
+     completed.disabled=cancelled.disabled=savingOrder;
+     completed.addEventListener("click",()=>changeOrderStatus(m.uid,o.id,"completed"));
+     cancelled.addEventListener("click",()=>changeOrderStatus(m.uid,o.id,"cancelled"));
+     actions.append(completed,cancelled);item.append(actions);
+   }
+   ordersBox.append(item);
  }
  if(!m.orders.length){const p=document.createElement("p");p.className="muted";p.textContent="Este usuario todavía no tiene pedidos registrados.";ordersBox.append(p)}
  detailPanel.hidden=false;detailPanel.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+async function changeOrderStatus(uid,orderId,nextStatus){
+ if(savingOrder || !["completed","cancelled"].includes(nextStatus))return;
+ if(!isMvp(auth.currentUser)){message("No tienes permisos para gestionar los pedidos.",true);return;}
+ const member=members.find(m=>m.uid===uid);
+ const order=member?.orders.find(o=>o.id===orderId);
+ if(!order || ["completed","cancelled"].includes(order.status))return;
+ const isComplete=nextStatus==="completed";
+ const question=isComplete
+   ?"¿Confirmas que entregaste "+(order.product||"el producto")+" al cliente y que el pago real está verificado?\n\nEl pedido pasará a COMPLETADO."
+   :"¿Seguro que quieres CANCELAR el pedido "+(order.product||orderId)+"?\n\nNo se acreditará ni devolverá saldo automáticamente.";
+ if(!window.confirm(question))return;
+ savingOrder=true;
+ document.querySelectorAll(".order-actions button").forEach(button=>button.disabled=true);
+ message("Guardando estado del pedido…");
+ try{
+   await runTransaction(db,async tx=>{
+     const ref=doc(db,"users",uid,"orders",orderId);
+     const snap=await tx.get(ref);
+     if(!snap.exists())throw new Error("El pedido ya no existe.");
+     if(!["pending","processing","verified"].includes(snap.data().status))
+       throw new Error("Este pedido ya fue completado o cancelado. Actualiza el panel.");
+     tx.update(ref,{status:nextStatus});
+   });
+   order.status=nextStatus;
+   renderStats();
+   message(isComplete?"Pedido marcado como COMPLETADO. El cliente verá el cambio en su historial.":"Pedido CANCELADO. El cliente verá el cambio en su historial.");
+ }catch(error){
+   console.error(error);
+   message(error.code==="permission-denied"?"Firebase no permitió cambiar el estado. Revisa tu cuenta administradora.":error.message||"No pudimos actualizar el pedido.",true);
+ }finally{
+   savingOrder=false;
+   showMember(uid);
+ }
 }
 
 async function load(){
