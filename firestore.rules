@@ -153,6 +153,36 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Precios oficiales utilizados para futuros pagos con saldo.
+    // Solo administradores con correo verificado pueden modificarlos.
+    match /catalogPrices/{productId} {
+      allow get, list: if true;
+
+      allow create, update: if isWalletAdmin()
+        && request.resource.data.keys().hasOnly([
+          'gameKey', 'game', 'product', 'priceCents', 'enabled', 'updatedAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'gameKey', 'game', 'product', 'priceCents', 'enabled', 'updatedAt'
+        ])
+        && request.resource.data.gameKey is string
+        && request.resource.data.gameKey.size() > 0
+        && request.resource.data.gameKey.size() <= 80
+        && request.resource.data.game is string
+        && request.resource.data.game.size() > 0
+        && request.resource.data.game.size() <= 100
+        && request.resource.data.product is string
+        && request.resource.data.product.size() > 0
+        && request.resource.data.product.size() <= 200
+        && request.resource.data.priceCents is int
+        && request.resource.data.priceCents >= 100
+        && request.resource.data.priceCents <= 100000
+        && request.resource.data.enabled is bool
+        && request.resource.data.updatedAt == request.time;
+
+      allow delete: if false;
+    }
+
     // Bloquea reutilizar un número de operación al aprobar otra solicitud.
     match /yapeOperations/{operation} {
       allow get: if isWalletAdmin();
