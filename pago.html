@@ -232,6 +232,16 @@ button{cursor:pointer}
   font-weight:900;
 }
 
+.wallet-checkout{background:#0c1b19;border:1px solid #2c685b;border-radius:13px;padding:17px;margin:15px 0}
+.wallet-checkout[hidden]{display:none}
+.wallet-checkout h3{font-size:17px;margin:0 0 9px;color:#91f1d0}
+.wallet-checkout p{font-size:12px;line-height:1.55;margin:8px 0;color:#bccdd0}
+.wallet-checkout strong{font-size:21px;color:#f5a623}
+.wallet-button{width:100%;background:#25ce99;color:#092017;border:0;padding:13px;border-radius:9px;font-weight:900;margin-top:13px;font-size:13px}
+.wallet-button:disabled{background:#303e3a;color:#9daea8;cursor:not-allowed}
+.wallet-link{display:inline-block;color:#96e8cf;font-size:12px;margin-top:12px}
+#walletResult{margin:12px 0;font-size:12px;line-height:1.6}
+#walletResult.error{color:#ffa3a3}
 .payment-info{padding:20px}
 .amount-box{
   display:flex;
@@ -484,6 +494,15 @@ button{cursor:pointer}
             <b>💬 Último paso</b>
             Escríbenos por WhatsApp y envía tu comprobante en el chat.
           </div>
+        </div>
+
+        <div class="wallet-checkout" id="walletCheckout" hidden>
+          <h3>💳 Pagar con saldo NEXORA</h3>
+          <p>Tu saldo confirmado: <strong id="walletAvailable">S/ 0.00</strong></p>
+          <p>El importe se descontará al confirmar. Se creará un pedido con pago verificado para que NEXORA lo entregue en menos de 24 horas.</p>
+          <button type="button" id="payWallet" class="wallet-button" disabled>Comprobando saldo…</button>
+          <p id="walletResult" role="status" aria-live="polite"></p>
+          <a class="wallet-link" href="recargar-saldo.html">Recargar mi saldo con Yape</a>
         </div>
 
         <button class="whatsapp-btn" id="sendWhatsApp">
@@ -869,6 +888,91 @@ sendWhatsApp.addEventListener(
   }
 );
 
+</script>
+
+
+<script type="module">
+import { auth } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { buyWithNexoraBalance, getMyWallet, formatSoles } from "./wallet-data.js";
+
+const walletPanel = document.getElementById("walletCheckout");
+const available = document.getElementById("walletAvailable");
+const payButton = document.getElementById("payWallet");
+const resultBox = document.getElementById("walletResult");
+let paying = false;
+function informWallet(text,error=false){resultBox.textContent=text;resultBox.className=error?"error":"";}
+function currentOrder(){
+ try { return JSON.parse(sessionStorage.getItem("nexoraOrder")||"null"); }
+ catch{return null;}
+}
+function showPaid(orderId,balanceCents){
+ payButton.disabled=true;payButton.textContent="Pedido pagado con saldo";
+ document.getElementById("sendWhatsApp").disabled=true;
+ document.getElementById("sendWhatsApp").textContent="El pedido ya se pagó con saldo";
+ available.textContent=formatSoles(balanceCents);
+ informWallet("¡Pago registrado! Pedido: "+orderId+". Tu saldo restante es "+formatSoles(balanceCents)+". Verás el estado «Pago verificado» en tu perfil.");
+ const anchor=document.getElementById("walletContact");
+ if(!anchor){
+   const a=document.createElement("a");a.id="walletContact";a.className="wallet-link";
+   a.textContent="Avisar a NEXORA por WhatsApp sobre mi compra";
+   a.target="_blank";a.rel="noopener noreferrer";
+   a.href="https://wa.me/51992515200?text="+encodeURIComponent("Hola NEXORA, pagué con mi saldo. Pedido: "+orderId+". Por favor, revisen la entrega.");
+   resultBox.after(a);
+ }
+}
+onAuthStateChanged(auth,async user=>{
+ if(!currentOrder())return;
+ walletPanel.hidden=false;
+ if(!user){
+   payButton.disabled=true;payButton.textContent="Inicia sesión para pagar con saldo";
+   informWallet("Para utilizar tu saldo debes iniciar sesión en NEXORA STORE.");
+   return;
+ }
+ try{
+   const existingOrder=currentOrder();
+   const refId=existingOrder.historyId;
+   if(refId && /^[A-Za-z0-9-]{1,80}$/.test(refId)){
+     const snap=await getDoc(doc(getFirestore(auth.app),"users",user.uid,"orders",refId));
+     if(snap.exists() && snap.data().paymentMethod==="wallet"){
+       showPaid(refId,await getMyWallet());return;
+     }
+   }
+   const balanceCents=await getMyWallet();
+   available.textContent=formatSoles(balanceCents);
+   const required=Math.round(Number(existingOrder.price)*100);
+   const sufficient=Number.isSafeInteger(required)&&required>0&&balanceCents>=required;
+   payButton.disabled=!sufficient;
+   payButton.textContent=sufficient?"Pagar con mi saldo":"Saldo insuficiente";
+   if(!sufficient)informWallet("Puedes recargar saldo con Yape y esperar su aprobación.");
+ }catch(e){
+   payButton.disabled=true;payButton.textContent="Saldo no disponible";
+   informWallet("No se pudo consultar tu billetera. Inténtalo más tarde.",true);
+ }
+});
+payButton.addEventListener("click",async()=>{
+ if(paying || !auth.currentUser)return;
+ const order=currentOrder();
+ if(!order){informWallet("No encontramos el pedido, vuelve al catálogo.",true);return;}
+ const amount=Number(order.price);
+ if(!Number.isFinite(amount)||amount<=0){informWallet("El total del pedido no es válido.",true);return;}
+ if(!confirm("¿Confirmas el pago de S/ "+amount.toFixed(2)+" desde tu saldo NEXORA? Se descontará al completar el pedido."))return;
+ if(!order.historyId){
+   order.historyId=crypto.randomUUID();
+   sessionStorage.setItem("nexoraOrder",JSON.stringify(order));
+ }
+ paying=true;payButton.disabled=true;payButton.textContent="Procesando pago…";
+ informWallet("Comprobando el precio y el saldo con Firebase…");
+ try{
+   const answer=await buyWithNexoraBalance(order);
+   showPaid(answer.orderId,answer.balanceCents);
+ }catch(error){
+   console.error(error);
+   informWallet(error.message||"No se pudo realizar el pago. Tu saldo no debería haber cambiado.",true);
+   payButton.disabled=false;payButton.textContent="Reintentar pago con saldo";
+ }finally{paying=false;}
+});
 </script>
 
 </body>
