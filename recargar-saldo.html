@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07090e">
+<title>Recargar saldo con Yape | NEXORA STORE</title>
+<link rel="icon" href="nexora-logo.png">
+<style>
+:root{color-scheme:dark;--orange:#f5a623;--line:#2c3440;--dim:#a8b1be}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 75% 0%,#2b1b17,transparent 35%),#07090e;color:#fff;font:15px Arial,sans-serif}a{color:inherit;text-decoration:none}
+header{border-bottom:1px solid var(--line);padding:16px max(20px,calc((100% - 1040px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-weight:900;letter-spacing:.3px}.back{color:var(--dim);font-size:13px}
+main{max-width:1040px;margin:35px auto;padding:0 18px 70px}.eyebrow{color:var(--orange);font-weight:900;font-size:11px;letter-spacing:1px}h1{font-size:36px;margin:9px 0}p{line-height:1.6}.muted{color:var(--dim);font-size:13px}.layout{display:grid;grid-template-columns:1fr 350px;gap:18px;margin-top:22px}
+.card{background:#10151e;border:1px solid var(--line);border-radius:17px;padding:24px}h2{font-size:20px;margin:0 0 12px}
+.balance{color:var(--orange);font-size:32px;font-weight:900;margin:6px 0 14px}
+label{display:block;font-weight:700;font-size:13px;margin:20px 0 8px}input{width:100%;padding:13px;border:1px solid #3b4658;border-radius:10px;background:#090c13;color:#fff;font-size:15px}
+input:focus{outline:2px solid var(--orange)}button,.action{display:inline-block;border:0;border-radius:10px;padding:12px 17px;background:var(--orange);color:#16120b;font-weight:900;cursor:pointer}button:disabled{opacity:.6;cursor:wait}
+button.secondary,.action.secondary{background:#1b2430;color:#fff;border:1px solid #3b4658}.message{min-height:24px;font-size:13px;color:#83e1b9}.message.error{color:#ff9292}
+.note{background:#241d14;border:1px solid #664820;border-radius:12px;padding:12px 14px;font-size:12px;line-height:1.6;margin:17px 0}
+.yape{background:linear-gradient(140deg,#82149a,#57116e);text-align:center}.yape strong{display:block;font-size:26px;margin:6px 0}
+.qr{background:#fff;padding:10px;border-radius:14px;width:245px;max-width:100%;margin:16px auto}.qr canvas{display:block;width:100%;aspect-ratio:1}
+.yape .phone{font-size:22px;font-weight:900;letter-spacing:.4px;margin:10px}.payee{font-size:14px;font-weight:800}
+.history{margin-top:22px}.history article{border-top:1px solid var(--line);padding:13px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.history article strong{color:var(--orange)}.history article small{display:block;color:var(--dim);margin-top:5px}.status{font-size:12px;font-weight:800}.approved{color:#66dd9e}.rejected{color:#ff9a9a}.pending{color:#ffd07e}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.card{padding:18px}h1{font-size:29px}header{padding:16px 18px}}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">NEXORA STORE</a><a class="back" href="perfil.html">← Mi perfil</a></header>
+<main>
+<div class="eyebrow">BILLETERA NEXORA</div><h1>Recarga tu saldo con Yape</h1>
+<p class="muted">Pagas directamente a nuestro Yape personal, sin comisión adicional de NEXORA. El saldo se acredita después de verificar el ingreso.</p>
+<div id="gate" class="card"><p id="gateText">Comprobando tu cuenta…</p><a id="loginLink" class="action" href="login.html" hidden>Iniciar sesión</a></div>
+<div id="content" hidden>
+  <div class="layout">
+    <section class="card">
+      <h2>Solicitar recarga</h2>
+      <p class="muted">Saldo disponible en tu cuenta</p><div class="balance" id="balance">S/ 0.00</div>
+      <form id="topupForm">
+        <label for="amount">¿Cuánto dinero yapeaste? (S/)</label>
+        <input id="amount" type="text" inputmode="decimal" placeholder="20.00" required maxlength="8" autocomplete="off">
+        <label for="operation">Número de operación que aparece en Yape</label>
+        <input id="operation" type="text" inputmode="numeric" pattern="[0-9]{6,16}" placeholder="Ej. 12345678" minlength="6" maxlength="16" required autocomplete="off">
+        <label for="payer">Nombre del titular que realizó el Yape (opcional)</label>
+        <input id="payer" type="text" maxlength="80" placeholder="Nombre del remitente" autocomplete="off">
+        <div class="note">Importante: verifica primero que el Yape se haya enviado correctamente al destinatario indicado. Registrar una operación <b>no confirma el pago</b>. Revisaremos el movimiento real en Yape antes de añadir saldo. Nunca compartas tu clave ni código de seguridad.</div>
+        <button id="send" type="submit">Enviar solicitud de recarga</button>
+      </form>
+      <p class="message" id="message" role="status" aria-live="polite"></p>
+    </section>
+    <aside class="card yape">
+      <h2>Datos para yapear</h2><p>Escanea el QR o utiliza el número.</p>
+      <div class="qr"><canvas id="yapeQr" width="360" height="360" aria-label="QR de Yape NEXORA"></canvas></div>
+      <p class="muted">A nombre de</p><div class="payee">Lea Ticona Coila</div>
+      <div class="phone" id="phone">992 515 200</div>
+      <button id="copyPhone" type="button" class="secondary">Copiar número</button>
+      <p style="font-size:12px;opacity:.87;margin-top:18px">Confirma en la aplicación Yape el nombre de la persona receptora antes de pagar.</p>
+    </aside>
+  </div>
+  <section class="card history">
+    <h2>Mis solicitudes de recarga</h2>
+    <p class="muted">Pendiente = aún sin verificar. Aprobado = saldo sumado. Rechazado = no acreditado.</p>
+    <div id="topups"><p class="muted">Cargando solicitudes…</p></div>
+    <button type="button" class="secondary" id="refresh">Actualizar saldo e historial</button>
+  </section>
+</div>
+</main>
+<script type="module">
+import { auth } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { requestYapeTopup, getMyWallet, getMyTopups, formatSoles } from "./wallet-data.js";
+const qrMatrix = [
+"11111110010101111110011010010011101111111",
+"10000010000101000100110100111110101000001",
+"10111010101101110110111110000001001011101",
+"10111010110011010000110010010100001011101",
+"10111010100010011010111110100010101011101",
+"10000010111111000110101001011110001000001",
+"11111110101010101010101010101010101111111",
+"00000000100001101001010110100001100000000",
+"10111110001000101100001001011010001111100",
+"00000101001001100011110010110000000111011",
+"10000110010110110110100001011110100101000",
+"10101000011101101001011110100001010011101",
+"00011011010000100110111011010110101011110",
+"01110000111011010011111100100000010001000",
+"11100110001101000010000111010110010100100",
+"01001100011000100010100010111001101011001",
+"00011110001100001010010011010010110011010",
+"01111100010001100010000110010011011010010",
+"11000111010000111011111111101110110101110",
+"11011100010110111111110000100001001011001",
+"10001011100011001100001001111110100010110",
+"00110101111001011100101001110000001110010",
+"11011010011001010000000101101111110101100",
+"11010001100100011001000001100001001010011",
+"01111110110011010001111111011010110110011",
+"01101001001100100011111110110010001010001",
+"11010010110010100110100001111100100101101",
+"00010100010101111101011110000011011010010",
+"11000111011000111010001010110010111110000",
+"10100001100101000010111010011000100110010",
+"10011010111011110001000010111111010101100",
+"10110100100011001001111010100001101010101",
+"10101111110101111111101000011000111111010",
+"00000000101111100110010000011010100010011",
+"11111110001010100101110011011110101011110",
+"10000010111011001110111000100000100010001",
+"10111010100101111000110001010010111111010",
+"10111010111101110010111000111011110010000",
+"10111010110010000100100011011110010011110",
+"10000010000000011101011100100001000100001",
+"11111110100001011010100001010110011010000"
+];
+function drawQr(){
+  const canvas=document.getElementById("yapeQr"),ctx=canvas.getContext("2d");
+  const quiet=4, count=qrMatrix.length, moduleSize=canvas.width/(count+quiet*2);
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#71177f";
+  qrMatrix.forEach((line,y)=>[...line].forEach((cell,x)=>{
+    if(cell==="1") ctx.fillRect(Math.floor((x+quiet)*moduleSize),Math.floor((y+quiet)*moduleSize),Math.ceil(moduleSize),Math.ceil(moduleSize));
+  }));
+}
+drawQr();
+const gate=document.getElementById("gate"),content=document.getElementById("content");
+const message=document.getElementById("message");
+function inform(txt,error=false){message.textContent=txt;message.className="message"+(error?" error":"");}
+async function refresh(){
+  const [balance,topups]=await Promise.all([getMyWallet(),getMyTopups()]);
+  document.getElementById("balance").textContent=formatSoles(balance);
+  const list=document.getElementById("topups");list.replaceChildren();
+  if(!topups.length){const p=document.createElement("p");p.className="muted";p.textContent="Todavía no tienes solicitudes.";list.append(p);}
+  for(const t of topups){
+    const card=document.createElement("article"),details=document.createElement("div"),amount=document.createElement("strong"),meta=document.createElement("small"),status=document.createElement("span");
+    amount.textContent=formatSoles(t.amountCents);meta.textContent="Operación: "+t.yapeOperation+" · "+(t.createdAt?.toDate?.().toLocaleString("es-PE") || "Reciente");
+    status.textContent=({pending:"Pendiente",approved:"Aprobado",rejected:"Rechazado"})[t.status] || t.status;
+    status.className="status "+t.status;details.append(amount,meta);card.append(details,status);list.append(card);
+  }
+}
+document.getElementById("topupForm").addEventListener("submit",async ev=>{
+  ev.preventDefault();const button=document.getElementById("send");button.disabled=true;inform("Registrando solicitud…");
+  try{
+    const id=await requestYapeTopup({amount:document.getElementById("amount").value,operation:document.getElementById("operation").value,payer:document.getElementById("payer").value});
+    inform("Solicitud registrada ("+id.slice(0,8)+"). Estado: pendiente de verificar en Yape. Todavía no se ha añadido saldo.");
+    ev.target.reset();await refresh();
+  }catch(e){inform(e.message==="Missing or insufficient permissions."?"El sistema de recargas aún no está habilitado. Contacta a NEXORA.":e.message||"No se pudo registrar la solicitud.",true);}
+  finally{button.disabled=false;}
+});
+document.getElementById("refresh").addEventListener("click",()=>refresh().catch(()=>inform("No se pudo actualizar. Revisa tu conexión.",true)));
+document.getElementById("copyPhone").addEventListener("click",async()=>{try{await navigator.clipboard.writeText("992515200");document.getElementById("copyPhone").textContent="Copiado";}catch{document.getElementById("copyPhone").textContent="Copia: 992515200";}});
+onAuthStateChanged(auth,async user=>{
+  if(!user){gate.hidden=false;content.hidden=true;document.getElementById("gateText").textContent="Inicia sesión para recargar y ver tu saldo.";document.getElementById("loginLink").hidden=false;return;}
+  gate.hidden=true;content.hidden=false;
+  try{await refresh();}catch(e){inform("No pudimos cargar el saldo. Es posible que falte activar las reglas de Firebase.",true);}
+});
+</script>
+</body>
+</html>
