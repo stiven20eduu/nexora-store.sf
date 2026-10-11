@@ -18,6 +18,10 @@ button:disabled{opacity:.5;cursor:wait}.secondary{color:#fff;background:#1b2430;
 .item strong{font-size:20px;color:var(--orange)}.item small{display:block;color:var(--muted);line-height:1.7}
 .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.status{font-size:12px;font-weight:900}.status.approved{color:#71e8aa}.status.rejected{color:#ff9c9c}.status.pending{color:#f5c377}
 .warning{padding:14px;background:#2a1d0e;border:1px solid #765020;border-radius:12px;line-height:1.6;font-size:13px}
+.proof-detail{margin:12px 0 0;padding:10px;border:1px solid #384454;border-radius:10px;max-width:430px;background:#0b111a}
+.proof-detail summary{cursor:pointer;color:#f5a623;font-size:13px;font-weight:800}
+.proof-detail img{display:block;margin:12px 0 3px;max-width:100%;max-height:520px;object-fit:contain;border-radius:8px}
+.proof-detail p{font-size:11px;color:var(--muted);line-height:1.5}
 #message{min-height:20px}#message.error{color:#ff9898}
 @media(max-width:650px){h1{font-size:27px}.item{grid-template-columns:1fr}.actions{justify-content:flex-start}}
 </style>
@@ -64,6 +68,16 @@ function makeItem(t){
  const payer=document.createElement("small");payer.textContent="Remitente declarado: "+(t.payerName||"No indicado");
  const created=document.createElement("small");created.textContent="Solicitado: "+dateText(t.createdAt);
  left.append(amount,identity,operation,payer,created);
+ if(typeof t.proofImage==="string" && t.proofImage.length<=180000 &&
+    /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(t.proofImage)){
+   const detail=document.createElement("details");detail.className="proof-detail";
+   const summary=document.createElement("summary");summary.textContent="Ver comprobante adjunto";
+   const img=document.createElement("img");img.alt="Comprobante de Yape enviado por el cliente";img.loading="lazy";img.src=t.proofImage;
+   const reminder=document.createElement("p");reminder.textContent="La captura puede estar modificada. Confirma el número de operación y el ingreso en la aplicación Yape antes de aprobar.";
+   detail.append(summary,img,reminder);left.append(detail);
+ }else{
+   const noImage=document.createElement("small");noImage.textContent="Comprobante: no adjuntado (solicitud anterior)";left.append(noImage);
+ }
  const right=document.createElement("div");right.className="actions";
  if(t.status==="pending"){
    const approve=document.createElement("button");approve.type="button";approve.textContent="Aprobar y sumar saldo";
