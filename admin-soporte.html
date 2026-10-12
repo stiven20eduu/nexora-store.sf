@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080a10">
+<title>Atención al cliente · Panel MVP | NEXORA STORE</title>
+<link rel="icon" href="Emblema%20Nexora%20Store%20SF%20con%20corona.png">
+<link rel="stylesheet" href="nexora-premium.css?v=2">
+<style>
+:root{color-scheme:dark;--bg:#090c12;--panel:#151b26;--line:rgba(194,206,226,.17);--muted:#aab5c6;--orange:#ffb45e}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 85% 0,rgba(255,158,56,.09),transparent 40%),var(--bg);color:white;font:14px Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{cursor:wait;opacity:.55}
+[hidden]{display:none!important}header{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:15px max(20px,calc((100% - 1240px)/2));background:rgba(10,13,20,.9);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900}.brand img{width:43px;height:43px;border-radius:50%;object-fit:cover}
+.back{padding:12px 15px;background:#192332;border:1px solid var(--line);border-radius:11px;font-weight:800;font-size:12px}
+main{max-width:1240px;margin:38px auto;padding:0 20px 90px}h1{font-size:clamp(32px,4.5vw,46px);margin:8px 0 11px;letter-spacing:-.05em}
+h2{font-size:21px;margin:0 0 10px;letter-spacing:-.025em}.eyebrow{color:var(--orange);letter-spacing:1.8px;font-size:11px;font-weight:900}
+.muted{color:var(--muted);line-height:1.7;font-size:13px}.layout{display:grid;grid-template-columns:minmax(300px,.8fr) minmax(0,1.2fr);gap:18px;align-items:start;margin-top:22px}
+.panel{background:linear-gradient(145deg,#151d2a,#101620);border:1px solid var(--line);border-radius:20px;padding:22px;min-width:0;box-shadow:0 20px 45px rgba(0,0,0,.16)}
+.toolbar{display:flex;align-items:center;gap:12px;justify-content:space-between;margin:14px 0 18px}
+select,textarea{padding:13px;color:white;background:#0e1621;border:1px solid rgba(191,207,232,.23);border-radius:11px;outline:none}
+select:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:2px solid #ffc37d;outline-offset:3px}
+#filter{min-width:175px}.btn{padding:12px 16px;border-radius:11px;font-weight:850;border:1px solid rgba(189,205,226,.21);color:#e2e9f6;background:#212a38}
+.btn.primary{border:0;background:linear-gradient(110deg,#ffa046,#ffca72);color:#1d140c}
+.ticket-list{display:grid;gap:9px;max-height:690px;overflow-y:auto;padding-right:3px}
+.ticket-button{display:block;width:100%;text-align:left;padding:16px;background:#0e1620;border:1px solid rgba(174,190,217,.15);border-radius:13px;color:inherit;cursor:pointer;transition:border-color .2s,background .2s}
+.ticket-button:hover,.ticket-button[aria-current=true]{border-color:rgba(255,174,70,.5);background:#20202c}
+.ticket-button strong{display:block;overflow-wrap:anywhere;font-size:13px;line-height:1.4}
+.ticket-button small{display:block;font-size:11px;color:#a4afbf;margin-top:6px;line-height:1.5}
+.state{display:inline-flex;align-items:center;padding:5px 9px;font-size:10px;font-weight:850;border-radius:100px;border:1px solid rgba(245,179,67,.3);color:#ffbd6e;margin-top:9px;background:#32251d}
+.state.reviewing{color:#aacdff;background:#1a2a3b;border-color:#345a85}
+.state.resolved{color:#a6f2ce;background:#16362a;border-color:#3b7a60}
+.detail-block{padding:14px 0;border-bottom:1px solid rgba(203,215,231,.09)}.detail-block label{display:block;font-size:11px;color:#96a4b9;font-weight:850;margin-bottom:9px}
+.detail-block p{font-size:13px;line-height:1.78;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.detail-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-top:13px}
+.detail-images a{border:1px solid rgba(206,222,245,.17);border-radius:13px;overflow:hidden;display:block;background:#0c1320}
+.detail-images img{width:100%;height:auto;aspect-ratio:4/3;object-fit:contain;display:block}
+.detail-images span{display:block;padding:9px;font-size:11px;color:#cbd6e4;text-align:center}
+.field-label{display:block;margin:20px 0 8px;font-weight:800;font-size:12px;color:#ced8e8}
+textarea{display:block;width:100%;min-height:130px;resize:vertical;line-height:1.7}
+.actions{display:flex;flex-wrap:wrap;gap:11px;align-items:center;margin-top:15px}
+.feedback{min-height:27px;margin:13px 0;color:#9ee5c2;font-size:12px;line-height:1.6}.feedback.error{color:#ffabab}
+@media(max-width:880px){.layout{grid-template-columns:minmax(0,1fr)}.ticket-list{max-height:390px}}
+@media(max-width:540px){main{padding:0 12px 75px;margin-top:22px}.panel{padding:16px}.toolbar{align-items:stretch;flex-direction:column}.detail-images{grid-template-columns:1fr}header{padding:12px}.back{padding:10px}}
+</style>
+</head><body>
+<header><a class="brand" href="admin.html"><img src="Emblema%20Nexora%20Store%20SF%20con%20corona.png" alt=""> NEXORA · MVP</a><a class="back" href="admin.html">← Panel principal</a></header>
+<main>
+<div class="eyebrow">GESTIÓN PRIVADA · ATENCIÓN AL CLIENTE</div>
+<h1>Solicitudes de soporte</h1>
+<p class="muted">Revisa las incidencias recibidas, examina las capturas adjuntas y responde al cliente. Los reportes solo pueden ser consultados por las cuentas MVP autorizadas.</p>
+<section id="gate" class="panel"><p id="gateText">Comprobando permisos de administrador…</p></section>
+<div id="dashboard" class="layout" hidden>
+  <section class="panel">
+    <h2>Bandeja de entrada</h2><p class="muted" id="summary">Cargando casos…</p>
+    <div class="toolbar"><select id="filter" aria-label="Filtrar solicitudes">
+      <option value="all">Todos los casos</option>
+      <option value="open">Recibidos</option>
+      <option value="reviewing">En revisión</option>
+      <option value="resolved">Resueltos</option>
+    </select><button class="btn" type="button" id="refresh">↻ Actualizar</button></div>
+    <div id="ticketList" class="ticket-list" aria-live="polite"></div>
+  </section>
+  <section class="panel" id="detailPanel">
+    <h2>Detalle del caso</h2>
+    <p id="emptyDetail" class="muted">Selecciona una solicitud de la izquierda para consultar el mensaje y las imágenes.</p>
+    <div id="details" hidden>
+      <div class="detail-block"><label>Asunto</label><p id="detailTitle"></p></div>
+      <div class="detail-block"><label>Motivo y fecha</label><p id="detailCategory"></p></div>
+      <div class="detail-block"><label>Identificador de cuenta</label><p id="detailUid"></p></div>
+      <div class="detail-block"><label>Número de pedido (si lo proporcionó)</label><p id="detailOrder"></p></div>
+      <div class="detail-block"><label>Descripción del problema</label><p id="detailText"></p></div>
+      <div class="detail-block"><label>Evidencias del cliente</label><p class="muted" id="imagesStatus"></p><div id="detailImages" class="detail-images"></div></div>
+      <form id="replyForm">
+        <label class="field-label" for="replyStatus">Estado de atención</label>
+        <select id="replyStatus"><option value="open">Recibido</option><option value="reviewing">En revisión</option><option value="resolved">Resuelto</option></select>
+        <label class="field-label" for="replyText">Respuesta para el cliente</label>
+        <textarea id="replyText" maxlength="1000" placeholder="Explica qué revisaste y cómo se resolverá la solicitud..."></textarea>
+        <p class="muted">Si marcas el caso como resuelto, debes escribir una respuesta de al menos cinco caracteres.</p>
+        <div class="actions"><button id="save" class="btn primary" type="submit">Guardar y responder</button></div>
+        <p id="message" class="feedback" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+</div>
+</main>
+<script type="module">
+import {auth} from "./firebase.js";
+import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import {getMvpSupportTickets,getSupportImages,respondSupportTicket,SUPPORT_CATEGORIES,SUPPORT_STATUSES} from "./support-data.js";
+const $=id=>document.getElementById(id);
+const ADMIN_EMAILS=new Set(["nexora.store.sf@gmail.com","stiven20eduu@gmail.com"]);
+let tickets=[],selectedId=null,loadSeq=0,busy=false;
+const msg=(value,error=false)=>{const m=$("message");m.textContent=value;m.classList.toggle("error",error)};
+const show=(id,value)=>{$(id).textContent=value||"—"};
+function showDate(obj){return obj?.toDate?.().toLocaleString("es-PE",{dateStyle:"medium",timeStyle:"short"})||"Fecha pendiente"}
+function renderList(){
+ const filter=$("filter").value;
+ const visible=tickets.filter(t=>filter==="all"||t.status===filter);
+ $("summary").textContent=tickets.length+" casos registrados · "+tickets.filter(t=>t.status!=="resolved").length+" por atender";
+ const root=$("ticketList");root.replaceChildren();
+ if(!visible.length){root.textContent="No hay solicitudes en esta categoría.";return}
+ for(const item of visible){
+  const btn=document.createElement("button");btn.type="button";btn.className="ticket-button";
+  btn.setAttribute("aria-current",String(item.id===selectedId));
+  const name=document.createElement("strong");name.textContent=item.subject||"Sin asunto";
+  const small=document.createElement("small");small.textContent=(SUPPORT_CATEGORIES[item.category]||"Consulta")+" · "+showDate(item.createdAt);
+  const badge=document.createElement("span");badge.className="state "+(item.status||"open");
+  badge.textContent=SUPPORT_STATUSES[item.status]||"Recibido";
+  btn.append(name,small,badge);btn.addEventListener("click",()=>openTicket(item.id));root.append(btn);
+ }
+}
+async function openTicket(id){
+ selectedId=id;renderList();msg("");
+ const item=tickets.find(x=>x.id===id);
+ if(!item)return;
+ $("details").hidden=false;$("emptyDetail").hidden=true;
+ show("detailTitle",item.subject);
+ show("detailCategory",(SUPPORT_CATEGORIES[item.category]||"Consulta")+" · "+showDate(item.createdAt));
+ show("detailUid",item.uid);
+ show("detailOrder",item.orderId||"Sin número de pedido");
+ show("detailText",item.description);
+ $("replyStatus").value=Object.hasOwn(SUPPORT_STATUSES,item.status)?item.status:"open";
+ $("replyText").value=item.adminReply||"";
+ const slot=$("detailImages");slot.replaceChildren();
+ $("imagesStatus").textContent=item.imageCount?"Cargando "+item.imageCount+" imagen(es)…":"No se adjuntaron imágenes.";
+ const req=++loadSeq;
+ if(!item.imageCount)return;
+ try{
+   const pictures=await getSupportImages(item);
+   if(req!==loadSeq||id!==selectedId)return;
+   $("imagesStatus").textContent=pictures.length+" imagen(es) disponibles. Toca una para verla en tamaño completo.";
+   for(const p of pictures){
+     const a=document.createElement("a");a.href=p.image;a.target="_blank";a.rel="noopener noreferrer";
+     a.setAttribute("aria-label","Abrir evidencia "+(Number(p.id)+1));
+     const img=document.createElement("img");img.src=p.image;img.alt="Captura de evidencia "+(Number(p.id)+1);
+     const span=document.createElement("span");span.textContent="Ver captura "+(Number(p.id)+1)+" ↗";
+     a.append(img,span);slot.append(a);
+   }
+ }catch(error){
+   console.warn(error);
+   if(req===loadSeq)$("imagesStatus").textContent="No se pudieron cargar las imágenes. Comprueba las reglas de Firebase.";
+ }
+}
+async function refresh(){
+ const btn=$("refresh");btn.disabled=true;$("summary").textContent="Actualizando solicitudes…";
+ try{
+  tickets=await getMvpSupportTickets();renderList();
+  if(selectedId&&tickets.some(x=>x.id===selectedId))await openTicket(selectedId);
+  else if(tickets.length)await openTicket(tickets[0].id);
+  else{$("details").hidden=true;$("emptyDetail").hidden=false}
+ }catch(error){
+  console.warn(error);
+  $("summary").textContent=error.code==="permission-denied"?"Faltan publicar las reglas de soporte en Firebase.":"No pudimos cargar los reportes.";
+ }finally{btn.disabled=false}
+}
+$("refresh").addEventListener("click",refresh);
+$("filter").addEventListener("change",renderList);
+$("replyForm").addEventListener("submit",async e=>{
+ e.preventDefault();if(busy||!selectedId)return;
+ const selected=tickets.find(x=>x.id===selectedId);if(!selected)return;
+ const status=$("replyStatus").value,reply=$("replyText").value.trim();
+ if(status==="resolved"&&reply.length<5){msg("Escribe una respuesta al cliente antes de resolver.",true);return}
+ busy=true;$("save").disabled=true;msg("Guardando respuesta…");
+ try{
+  await respondSupportTicket(selectedId,status,reply);
+  selected.status=status;selected.adminReply=reply;
+  renderList();msg("✓ Cambios guardados. El cliente podrá ver tu respuesta.");
+ }catch(error){
+  msg(error.code==="permission-denied"?"Firebase rechazó el cambio. Debes publicar las reglas de soporte.":error.message||"No se pudo guardar.",true);
+ }finally{busy=false;$("save").disabled=false}
+});
+onAuthStateChanged(auth,async user=>{
+ if(!user){location.replace("login.html");return}
+ if(!user.emailVerified||!ADMIN_EMAILS.has((user.email||"").toLowerCase())){
+   $("gateText").textContent="Acceso denegado. Necesitas una cuenta MVP verificada.";return;
+ }
+ $("gate").hidden=true;$("dashboard").hidden=false;
+ await refresh();
+});
+</script></body></html>
