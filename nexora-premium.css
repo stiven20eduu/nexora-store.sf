@@ -323,3 +323,22 @@ body[data-nexora-page=admin] .user:hover{transform:translateY(-2px);border-color
   .nx-reveal,.nx-ready .nx-reveal{transition:none!important;transform:none!important;opacity:1!important}
   body[data-nexora-page] *,body[data-nexora-page] *::before,body[data-nexora-page] *::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 }
+
+
+/* FAQ pública: información clara con acordeón nativo accesible */
+.nx-faq{padding:66px 22px 80px;background:radial-gradient(ellipse at 8% 100%,rgba(255,133,47,.075),transparent 45%)}
+.nx-faq-wrap{width:min(1200px,100%);margin:auto;display:grid;grid-template-columns:minmax(260px,.8fr) minmax(0,1.2fr);align-items:start;gap:clamp(28px,5vw,85px)}
+.nx-faq-kicker{font-size:11px;letter-spacing:2px;font-weight:900;color:#ffb559}
+.nx-faq-intro h2{font-size:clamp(29px,3.4vw,46px);letter-spacing:-.04em;margin:13px 0}
+.nx-faq-intro p{font-size:14px;line-height:1.75;color:#a8b1c0}
+.nx-faq-intro>a{display:inline-flex;gap:9px;margin-top:22px;padding:12px 16px;border:1px solid rgba(255,175,66,.25);border-radius:12px;color:#ffc477;font-weight:800;font-size:13px}
+.nx-faq-questions{display:grid;gap:12px}
+.nx-faq-questions details{background:linear-gradient(145deg,#161d29,#111721);border:1px solid rgba(191,205,225,.13);border-radius:16px;overflow:hidden;transition:border-color .2s,background .2s}
+.nx-faq-questions details[open]{border-color:rgba(255,171,69,.31)}
+.nx-faq-questions summary{position:relative;cursor:pointer;list-style:none;padding:21px 48px 21px 21px;font-size:14px;font-weight:800;line-height:1.5}
+.nx-faq-questions summary::-webkit-details-marker{display:none}
+.nx-faq-questions summary::after{content:"+";position:absolute;top:50%;right:20px;transform:translateY(-50%);font-size:22px;font-weight:500;color:#ffbd69}
+.nx-faq-questions details[open] summary::after{content:"−"}
+.nx-faq-questions details p{margin:0 21px 21px;padding-top:16px;border-top:1px solid rgba(187,202,227,.09);font-size:13px;line-height:1.8;color:#abb7c7}
+.nx-faq-questions details a{color:#ffbd69;text-decoration:underline}
+@media(max-width:760px){.nx-faq{padding:48px 12px 100px}.nx-faq-wrap{grid-template-columns:minmax(0,1fr);gap:27px}.nx-faq-questions summary{padding:17px 43px 17px 17px;font-size:13px}.nx-faq-questions details p{margin:0 17px 17px}}
