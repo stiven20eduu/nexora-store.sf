@@ -112,6 +112,33 @@
     }
   }
 
+
+  // Respuestas claras a las dudas más frecuentes, sin mensajes engañosos sobre pagos.
+  if (page === "home" && !doc.getElementById("nx-faq")) {
+    const reference = doc.querySelector("footer, .footer");
+    const area = doc.createElement("section");
+    area.id = "nx-faq";
+    area.className = "nx-faq";
+    area.setAttribute("aria-labelledby", "nx-faq-heading");
+    area.innerHTML = `
+      <div class="nx-faq-wrap">
+        <div class="nx-faq-intro">
+          <span class="nx-faq-kicker">CENTRO DE AYUDA</span>
+          <h2 id="nx-faq-heading">Preguntas frecuentes</h2>
+          <p>Todo lo que necesitas saber antes de tu próxima recarga.</p>
+          <a href="perfil.html">Consultar mi cuenta <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="nx-faq-questions">
+          <details><summary>¿Cuándo aparece mi recarga de saldo?</summary><p>Cuando NEXORA confirma que el pago por Yape realmente fue recibido, acredita el saldo a tu cuenta. Enviar un comprobante no significa que ya esté aprobado.</p></details>
+          <details><summary>¿Puedo pagar con el saldo de mi cuenta?</summary><p>Sí. Si tienes saldo suficiente, al confirmar la compra se descuenta el importe y se registra un pedido pendiente de entrega.</p></details>
+          <details><summary>¿Cuánto tarda la entrega?</summary><p>Los pedidos pagados se atienden en menos de 24 horas. Puedes revisar el estado de tu pedido desde tu perfil.</p></details>
+          <details><summary>¿Dónde veo mis compras?</summary><p>Inicia sesión y entra en <a href="perfil.html">Mi perfil</a> para ver el historial y el estado de tus pedidos.</p></details>
+        </div>
+      </div>`;
+    if (reference) reference.parentNode.insertBefore(area, reference);
+    else doc.body.append(area);
+  }
+
   // Medidas preventivas: las imágenes de contenido no bloquean el primer render.
   doc.querySelectorAll("main img, .catalog-card img, footer img").forEach(img => {
     if (img.closest(".hero-slide")) return;
