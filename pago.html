@@ -312,6 +312,12 @@ function showConfirmation(order){
 }
 
 function setStatus(message,type=""){status.textContent=message;status.className="status"+(type?" "+type:"");}
+function setWalletState(label,style="waiting"){
+ const badge=byId("walletStatusBadge");
+ badge.textContent=label;
+ badge.className="wallet-state "+style;
+ byId("remainingRow").classList.toggle("warning",style==="bad");
+}
 function readOrder(){
  try{return JSON.parse(sessionStorage.getItem("nexoraOrder")||"null")}
  catch{return null}
@@ -341,6 +347,8 @@ function refreshAvailableBalance(cents){
 function paySucceeded(id,balance){
  paid=true;busy=false;
  refreshAvailableBalance(balance);
+ byId("walletRemaining").textContent=formatSoles(balance);
+ setWalletState("Pago confirmado","paid");
  button.disabled=true;button.textContent="Pedido pagado";
  setStatus("¡Pago confirmado! El pedido quedó registrado y NEXORA lo atenderá en menos de 24 horas.","success");
  byId("purchaseSuccess").hidden=false;
@@ -368,8 +376,10 @@ async function loadWallet(order,user){
  currentUserId=uid;
  approvedPriceCents=null;
  busy=false;paid=false;button.disabled=true;
+ setWalletState("Comprobando","waiting");
  byId("purchaseSuccess").hidden=true;
  if(!uid){
+  setWalletState("Inicia sesión","waiting");
   byId("loginHelp").hidden=false;
   button.textContent="Inicia sesión para usar tu saldo";
   byId("walletBalance").textContent="Inicia sesión";
@@ -404,16 +414,20 @@ async function loadWallet(order,user){
   }
   byId("walletRemaining").textContent=formatSoles(Math.max(0,wallet-official.priceCents));
   if(wallet<official.priceCents){
+   setWalletState("Saldo insuficiente","bad");
+   byId("walletRemaining").textContent="—";
    button.disabled=false;
    button.textContent="Comprar con saldo";
-   setStatus("Tu saldo no alcanza. Pulsa «Comprar con saldo» para ver cuánto falta y recargar.");
+   setStatus("No cuentas con saldo suficiente para completar esta compra. Puedes recargar con Yape y volver a intentarlo.");
    return;
   }
+  setWalletState("Saldo disponible","ok");
   button.disabled=false;
   button.textContent="Confirmar y pagar "+formatSoles(official.priceCents);
   setStatus("Saldo suficiente. Confirma para registrar el pago y solicitar la entrega.");
  }catch(error){
   console.error(error);
+  setWalletState("Revisar saldo","waiting");
   button.disabled=true;button.textContent="No se puede pagar";
   setStatus(error.message||"No pudimos verificar tu saldo. Intenta nuevamente más tarde.","error");
  }
