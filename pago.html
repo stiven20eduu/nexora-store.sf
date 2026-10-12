@@ -41,6 +41,33 @@ h1{font-size:clamp(27px,4vw,37px);margin:7px 0 10px}.subhead{color:var(--muted);
 .success-box[hidden],.error-card[hidden]{display:none}.success-box h3{margin:0 0 8px;color:var(--green)}
 .success-box p{font-size:12px;margin:6px 0}.success-box a{color:#ffe09a;text-decoration:underline}
 .error-card{max-width:600px;margin:65px auto;padding:30px;text-align:center}.error-card h2{margin-top:0}
+/* Ventanas de confirmación y saldo insuficiente */
+.modal-screen{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:rgba(1,4,10,.84);backdrop-filter:blur(6px);padding:22px;overflow-y:auto}
+.modal-card{width:min(100%,460px);border:1px solid #ad772f;border-radius:23px;background:linear-gradient(145deg,#12151e,#0c0f16);box-shadow:0 26px 85px rgba(0,0,0,.65),0 0 35px rgba(245,166,35,.08);padding:clamp(23px,5vw,30px);max-height:calc(100dvh - 44px);overflow-y:auto}
+.modal-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.modal-heading h2{color:var(--orange);font-size:clamp(20px,5vw,24px);margin:0;line-height:1.2;font-weight:900}
+.modal-exit{display:grid;place-items:center;flex-shrink:0;border:1px solid #354052;background:#0c111b;color:#aeb7c5;font-size:25px;border-radius:12px;width:40px;height:40px}
+.modal-hint{color:var(--muted);line-height:1.7;font-size:13px;margin:10px 0 22px}
+.modal-table{margin:17px 0 21px}
+.modal-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid #303844}
+.modal-row span{color:#aeb7c5;font-size:13px;flex-shrink:0}
+.modal-row strong{text-align:right;overflow-wrap:anywhere;font-size:14px}
+.modal-row.total strong{color:var(--orange);font-size:24px}
+.modal-row.total{padding-bottom:20px}
+.modal-buttons{display:grid;grid-template-columns:1fr 1.45fr;gap:12px;margin-top:24px}
+.modal-buttons button,.modal-buttons a{display:grid;place-items:center;min-height:50px;padding:11px 12px;border-radius:10px;font-size:14px;font-weight:900;text-align:center}
+.modal-back{background:#161a24;border:1px solid #3a4351;color:#d3d5df}
+.modal-approve,.modal-recharge{background:var(--orange);border:1px solid var(--orange);color:#161008}
+.modal-approve:disabled{opacity:.6;cursor:wait}
+.warn-symbol{display:grid;place-items:center;width:92px;height:92px;margin:8px auto 22px;background:linear-gradient(135deg,#e3295c,#a30b3e);border-radius:50%;color:#fff;font-size:64px;font-weight:900;box-shadow:0 0 35px rgba(225,20,67,.25)}
+.warning-modal{text-align:center}
+.warning-modal .modal-heading{justify-content:center}
+.warning-modal h2{color:#fff;font-size:27px}
+.warning-caption{color:#ff8099;font-weight:900;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin:0 0 15px}
+.warning-modal .modal-hint{font-size:15px;margin:0 0 14px}
+.warning-meta{font-size:13px;color:#bac1ce;line-height:1.7}
+body.modal-open{overflow:hidden}
+@media(max-width:420px){.modal-screen{padding:13px}.modal-card{padding:22px 20px}.modal-buttons{gap:9px}.modal-buttons button,.modal-buttons a{font-size:12px}}
 footer{border-top:1px solid #29313d;color:#8894a4;padding:23px max(18px,calc((100% - 1100px)/2));font-size:12px}
 [hidden]{display:none!important}
 @media(max-width:780px){.layout{grid-template-columns:1fr}header{padding:12px 18px}.card-body{padding:17px}}
@@ -98,6 +125,31 @@ footer{border-top:1px solid #29313d;color:#8894a4;padding:23px max(18px,calc((10
 </aside>
 </div>
 </section>
+<!-- Diálogos: se abren únicamente después de validar precio y saldo -->
+<div class="modal-screen" id="confirmModal" hidden>
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmHint">
+    <div class="modal-heading"><h2 id="confirmTitle">CONFIRMA TU COMPRA</h2><button type="button" class="modal-exit" id="confirmExit" aria-label="Cerrar ventana">×</button></div>
+    <p id="confirmHint" class="modal-hint">Revisa bien el ID y el paquete antes de usar tu saldo.</p>
+    <div class="modal-table">
+      <div class="modal-row"><span>Paquete</span><strong id="modalProduct">—</strong></div>
+      <div class="modal-row"><span>ID del jugador</span><strong id="modalPlayerId">—</strong></div>
+      <div class="modal-row"><span>Jugador</span><strong id="modalPlayerName">—</strong></div>
+      <div class="modal-row total"><span>Total</span><strong id="modalPrice">S/ —</strong></div>
+      <div class="modal-row"><span>Saldo restante</span><strong id="modalRemaining">S/ —</strong></div>
+    </div>
+    <div class="modal-buttons"><button class="modal-back" id="confirmBack" type="button">Volver</button><button class="modal-approve" id="modalApprove" type="button">Confirmar compra</button></div>
+  </section>
+</div>
+<div class="modal-screen" id="insufficientModal" hidden>
+  <section class="modal-card warning-modal" role="alertdialog" aria-modal="true" aria-labelledby="insufficientTitle" aria-describedby="insufficientText">
+    <div class="warn-symbol" aria-hidden="true">!</div>
+    <p class="warning-caption">Atención</p>
+    <div class="modal-heading"><h2 id="insufficientTitle">Saldo insuficiente</h2></div>
+    <p class="modal-hint" id="insufficientText">Saldo insuficiente. Recarga tu cuenta para realizar esta compra.</p>
+    <p class="warning-meta" id="shortfallText"></p>
+    <div class="modal-buttons"><button class="modal-back" id="insufficientBack" type="button">Volver</button><a class="modal-recharge" href="recargar-saldo.html">Recargar saldo</a></div>
+  </section>
+</div>
 <section id="missingOrder" class="card error-card" hidden>
 <h2>No encontramos tu pedido</h2>
 <p class="subhead">Regresa a NEXORA STORE, selecciona un producto y pulsa «Finalizar compra».</p>
@@ -121,6 +173,52 @@ let paid=false;
 let approvedPriceCents=null;
 let visibleBalance=null;
 let currentUserId=null;
+let lastFocus=null;
+function showModal(id){
+  closeModals(false);
+  lastFocus=document.activeElement;
+  const modal=byId(id);
+  modal.hidden=false;
+  document.body.classList.add("modal-open");
+  const focus=modal.querySelector("button");
+  focus?.focus();
+}
+function closeModals(restoreFocus=true){
+  byId("confirmModal").hidden=true;
+  byId("insufficientModal").hidden=true;
+  document.body.classList.remove("modal-open");
+  if(restoreFocus && lastFocus?.isConnected)lastFocus.focus();
+  lastFocus=null;
+}
+for(const [id,modalId] of [["confirmExit","confirmModal"],["confirmBack","confirmModal"],["insufficientBack","insufficientModal"]]){
+  byId(id).addEventListener("click",()=>closeModals());
+  byId(modalId).addEventListener("click",event=>{if(event.target===byId(modalId))closeModals()});
+}
+document.addEventListener("keydown",event=>{
+ if(event.key==="Escape" && (!byId("confirmModal").hidden||!byId("insufficientModal").hidden))closeModals();
+ if(event.key==="Tab"){
+  const active=!byId("confirmModal").hidden?byId("confirmModal"):(!byId("insufficientModal").hidden?byId("insufficientModal"):null);
+  if(!active)return;
+  const focusables=Array.from(active.querySelectorAll("button:not([disabled]),a[href]"));
+  if(!focusables.length)return;
+  const first=focusables[0],last=focusables[focusables.length-1];
+  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+ }
+});
+function showInsufficient(){
+ if(!Number.isSafeInteger(approvedPriceCents)||!Number.isSafeInteger(visibleBalance))return;
+ byId("shortfallText").textContent="Saldo: "+formatSoles(visibleBalance)+" · Te faltan "+formatSoles(Math.max(0,approvedPriceCents-visibleBalance))+".";
+ showModal("insufficientModal");
+}
+function showConfirmation(order){
+ byId("modalProduct").textContent=order.product;
+ byId("modalPlayerId").textContent=[order.playerId,order.serverId].filter(Boolean).join(" / ")||"No indicado";
+ byId("modalPlayerName").textContent=order.playerName||"Nombre no verificado";
+ byId("modalPrice").textContent=formatSoles(approvedPriceCents);
+ byId("modalRemaining").textContent=formatSoles(visibleBalance-approvedPriceCents);
+ showModal("confirmModal");
+}
 
 function setStatus(message,type=""){status.textContent=message;status.className="status"+(type?" "+type:"");}
 function readOrder(){
@@ -215,8 +313,9 @@ async function loadWallet(order,user){
   }
   byId("walletRemaining").textContent=formatSoles(Math.max(0,wallet-official.priceCents));
   if(wallet<official.priceCents){
-   button.textContent="Saldo insuficiente";
-   setStatus("Te faltan "+formatSoles(official.priceCents-wallet)+". Recarga con Yape y espera a que el saldo se acredite.");
+   button.disabled=false;
+   button.textContent="Comprar con saldo";
+   setStatus("Tu saldo no alcanza. Pulsa «Comprar con saldo» para ver cuánto falta y recargar.");
    return;
   }
   button.disabled=false;
@@ -239,31 +338,42 @@ if(!validOrder(originalOrder)){
   loadWallet(originalOrder,user);
  });
 }
-button.addEventListener("click",async()=>{
- if(busy||paid||!auth.currentUser||auth.currentUser.uid!==currentUserId||!Number.isSafeInteger(approvedPriceCents)||visibleBalance<approvedPriceCents)return;
+button.addEventListener("click",()=>{
+ if(busy||paid||!auth.currentUser||auth.currentUser.uid!==currentUserId||!Number.isSafeInteger(approvedPriceCents)||!Number.isSafeInteger(visibleBalance))return;
  const order=readOrder();
  if(!validOrder(order) || order.game!==originalOrder.game || order.product!==originalOrder.product ||
    order.gameKey!==originalOrder.gameKey || Math.round(Number(order.price)*100)!==approvedPriceCents){
-  setStatus("El pedido cambió. Vuelve al catálogo y selecciónalo otra vez.","error");button.disabled=true;return;
+  setStatus("El pedido cambió. Vuelve al catálogo y selecciónalo de nuevo.","error");button.disabled=true;return;
  }
- const remaining=visibleBalance-approvedPriceCents;
- if(!confirm("¿Confirmas que deseas pagar "+formatSoles(approvedPriceCents)+" con tu saldo NEXORA?\n\nSaldo actual: "+formatSoles(visibleBalance)+"\nSaldo después de pagar: "+formatSoles(remaining)+"\n\nEl pedido quedará con PAGO VERIFICADO, pendiente de entrega en menos de 24 horas."))return;
+ if(visibleBalance<approvedPriceCents){showInsufficient();return;}
+ showConfirmation(order);
+});
+byId("modalApprove").addEventListener("click",async()=>{
+ if(busy||paid||!auth.currentUser||auth.currentUser.uid!==currentUserId)return;
+ const order=readOrder();
+ if(!validOrder(order) || order.game!==originalOrder.game || order.product!==originalOrder.product ||
+    order.gameKey!==originalOrder.gameKey || Math.round(Number(order.price)*100)!==approvedPriceCents){
+    closeModals();
+    setStatus("El pedido cambió. Vuelve al catálogo y selecciónalo de nuevo.","error");button.disabled=true;return;
+ }
+ if(!Number.isSafeInteger(approvedPriceCents)||!Number.isSafeInteger(visibleBalance))return;
+ if(visibleBalance<approvedPriceCents){showInsufficient();return;}
+ closeModals();
  if(!order.historyId){
   order.historyId=crypto.randomUUID();
   sessionStorage.setItem("nexoraOrder",JSON.stringify(order));
  }
  busy=true;button.disabled=true;button.textContent="Procesando pago…";
- setStatus("Validando precio y descontando el saldo en una sola transacción…");
+ setStatus("Verificando el precio y descontando tu saldo en una única transacción…");
  try{
-  const completed=await buyWithNexoraBalance(order);
-  paySucceeded(completed.orderId,completed.balanceCents);
+  const answer=await buyWithNexoraBalance(order);
+  paySucceeded(answer.orderId,answer.balanceCents);
  }catch(error){
   console.error(error);
-  button.disabled=true;button.textContent="Revisar saldo";
-  setStatus(error.message||"No pudimos confirmar el pago. Revisa el historial antes de reintentar.","error");
+  button.disabled=true;button.textContent="Verificar nuevamente";
+  setStatus(error.message||"No pudimos confirmar el pago. Revisa primero tu historial.","error");
   busy=false;
-  // Antes de permitir otro intento, lee Firebase de nuevo: quizá el servidor
-  // confirmó la transacción pero se interrumpió la conexión.
+  // Volvemos a consultar Firebase para no repetir un débito posiblemente confirmado.
   await loadWallet(originalOrder,auth.currentUser);
  }
 });
