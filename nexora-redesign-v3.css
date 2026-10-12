@@ -13,7 +13,31 @@ body[data-nexora-page=home] .brand img{width:48px;height:48px;border:1px solid r
 body[data-nexora-page=home] .brand-name{font-size:16px;letter-spacing:.045em}
 body[data-nexora-page=home] .nav-menu a{font-size:12px;font-weight:800}
 body[data-nexora-page=home] .register{padding:13px 19px}
-body[data-nexora-page=home] .ticker{display:none}
+/* La franja original de minimensajes vuelve, visible al desplazarse. */
+body[data-nexora-page=home] .ticker{
+ display:block;
+ position:sticky;
+ top:78px;
+ z-index:999;
+ height:33px;
+ background:rgba(9,12,19,.96);
+ border-top:1px solid rgba(255,184,95,.08);
+ border-bottom:1px solid rgba(255,179,91,.17);
+ box-shadow:0 9px 24px rgba(0,0,0,.27);
+ backdrop-filter:blur(18px);
+ -webkit-backdrop-filter:blur(18px);
+}
+body[data-nexora-page=home] .ticker-track{animation-duration:58s}
+body[data-nexora-page=home] .ticker-item{font-size:10px}
+body[data-nexora-page=home] .ticker:hover .ticker-track{animation-play-state:paused}
+@media(max-width:650px){
+ body[data-nexora-page=home] .ticker{top:64px;height:30px}
+ body[data-nexora-page=home] .ticker-item{font-size:9px;margin-right:40px}
+}
+@media(prefers-reduced-motion:reduce){
+ body[data-nexora-page=home] .ticker{overflow-x:auto}
+ body[data-nexora-page=home] .ticker-track{animation:none;transform:none}
+}
 body[data-nexora-page=home] .hero-section{padding:30px 0 0}
 body[data-nexora-page=home] .nxv3-spotlight{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);gap:18px;min-height:552px}
 body[data-nexora-page=home] .nxv3-intro{

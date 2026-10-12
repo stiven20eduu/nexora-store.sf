@@ -7,16 +7,9 @@
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const motion = () => reducedMotion.matches ? "auto" : "smooth";
 
-  // Indicador de lectura. Se reutiliza un solo frame por desplazamiento.
-  const progress = doc.createElement("div");
-  progress.id = "nx-scroll-progress";
-  progress.setAttribute("aria-hidden", "true");
-  doc.body.append(progress);
+  // Botón volver arriba; sin barra de progreso visual.
   let scheduled = false;
   const scrollUpdate = () => {
-    const max = Math.max(0, doc.documentElement.scrollHeight - window.innerHeight);
-    const proportion = max > 0 ? Math.max(0, Math.min(1, window.scrollY / max)) : 0;
-    progress.style.transform = "scaleX(" + proportion.toFixed(4) + ")";
     const back = doc.getElementById("nx-to-top");
     if (back) back.classList.toggle("nx-visible", window.scrollY > 540);
     scheduled = false;
