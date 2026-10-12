@@ -1,0 +1,325 @@
+/* NEXORA STORE · Identidad visual premium V2
+   Capa de presentación: no altera cálculos, cuentas ni operaciones. */
+:root{
+  --nx-bg:#08090e;--nx-surface:#111620;--nx-surface-soft:#171d29;
+  --nx-border:rgba(184,196,220,.15);--nx-ink:#f7f8fb;--nx-muted:#a0aabc;
+  --nx-orange:#ffae35;--nx-red:#ef543d;--nx-glow:rgba(252,125,43,.15);
+  --nx-shadow:0 25px 65px rgba(0,0,0,.32);--nx-round:20px;
+}
+html{scroll-padding-top:88px;scroll-behavior:smooth}
+body[data-nexora-page]{
+  color:var(--nx-ink);
+  background-color:var(--nx-bg);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+body[data-nexora-page] :is(button,input,select,textarea){font-family:inherit}
+body[data-nexora-page] button,body[data-nexora-page] a{-webkit-tap-highlight-color:transparent}
+body[data-nexora-page] :is(a,button,input,select,textarea,summary):focus-visible{
+  outline:2px solid #ffd18b;outline-offset:3px;
+}
+body[data-nexora-page] :is(h1,h2,h3){text-wrap:balance;letter-spacing:-.025em}
+body[data-nexora-page] p{overflow-wrap:break-word}
+body[data-nexora-page] :is(.card,.box,.panel,.stat,.benefit,.step,.trust-item){
+  border-color:var(--nx-border);
+}
+body[data-nexora-page] :is(.back,.secondary,.shop,.btn.secondary,.wallet-action-secondary){
+  transition:transform .22s ease,border-color .22s ease,background .22s ease,box-shadow .22s ease;
+}
+body[data-nexora-page] :is(.back,.secondary,.shop,.btn.secondary,.wallet-action-secondary):hover{
+  border-color:rgba(255,187,92,.37);transform:translateY(-2px);
+}
+body[data-nexora-page] :is(.primary,.register,.register-btn,.pay,.continue-btn,.btn:not(.secondary),.wallet-action-primary,.hero-btn){
+  transition:transform .2s ease,box-shadow .2s ease,filter .2s ease,background .2s ease;
+}
+body[data-nexora-page] :is(.primary,.register,.register-btn,.pay:not(:disabled),.continue-btn:not(:disabled),.btn:not(.secondary),.wallet-action-primary,.hero-btn):hover{
+  transform:translateY(-2px);box-shadow:0 13px 29px rgba(250,133,36,.23);filter:brightness(1.06);
+}
+body[data-nexora-page] :is(input:not([type=checkbox]),select,textarea){
+  transition:border-color .2s ease,box-shadow .2s ease,background .2s ease;
+}
+body[data-nexora-page] :is(input:not([type=checkbox]),select,textarea):focus{
+  border-color:#ffb84d;box-shadow:0 0 0 4px rgba(255,175,65,.11);outline:none;
+}
+body[data-nexora-page] [hidden]{display:none!important}
+/* Fina línea de navegación que acompaña al desplazamiento. */
+#nx-scroll-progress{position:fixed;top:0;left:0;z-index:10005;height:3px;width:100%;transform:scaleX(0);transform-origin:left;pointer-events:none;background:linear-gradient(90deg,#ff6b37 0%,#ffc15b 55%,#ff514c 100%);box-shadow:0 0 13px rgba(255,152,60,.65)}
+#nx-to-top{position:fixed;right:20px;bottom:22px;z-index:9000;width:43px;height:43px;display:grid;place-items:center;border:1px solid rgba(255,180,88,.34);border-radius:14px;background:rgba(22,25,34,.9);color:#ffd18a;box-shadow:0 12px 30px rgba(0,0,0,.3);backdrop-filter:blur(16px);opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .25s,transform .25s;cursor:pointer}
+#nx-to-top.nx-visible{opacity:1;transform:none;pointer-events:auto}
+#nx-to-top:hover{background:#27212a}
+.nx-bottom-nav{display:none}
+.nx-reveal{transition:opacity .6s cubic-bezier(.2,.65,.2,1),transform .6s cubic-bezier(.2,.65,.2,1);transition-delay:var(--nx-stagger,0ms)}
+.nx-ready .nx-reveal:not(.nx-in){opacity:0;transform:translateY(16px)}
+.nx-ready .nx-reveal.nx-in{opacity:1;transform:translateY(0)}
+/* HOME: hero inmersivo, tarjetas cinematográficas, secciones aireadas */
+body[data-nexora-page=home]{
+  --orange:#ffad37;--orange-hover:#ffc463;--border:rgba(176,194,221,.16);
+  background:radial-gradient(ellipse 65% 38% at 75% -7%,rgba(246,87,46,.15),transparent 85%),radial-gradient(ellipse 80% 55% at 3% 62%,rgba(255,145,31,.055),transparent 85%),#08090e;
+}
+body[data-nexora-page=home] .navbar,body[data-nexora-page=game] .navbar{
+  background:rgba(8,10,15,.82);border-color:rgba(255,255,255,.09);
+  backdrop-filter:blur(24px) saturate(130%);-webkit-backdrop-filter:blur(24px) saturate(130%);
+  box-shadow:0 8px 27px rgba(0,0,0,.12);
+}
+body[data-nexora-page=home] .nav-menu{gap:4px}
+body[data-nexora-page=home] .nav-menu a{
+  padding:10px 14px;border-radius:11px;color:#b9c1d1;font-size:12px;
+  transition:background .2s,color .2s;
+}
+body[data-nexora-page=home] .nav-menu a:hover{background:rgba(255,255,255,.055);color:#fff}
+body[data-nexora-page=home] .brand-name,body[data-nexora-page=game] .brand-name{letter-spacing:.035em}
+body[data-nexora-page=home] .brand-sub,body[data-nexora-page=game] .brand-sub{color:#ffbd69;letter-spacing:1.45px}
+body[data-nexora-page=home] .register,body[data-nexora-page=game] .register{
+  border-radius:12px;background:linear-gradient(117deg,#ff8e37,#ffca58);color:#190e09;
+  box-shadow:0 5px 18px rgba(255,128,40,.14);
+}
+body[data-nexora-page=home] .hero-section{padding-top:26px}
+body[data-nexora-page=home] .hero{
+  isolation:isolate;overflow:hidden;
+  border:1px solid rgba(255,197,111,.16);border-radius:27px;
+  box-shadow:0 34px 90px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.05);
+  background-color:#17131b;
+}
+body[data-nexora-page=home] .hero::after{
+  content:"";pointer-events:none;position:absolute;z-index:1;inset:0;border-radius:inherit;
+  background:linear-gradient(120deg,rgba(255,255,255,.045),transparent 35%,rgba(255,176,60,.03) 75%);
+}
+body[data-nexora-page=home] .hero-slide::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(5,7,12,.86) 0%,rgba(5,7,12,.49) 48%,rgba(6,7,13,.12) 100%);
+}
+body[data-nexora-page=home] .hero-content{position:relative;z-index:2}
+body[data-nexora-page=home] .hero-content h1{
+  font-size:clamp(39px,5.1vw,76px);line-height:1.04;letter-spacing:-.052em;
+  text-shadow:0 8px 30px rgba(0,0,0,.35);
+}
+body[data-nexora-page=home] .hero-subtitle{font-size:clamp(15px,1.7vw,20px);font-weight:700;color:#ffd49d}
+body[data-nexora-page=home] .hero-description{line-height:1.65;color:#d7dce7}
+body[data-nexora-page=home] .hero-btn{
+  border-radius:12px;padding:14px 23px;font-weight:850;
+  background:linear-gradient(120deg,#fb8f36,#ffc04d);box-shadow:0 10px 28px rgba(255,128,40,.24);
+}
+body[data-nexora-page=home] .hero-controls{z-index:3}
+body[data-nexora-page=home] .ticker{border-color:rgba(255,255,255,.08);background:rgba(19,23,30,.8)}
+body[data-nexora-page=home] .trust-strip{margin-top:8px}
+body[data-nexora-page=home] .trust-item{
+  background:linear-gradient(155deg,rgba(29,35,46,.93),rgba(14,19,28,.91));
+  border:1px solid rgba(182,194,221,.1);border-radius:18px;
+  transition:transform .22s ease,border-color .22s ease;
+}
+body[data-nexora-page=home] .trust-item:hover{transform:translateY(-3px);border-color:rgba(255,177,83,.28)}
+body[data-nexora-page=home] .section{padding-top:54px;padding-bottom:22px}
+body[data-nexora-page=home] .section-title{
+  font-size:clamp(26px,2.8vw,39px);letter-spacing:-.035em;
+}
+body[data-nexora-page=home] .eyebrow,body[data-nexora-page=game] .eyebrow{
+  color:#ffb74f;letter-spacing:2px;font-size:11px;font-weight:900;
+}
+body[data-nexora-page=home] .toolbar{
+  background:linear-gradient(130deg,rgba(22,28,38,.85),rgba(13,18,27,.89));
+  border:1px solid rgba(181,200,229,.12);border-radius:18px;padding:12px;
+  box-shadow:0 18px 35px rgba(0,0,0,.12);
+}
+body[data-nexora-page=home] .search{background:#090e16;border-radius:12px}
+body[data-nexora-page=home] .filter{border-radius:11px;transition:background .2s,border-color .2s,transform .2s}
+body[data-nexora-page=home] .filter:hover{transform:translateY(-2px)}
+body[data-nexora-page=home] .catalog-card{
+  border:1px solid rgba(238,238,244,.14);border-radius:21px;
+  box-shadow:0 18px 36px rgba(0,0,0,.25);overflow:hidden;isolation:isolate;
+  transition:transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s,border-color .28s;
+}
+body[data-nexora-page=home] .catalog-card:hover{
+  transform:translateY(-7px);border-color:rgba(255,186,94,.48);
+  box-shadow:0 28px 60px rgba(0,0,0,.4),0 0 0 1px rgba(255,159,42,.05);
+}
+body[data-nexora-page=home] .catalog-card img{transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+body[data-nexora-page=home] .catalog-card:hover img{transform:scale(1.05)}
+body[data-nexora-page=home] :is(.benefit,.step){
+  background:linear-gradient(144deg,#171d28,#0e131d);
+  border:1px solid rgba(174,195,221,.11);
+  border-radius:20px;box-shadow:0 12px 27px rgba(0,0,0,.1);
+  transition:transform .25s,border-color .25s,box-shadow .25s;
+}
+body[data-nexora-page=home] :is(.benefit,.step):hover{
+  transform:translateY(-5px);border-color:rgba(255,171,64,.3);box-shadow:0 21px 36px rgba(0,0,0,.17);
+}
+body[data-nexora-page=home] .cta{
+  border-radius:24px;overflow:hidden;
+  background:radial-gradient(circle at 90% 10%,rgba(255,139,54,.17),transparent 55%),linear-gradient(125deg,#1b1d28,#111621);
+  border:1px solid rgba(255,178,76,.21);box-shadow:var(--nx-shadow);
+}
+body[data-nexora-page=home] .footer{background:linear-gradient(#0d111a,#06080c)}
+/* GAME: mejor lectura, jerarquía de producto y resumen */
+body[data-nexora-page=game]{--orange:#ffaf41;--orange2:#ffc269;--border:rgba(190,203,222,.15);background:radial-gradient(circle at 84% 0,rgba(252,96,46,.09),transparent 42%),#080a10}
+body[data-nexora-page=game] .game-hero{border-bottom:1px solid rgba(255,175,69,.19);isolation:isolate}
+body[data-nexora-page=game] .game-hero img{filter:saturate(1.07)}
+body[data-nexora-page=game] .game-hero::after{background:linear-gradient(90deg,rgba(6,8,13,.92),rgba(9,10,15,.58) 58%,rgba(9,10,15,.19))}
+body[data-nexora-page=game] .hero-info{position:relative;z-index:2}
+body[data-nexora-page=game] .hero-info h1{font-size:clamp(42px,5vw,66px);letter-spacing:-.04em}
+body[data-nexora-page=game] .main{margin-top:38px}
+body[data-nexora-page=game] .top-heading h2{font-size:clamp(25px,3vw,37px);letter-spacing:-.035em}
+body[data-nexora-page=game] .box,body[data-nexora-page=game] .summary{
+  background:linear-gradient(140deg,#151c28,#0d131d);border:1px solid rgba(182,200,225,.15);
+  border-radius:20px;box-shadow:0 17px 42px rgba(0,0,0,.16);
+}
+body[data-nexora-page=game] .summary{top:92px}
+body[data-nexora-page=game] .box-header{border-bottom-color:rgba(199,207,229,.1)}
+body[data-nexora-page=game] .product-card,body[data-nexora-page=game] .guide-step{
+  border-radius:14px;transition:border-color .23s,background .23s,transform .23s,box-shadow .23s;
+}
+body[data-nexora-page=game] .product-card:hover{
+  transform:translateY(-3px);border-color:rgba(255,186,91,.38);box-shadow:0 10px 25px rgba(0,0,0,.18);
+}
+body[data-nexora-page=game] .continue-btn:not(:disabled){background:linear-gradient(115deg,#ff9438,#ffc158);border:0;border-radius:12px}
+body[data-nexora-page=game] .summary-empty{border-radius:12px}
+/* CHECKOUT: destellos discretos sin tocar la lógica transaccional */
+body[data-nexora-page=checkout]{background:radial-gradient(ellipse at 90% 0,rgba(244,118,43,.13),transparent 45%),radial-gradient(ellipse at 0 30%,rgba(125,73,178,.09),transparent 40%),#080a10}
+body[data-nexora-page=checkout] header{background:rgba(11,14,20,.8);backdrop-filter:blur(17px)}
+body[data-nexora-page=checkout] h1{letter-spacing:-.045em}
+body[data-nexora-page=checkout] .card{border-radius:20px;box-shadow:0 21px 55px rgba(0,0,0,.2)}
+body[data-nexora-page=checkout] .wallet-card{border-color:rgba(255,173,59,.24)}
+body[data-nexora-page=checkout] .balance-main{
+  background:radial-gradient(circle at 85% 12%,rgba(98,235,166,.12),transparent 45%),linear-gradient(130deg,#162c2d,#10212b);
+}
+body[data-nexora-page=checkout] .pay:not(:disabled){background:linear-gradient(105deg,#ff9438,#ffcc66)}
+/* ACCOUNT + WALLET: orden visual y bloques legibles */
+body[data-nexora-page=profile],body[data-nexora-page=topup]{
+  background:radial-gradient(ellipse 60% 34% at 93% 0,rgba(245,133,45,.12),transparent 80%),#080a10;
+}
+body[data-nexora-page=profile] header,body[data-nexora-page=topup] header{
+  background:rgba(11,14,22,.73);backdrop-filter:blur(18px)
+}
+body[data-nexora-page=profile] main{max-width:880px}
+body[data-nexora-page=profile] .card,body[data-nexora-page=topup] .card{
+  background:linear-gradient(143deg,#151b27,#0e141e);
+  border-radius:21px;box-shadow:0 22px 55px rgba(0,0,0,.14);
+}
+body[data-nexora-page=profile] .wallet-feature{
+  border-color:rgba(255,179,66,.32);
+  background:radial-gradient(circle at 94% 0,rgba(255,179,66,.11),transparent 58%),linear-gradient(140deg,#182437,#101824);
+}
+body[data-nexora-page=profile] .dashboard .stat{
+  background:linear-gradient(140deg,#1a2331,#111824);border-radius:16px;
+}
+body[data-nexora-page=profile] .order-item{background:#101824;transition:border-color .25s}
+body[data-nexora-page=profile] .order-item:hover{border-color:rgba(255,169,60,.25)}
+body[data-nexora-page=topup] .card{border-color:rgba(180,192,219,.14)}
+body[data-nexora-page=topup] .yape{background:linear-gradient(140deg,#851c9d,#45115e);border-color:rgba(223,142,244,.26)}
+/* AUTH: la misma marca en registro e ingreso */
+body[data-nexora-page=login]{
+  background-color:#080a10;
+}
+body[data-nexora-page=login] .panel{
+  background:linear-gradient(148deg,rgba(10,13,20,.97),rgba(17,20,30,.97));
+  border-left:1px solid rgba(255,188,93,.12);box-shadow:-34px 0 85px rgba(0,0,0,.46)
+}
+body[data-nexora-page=login] .box{max-width:435px}
+body[data-nexora-page=login] h1,body[data-nexora-page=register] h1{font-size:clamp(30px,3vw,40px);letter-spacing:-.045em}
+body[data-nexora-page=login] .primary,
+body[data-nexora-page=register] .register-btn{
+  color:#180f09;background:linear-gradient(118deg,#ff943a,#ffc35d);border-radius:12px;
+}
+body[data-nexora-page=login] .google,body[data-nexora-page=register] .google-btn{
+  background:#1c2532;color:#f1f3f8;border:1px solid rgba(179,197,222,.2);border-radius:12px;
+}
+body[data-nexora-page=login] .field input,
+body[data-nexora-page=register] input:not([type=checkbox]){
+  background:#0c121c;border-color:rgba(172,189,218,.19);border-radius:12px;
+}
+body[data-nexora-page=register],body[data-nexora-page=register] *{
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+body[data-nexora-page=register]{
+  background:radial-gradient(ellipse 70% 65% at 15% 10%,rgba(247,89,59,.19),transparent 75%),radial-gradient(ellipse at 90% 87%,rgba(255,175,56,.11),transparent 60%),#080a10;
+}
+body[data-nexora-page=register] .container{
+  width:min(100%,480px);max-width:480px;padding:clamp(26px,4vw,42px);
+  border:1px solid rgba(255,181,84,.21);
+  background:linear-gradient(160deg,rgba(23,29,42,.97),rgba(12,16,25,.98));
+  box-shadow:0 35px 90px rgba(0,0,0,.4);border-radius:24px;
+}
+body[data-nexora-page=register] .register-btn{margin-top:11px}
+body[data-nexora-page=register] .login-link a{color:#ffbd63}
+body[data-nexora-page=register] .logo{width:88px;height:88px;box-shadow:0 0 45px rgba(238,95,55,.23)}
+/* MVP: legibilidad y separación de las acciones internas */
+body[data-nexora-page=admin],body[data-nexora-page=admin-topups],body[data-nexora-page=admin-catalog]{
+  background:radial-gradient(ellipse at 90% 0,rgba(247,133,47,.085),transparent 45%),#090b11;
+}
+body[data-nexora-page=admin] .stat,
+body[data-nexora-page=admin] .panel,
+body[data-nexora-page=admin-topups] .box,
+body[data-nexora-page=admin-catalog] .panel{
+  border:1px solid rgba(177,193,220,.15);border-radius:19px;
+  background:linear-gradient(145deg,#171e2a,#0e141d);
+}
+body[data-nexora-page=admin] .admin-quick-actions{margin:25px 0 35px;gap:20px}
+body[data-nexora-page=admin] .admin-primary-action{
+  width:auto;max-width:100%;min-height:60px;padding:17px 22px;border-radius:14px;
+  background:linear-gradient(120deg,#ff943a,#ffcb63);color:#16100a;
+}
+body[data-nexora-page=admin] .admin-tools{margin-top:42px}
+body[data-nexora-page=admin] .admin-tools-content{padding-top:23px}
+body[data-nexora-page=admin] .admin-tool-link{margin-top:17px}
+body[data-nexora-page=admin] .user{transition:transform .2s,border-color .2s}
+body[data-nexora-page=admin] .user:hover{transform:translateY(-2px);border-color:rgba(255,178,78,.25)}
+/* Navegación de ayuda para móvil en tienda, sin desplazar los controles originales */
+@media(max-width:1020px){
+  body[data-nexora-page=home] .hero-content h1{font-size:clamp(35px,5.6vw,62px)}
+}
+@media(max-width:760px){
+  body[data-nexora-page=home] .hero-section{padding-top:12px}
+  body[data-nexora-page=home] .hero{border-radius:21px}
+  body[data-nexora-page=home] .hero-slide::after{
+    background:linear-gradient(0deg,rgba(4,6,12,.94),rgba(5,7,11,.36) 65%,rgba(8,8,12,.12));
+  }
+  body[data-nexora-page=home] .hero-content{justify-content:flex-end}
+  body[data-nexora-page=home] .hero-content h1{font-size:clamp(36px,8vw,48px)}
+  body[data-nexora-page=home] .section{padding-top:37px}
+  body[data-nexora-page=home] .toolbar{padding:10px;border-radius:16px}
+  body[data-nexora-page=home] .trust-item{padding:12px;border-radius:14px}
+  body[data-nexora-page=home] .catalog-card{border-radius:17px}
+  body[data-nexora-page=game] .game-hero{height:310px}
+  body[data-nexora-page=game] .hero-info h1{font-size:clamp(38px,8vw,50px)}
+  body[data-nexora-page=game] .summary{position:static}
+  body[data-nexora-page=profile] .card{padding:clamp(16px,4vw,28px)}
+  body[data-nexora-page=login] .panel{border-left:0;box-shadow:none}
+  body[data-nexora-page=admin] .admin-primary-action{width:100%}
+  #nx-to-top{bottom:85px;right:13px}
+  .nx-bottom-nav{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;
+    position:fixed;z-index:8999;left:10px;right:10px;bottom:calc(8px + env(safe-area-inset-bottom,0px));
+    padding:7px;border:1px solid rgba(201,210,230,.18);border-radius:18px;
+    background:rgba(18,22,31,.93);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+    box-shadow:0 15px 45px rgba(0,0,0,.53);
+  }
+  .nx-bottom-nav a{
+    min-height:46px;display:flex;flex-direction:column;justify-content:center;align-items:center;
+    gap:4px;border-radius:12px;text-decoration:none;color:#c8d0dc;font-size:10px;font-weight:750;
+    white-space:nowrap;
+  }
+  .nx-bottom-nav a svg{width:19px;height:19px}
+  .nx-bottom-nav a[aria-current=page]{background:linear-gradient(135deg,rgba(255,154,54,.18),rgba(245,75,55,.10));color:#ffc476}
+  body[data-nexora-page=home],body[data-nexora-page=game],body[data-nexora-page=profile]{padding-bottom:75px}
+  body[data-nexora-page=home] .floating-support{bottom:85px}
+}
+@media(max-width:520px){
+  body[data-nexora-page=home] .navbar,body[data-nexora-page=game] .navbar{height:64px}
+  body[data-nexora-page=home] .nav-inner,body[data-nexora-page=game] .nav-inner{width:calc(100% - 22px)}
+  body[data-nexora-page=home] .brand img,body[data-nexora-page=game] .brand img{width:41px;height:41px}
+  body[data-nexora-page=home] .nav-actions .country,body[data-nexora-page=game] .nav-actions .country{display:none}
+  body[data-nexora-page=home] .nav-actions .login,body[data-nexora-page=game] .nav-actions .login{font-size:11px}
+  body[data-nexora-page=home] .register,body[data-nexora-page=game] .register{font-size:11px}
+  body[data-nexora-page=home] .hero{height:475px}
+  body[data-nexora-page=home] .hero-content{padding:30px 21px 51px}
+  body[data-nexora-page=home] .hero-content h1{font-size:clamp(35px,8vw,45px)}
+  body[data-nexora-page=home] .catalog-card{min-width:285px;width:285px;height:215px}
+  body[data-nexora-page=checkout] .layout{grid-template-columns:minmax(0,1fr)}
+  body[data-nexora-page=register] .container{padding:27px 22px;border-radius:19px}
+  body[data-nexora-page=topup] .layout{grid-template-columns:minmax(0,1fr)}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .nx-reveal,.nx-ready .nx-reveal{transition:none!important;transform:none!important;opacity:1!important}
+  body[data-nexora-page] *,body[data-nexora-page] *::before,body[data-nexora-page] *::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
