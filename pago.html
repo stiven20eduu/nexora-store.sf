@@ -1,979 +1,272 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEXORA STORE | Pago con Yape</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Finalizar compra con saldo | NEXORA STORE</title>
 <link rel="icon" type="image/png" href="Emblema%20Nexora%20Store%20SF%20con%20corona.png">
-
 <style>
-:root{
-  --bg:#07090e;
-  --panel:#111722;
-  --border:#283241;
-  --text:#fff;
-  --muted:#929baa;
-  --orange:#f5a623;
-  --orange2:#ffbd4b;
-  --purple:#71177f;
-  --green:#22d875;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  min-height:100vh;
-  background:
-    radial-gradient(circle at 10% 10%,rgba(113,23,127,.14),transparent 30%),
-    radial-gradient(circle at 90% 0%,rgba(245,166,35,.08),transparent 25%),
-    var(--bg);
-  color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-}
-a{color:inherit;text-decoration:none}
-button,input{font:inherit}
-button{cursor:pointer}
-
-.navbar{
-  height:68px;
-  background:rgba(7,9,14,.95);
-  border-bottom:1px solid rgba(255,255,255,.06);
-}
-.nav-inner{
-  width:min(1180px,calc(100% - 32px));
-  height:100%;
-  margin:auto;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-.brand{display:flex;align-items:center;gap:10px;font-weight:900}
-.brand img{width:44px;height:44px;object-fit:contain}
-.back{
-  padding:10px 14px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  background:#10151d;
-  color:#cbd1da;
-  font-size:12px;
-}
-
-.main{
-  width:min(1180px,calc(100% - 32px));
-  margin:36px auto 70px;
-}
-.eyebrow{
-  color:var(--orange);
-  font-size:10px;
-  font-weight:900;
-  letter-spacing:1.1px;
-  margin-bottom:7px;
-}
-.heading h1{
-  font-size:34px;
-  letter-spacing:-1px;
-}
-.heading p{
-  margin-top:8px;
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.55;
-}
-.checkout{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 390px;
-  gap:18px;
-  align-items:start;
-  margin-top:20px;
-}
-.card{
-  background:linear-gradient(145deg,#121821,#0e131b);
-  border:1px solid var(--border);
-  border-radius:18px;
-  overflow:hidden;
-}
-.card-head{
-  padding:18px 20px;
-  border-bottom:1px solid var(--border);
-}
-.card-head h2{font-size:16px}
-.card-head p{
-  margin-top:4px;
-  color:var(--muted);
-  font-size:10px;
-}
+:root{color-scheme:dark;--bg:#080a10;--card:#111721;--border:#303a48;--muted:#a9b4c4;--orange:#f6a825;--green:#79e4b7}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 10%,#302014 0,transparent 35%),radial-gradient(circle at 10% 12%,#24172d 0,transparent 32%),var(--bg);color:#fff;font:14px Arial,Helvetica,sans-serif}
+a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer}
+header{background:#090d15;border-bottom:1px solid #26303d;padding:13px max(18px,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900}.brand img{width:43px;height:43px;border-radius:50%;object-fit:cover}
+.back,.secondary{display:inline-block;padding:11px 14px;border:1px solid #3b4758;border-radius:10px;background:#161e29;font-weight:700}
+main{max-width:1100px;margin:35px auto 80px;padding:0 18px}.eyebrow{color:var(--orange);font-weight:900;font-size:11px;letter-spacing:1.4px}
+h1{font-size:clamp(27px,4vw,37px);margin:7px 0 10px}.subhead{color:var(--muted);line-height:1.7;margin:0 0 23px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(310px,380px);align-items:start;gap:18px}
+.card{background:linear-gradient(140deg,#121923,#10151e);border:1px solid var(--border);border-radius:17px;overflow:hidden}
+.card-head{padding:20px;border-bottom:1px solid var(--border)}
+.card-head h2{font-size:19px;margin:0 0 6px}.card-head p{font-size:12px;color:var(--muted);margin:0;line-height:1.5}
 .card-body{padding:20px}
-
-.steps{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-  margin-bottom:20px;
-}
-.step{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  color:#687382;
-  font-size:10px;
-}
-.step b{
-  width:26px;height:26px;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  border:1px solid #46505f;
-}
-.step.active{color:#fff}
-.step.active b{
-  background:var(--orange);
-  border-color:var(--orange);
-  color:#111;
-}
-
-.order-box{
-  border:1px solid var(--border);
-  border-radius:13px;
-  overflow:hidden;
-  margin-bottom:16px;
-}
-.order-row{
-  display:flex;
-  justify-content:space-between;
-  gap:20px;
-  padding:12px 14px;
-  border-bottom:1px solid rgba(255,255,255,.06);
-  font-size:11px;
-}
-.order-row:last-child{border-bottom:0}
-.order-row span{color:var(--muted)}
-.order-row strong{text-align:right}
-.total-row strong{
-  color:var(--orange);
-  font-size:19px;
-}
-.notice{
-  padding:13px 14px;
-  border-radius:11px;
-  border:1px solid rgba(245,166,35,.25);
-  background:rgba(245,166,35,.06);
-  color:#d5dae2;
-  font-size:10px;
-  line-height:1.55;
-}
-
-.yape-card{
-  position:sticky;
-  top:18px;
-}
-.yape-top{
-  padding:22px;
-  text-align:center;
-  background:
-    radial-gradient(circle at 50% 0%,rgba(255,255,255,.1),transparent 35%),
-    linear-gradient(145deg,#87129b,#651174);
-}
-.yape-brand{
-  font-size:34px;
-  font-weight:900;
-  font-style:italic;
-  letter-spacing:-2px;
-}
-.yape-top p{
-  margin-top:4px;
-  color:rgba(255,255,255,.78);
-  font-size:10px;
-}
-.qr-wrap{
-  width:290px;
-  max-width:100%;
-  margin:18px auto 12px;
-  padding:13px;
-  border-radius:18px;
-  background:#fff;
-  box-shadow:0 18px 45px rgba(0,0,0,.25);
-}
-#yapeQr{
-  width:100%;
-  aspect-ratio:1;
-  display:block;
-  image-rendering:pixelated;
-}
-.payee{
-  margin-top:15px;
-  text-align:center;
-}
-.payee small{
-  display:block;
-  color:rgba(255,255,255,.7);
-  font-size:9px;
-  letter-spacing:.9px;
-  margin-bottom:6px;
-}
-.payee strong{
-  display:block;
-  font-size:18px;
-}
-.phone{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:8px;
-  margin-top:8px;
-  color:#ffe2a4;
-  font-size:16px;
-  font-weight:900;
-}
-.copy-btn{
-  border:0;
-  border-radius:8px;
-  padding:7px 9px;
-  background:rgba(255,255,255,.13);
-  color:#fff;
-  font-size:9px;
-  font-weight:900;
-}
-
-.wallet-checkout{background:#0c1b19;border:1px solid #2c685b;border-radius:13px;padding:17px;margin:15px 0}
-.wallet-checkout[hidden]{display:none}
-.wallet-checkout h3{font-size:17px;margin:0 0 9px;color:#91f1d0}
-.wallet-checkout p{font-size:12px;line-height:1.55;margin:8px 0;color:#bccdd0}
-.wallet-checkout strong{font-size:21px;color:#f5a623}
-.wallet-button{width:100%;background:#25ce99;color:#092017;border:0;padding:13px;border-radius:9px;font-weight:900;margin-top:13px;font-size:13px}
-.wallet-button:disabled{background:#303e3a;color:#9daea8;cursor:not-allowed}
-.wallet-link{display:inline-block;color:#96e8cf;font-size:12px;margin-top:12px}
-#walletResult{margin:12px 0;font-size:12px;line-height:1.6}
-#walletResult.error{color:#ffa3a3}
-.payment-info{padding:20px}
-.amount-box{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-  padding:15px;
-  border-radius:12px;
-  background:#0c1118;
-  border:1px solid var(--border);
-  margin-bottom:16px;
-}
-.amount-box span{
-  color:var(--muted);
-  font-size:10px;
-}
-.amount-box strong{
-  color:var(--orange);
-  font-size:24px;
-}
-.upload-title{
-  font-size:13px;
-  margin-bottom:5px;
-}
-.upload-desc{
-  color:var(--muted);
-  font-size:10px;
-  line-height:1.5;
-  margin-bottom:11px;
-}
-.upload-box{
-  min-height:150px;
-  border:1px dashed #485465;
-  border-radius:13px;
-  display:grid;
-  place-items:center;
-  text-align:center;
-  padding:15px;
-  cursor:pointer;
-  background:#0c1118;
-  overflow:hidden;
-  transition:.2s ease;
-}
-.upload-box:hover{border-color:var(--orange)}
-.upload-box input{display:none}
-.upload-placeholder{
-  color:#8b95a3;
-  font-size:10px;
-  line-height:1.5;
-}
-.upload-placeholder b{
-  display:block;
-  color:#fff;
-  font-size:12px;
-  margin-bottom:4px;
-}
-#proofPreview{
-  display:none;
-  max-width:100%;
-  max-height:260px;
-  border-radius:9px;
-}
-.whatsapp-btn{
-  width:100%;
-  margin-top:14px;
-  padding:14px;
-  border:0;
-  border-radius:10px;
-  background:#20c968;
-  color:#07130c;
-  font-size:12px;
-  font-weight:900;
-}
-.whatsapp-btn:disabled{
-  background:#28303c;
-  color:#7e8896;
-  cursor:not-allowed;
-}
-.help{
-  margin-top:10px;
-  color:#7d8794;
-  font-size:9px;
-  line-height:1.45;
-}
-.error{
-  width:min(650px,calc(100% - 30px));
-  margin:80px auto;
-  text-align:center;
-}
-.error h1{font-size:28px}
-.error p{
-  margin:10px 0 20px;
-  color:var(--muted);
-  font-size:12px;
-}
-.error a{
-  display:inline-block;
-  padding:12px 16px;
-  border-radius:9px;
-  background:var(--orange);
-  color:#111;
-  font-size:11px;
-  font-weight:900;
-}
-.footer{
-  padding:30px 0;
-  border-top:1px solid var(--border);
-  color:#66707e;
-  font-size:9px;
-}
-.footer-inner{
-  width:min(1180px,calc(100% - 32px));
-  margin:auto;
-  display:flex;
-  justify-content:space-between;
-  gap:20px;
-}
-.footer a{color:var(--orange)}
-
-@media(max-width:850px){
-  .checkout{grid-template-columns:1fr}
-  .yape-card{position:static}
-}
-@media(max-width:560px){
-  .brand span{display:none}
-  .heading h1{font-size:27px}
-  .steps{grid-template-columns:1fr}
-  .qr-wrap{width:260px}
-  .footer-inner{flex-direction:column}
-}
+.order-row{display:flex;align-items:start;justify-content:space-between;gap:20px;border-bottom:1px solid #29313d;padding:13px 0}
+.order-row:last-child{border-bottom:0}.order-row span{font-size:12px;color:var(--muted)}.order-row strong{text-align:right;font-size:13px;overflow-wrap:anywhere;max-width:60%}
+.order-total strong{font-size:24px;color:var(--orange)}
+.notice{background:#262016;border:1px solid #674b28;border-radius:12px;padding:14px;margin-top:18px;font-size:12px;line-height:1.6}
+.wallet-title{display:flex;gap:10px;align-items:center;color:var(--green)}
+.wallet-title h2{font-size:21px;margin:0}.wallet-icon{font-size:24px}
+.balance-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid #293442}
+.balance-row span{font-size:12px;color:var(--muted)}.balance-row strong{font-size:20px;white-space:nowrap}
+.balance-row.highlight strong{color:var(--green)}.balance-row.highlight span{color:#d6e8e2}
+.actions{margin-top:18px}
+.pay{width:100%;padding:15px 13px;border:0;border-radius:11px;background:#f6a825;color:#171000;font-weight:900;font-size:14px}
+.pay:disabled{background:#343b44;color:#aeb7c0;cursor:not-allowed}
+.small{color:var(--muted);font-size:12px;line-height:1.65;margin:11px 0}
+.status{min-height:42px;padding:12px 0;line-height:1.6;font-size:12px;color:#a8bdcb;overflow-wrap:anywhere}
+.status.error{color:#ffaaaa}.status.success{color:var(--green)}
+.help-links{display:flex;flex-direction:column;gap:12px;margin-top:16px}.help-links a{font-size:13px;color:#ffc86b;text-decoration:underline;text-underline-offset:3px}
+#loginHelp{background:#17202d;border-radius:12px;padding:13px;margin-top:16px}
+#loginHelp a{display:inline-block;margin-top:9px}
+.success-box{background:#0f2822;border:1px solid #2e705c;border-radius:13px;padding:16px;margin-top:14px;line-height:1.65}
+.success-box[hidden],.error-card[hidden]{display:none}.success-box h3{margin:0 0 8px;color:var(--green)}
+.success-box p{font-size:12px;margin:6px 0}.success-box a{color:#ffe09a;text-decoration:underline}
+.error-card{max-width:600px;margin:65px auto;padding:30px;text-align:center}.error-card h2{margin-top:0}
+footer{border-top:1px solid #29313d;color:#8894a4;padding:23px max(18px,calc((100% - 1100px)/2));font-size:12px}
+[hidden]{display:none!important}
+@media(max-width:780px){.layout{grid-template-columns:1fr}header{padding:12px 18px}.card-body{padding:17px}}
 </style>
 </head>
-
 <body>
-
-<header class="navbar">
-  <div class="nav-inner">
-    <a href="index.html" class="brand">
-      <img src="Emblema%20Nexora%20Store%20SF%20con%20corona.png" alt="NEXORA STORE">
-      <span>NEXORA STORE</span>
-    </a>
-
-    <a href="javascript:history.back()" class="back">← Volver</a>
-  </div>
+<header>
+<a class="brand" href="index.html"><img src="Emblema%20Nexora%20Store%20SF%20con%20corona.png" alt="Logo NEXORA"><span>NEXORA STORE</span></a>
+<a class="back" href="javascript:history.back()">← Volver</a>
 </header>
-
-<main class="main" id="checkoutPage">
-
-  <div class="heading">
-    <div class="eyebrow">FINALIZAR COMPRA</div>
-    <h1>Completa tu pago con Yape</h1>
-    <p>
-      Revisa tu pedido, yapea exactamente el total mostrado y luego escríbenos por WhatsApp para enviar el comprobante.
-    </p>
-  </div>
-
-  <div class="checkout">
-
-    <section class="card">
-      <div class="card-head">
-        <h2>Resumen del pedido</h2>
-        <p>Comprueba que tus datos sean correctos antes de pagar.</p>
-      </div>
-
-      <div class="card-body">
-
-        <div class="steps">
-          <div class="step active"><b>1</b> Pedido</div>
-          <div class="step active"><b>2</b> Yape</div>
-          <div class="step"><b>3</b> WhatsApp</div>
-        </div>
-
-        <div class="order-box">
-          <div class="order-row">
-            <span>Juego</span>
-            <strong id="orderGame">—</strong>
-          </div>
-
-          <div class="order-row">
-            <span>Producto</span>
-            <strong id="orderProduct">—</strong>
-          </div>
-
-          <div class="order-row" id="idRow">
-            <span>ID del jugador</span>
-            <strong id="orderPlayerId">—</strong>
-          </div>
-
-          <div class="order-row" id="serverRow" style="display:none;">
-            <span>Server ID</span>
-            <strong id="orderServerId">—</strong>
-          </div>
-
-          <div class="order-row">
-            <span>Entrega</span>
-            <strong>Menos de 24 horas</strong>
-          </div>
-
-          <div class="order-row total-row">
-            <span>Total a pagar</span>
-            <strong id="orderTotal">S/ 0.00</strong>
-          </div>
-        </div>
-
-        <div class="notice">
-          <b>Importante:</b> paga exactamente el monto de tu pedido y revisa que el destinatario sea <b>Lea Ticona Coila</b>.
-        </div>
-
-      </div>
-    </section>
-
-
-    <aside class="card yape-card">
-
-      <div class="yape-top">
-        <div class="yape-brand">Yape</div>
-        <p>Escanea el QR o yapea al número</p>
-
-        <div class="qr-wrap">
-          <canvas id="yapeQr" width="360" height="360" aria-label="QR de Yape"></canvas>
-        </div>
-
-        <div class="payee">
-          <small>A NOMBRE DE</small>
-          <strong>Lea Ticona Coila</strong>
-
-          <div class="phone">
-            <span>992 515 200</span>
-            <button class="copy-btn" id="copyPhone" type="button">COPIAR</button>
-          </div>
-        </div>
-      </div>
-
-
-      <div class="payment-info">
-
-        <div class="amount-box">
-          <span>MONTO EXACTO</span>
-          <strong id="payAmount">S/ 0.00</strong>
-        </div>
-
-        <h3 class="upload-title">Envía tu comprobante por WhatsApp</h3>
-
-        <p class="upload-desc">
-          Después de realizar el Yape, pulsa el botón. Se abrirá nuestro WhatsApp con los datos de tu pedido listos. Allí envía la captura de tu comprobante.
-        </p>
-
-        <div class="upload-box" style="min-height:105px;cursor:default;">
-          <div class="upload-placeholder">
-            <b>💬 Último paso</b>
-            Escríbenos por WhatsApp y envía tu comprobante en el chat.
-          </div>
-        </div>
-
-        <div class="wallet-checkout" id="walletCheckout" hidden>
-          <h3>💳 Pagar con saldo NEXORA</h3>
-          <p>Tu saldo confirmado: <strong id="walletAvailable">S/ 0.00</strong></p>
-          <p>El importe se descontará al confirmar. Se creará un pedido con pago verificado para que NEXORA lo entregue en menos de 24 horas.</p>
-          <button type="button" id="payWallet" class="wallet-button" disabled>Comprobando saldo…</button>
-          <p id="walletResult" role="status" aria-live="polite"></p>
-          <a class="wallet-link" href="recargar-saldo.html">Recargar mi saldo con Yape</a>
-        </div>
-
-        <button class="whatsapp-btn" id="sendWhatsApp">
-          Escribir por WhatsApp y enviar comprobante
-        </button>
-
-        <p class="help">
-          El comprobante ya no se sube a la página. Debes enviarlo directamente por WhatsApp para que podamos revisar tu pago.
-        </p>
-
-      </div>
-
-    </aside>
-
-  </div>
-
-</main>
-
-<section class="error" id="missingOrder" style="display:none;">
-  <h1>No encontramos un pedido</h1>
-  <p>Vuelve al catálogo, selecciona un producto y pulsa “Finalizar compra”.</p>
-  <a href="index.html#catalogo">Volver al catálogo</a>
+<main>
+<section id="checkout" hidden>
+<div class="eyebrow">COMPRA CON BILLETERA NEXORA</div>
+<h1>Confirma tu pedido con tu saldo</h1>
+<p class="subhead">Paga sin hacer otro Yape. Se descuenta solo el importe del producto y el pedido queda registrado con pago verificado para ser atendido en menos de 24 horas.</p>
+<div class="layout">
+<section class="card">
+<div class="card-head"><h2>Resumen de tu compra</h2><p>Verifica el producto y el ID de destino antes de confirmar.</p></div>
+<div class="card-body">
+<div class="order-row"><span>Juego</span><strong id="orderGame">—</strong></div>
+<div class="order-row"><span>Producto</span><strong id="orderProduct">—</strong></div>
+<div class="order-row" id="idRow"><span>ID del jugador</span><strong id="orderPlayerId">—</strong></div>
+<div class="order-row" id="serverRow" hidden><span>Servidor</span><strong id="orderServerId">—</strong></div>
+<div class="order-row"><span>Plazo de atención</span><strong>Menos de 24 horas</strong></div>
+<div class="order-row order-total"><span>Precio del producto</span><strong id="orderTotal">S/ —</strong></div>
+<div class="notice"><b>Importante:</b> NEXORA solo confirmará la entrega después de prepararla. Pagar con saldo registra el pago como verificado, pero no marca el producto como entregado.</div>
+</div>
 </section>
-
-<footer class="footer">
-  <div class="footer-inner">
-    <span>© 2026 NEXORA STORE · Creado por stiven20edu</span>
-    <a
-      href="https://whatsapp.com/channel/0029Vb8pdP7HwXbDQSnkL13u"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Canal oficial de WhatsApp
-    </a>
-  </div>
-</footer>
-
-<script>
-window.saveNexoraOrder = async function(order) {
-  let status = document.getElementById("historySaveStatus");
-  if (!status) {
-    status = document.createElement("p");
-    status.id = "historySaveStatus";
-    status.setAttribute("role","status");
-    document.getElementById("sendWhatsApp").after(status);
-  }
-  status.textContent = "Guardando pedido en tu historial…";
-  try {
-    const { auth } = await import("./firebase.js");
-    await auth.authStateReady();
-    if (!auth.currentUser) {
-      status.textContent = "Este pedido no se guardará en una cuenta porque no has iniciado sesión.";
-      return;
-    }
-    const { recordOrder } = await import("./account-data.js");
-    await recordOrder(order);
-    status.textContent = "Pedido guardado como pendiente de verificación. Completa el envío en WhatsApp.";
-  } catch {
-    status.textContent = "No se pudo guardar el historial. Puedes continuar enviando tu pedido por WhatsApp y reintentar después.";
-  }
-};
-</script>
-<script>
-const orderRaw =
-  sessionStorage.getItem(
-    "nexoraOrder"
-  );
-
-let order = null;
-
-try{
-  order =
-    orderRaw
-    ? JSON.parse(orderRaw)
-    : null;
-}
-catch(error){
-  order = null;
-}
-
-if(!order){
-
-  document.getElementById(
-    "checkoutPage"
-  ).style.display =
-    "none";
-
-  document.getElementById(
-    "missingOrder"
-  ).style.display =
-    "block";
-
-}
-else{
-
-  document.getElementById(
-    "orderGame"
-  ).textContent =
-    order.game || "—";
-
-  document.getElementById(
-    "orderProduct"
-  ).textContent =
-    order.product || "—";
-
-  const amount =
-    `S/ ${Number(order.price || 0).toFixed(2)}`;
-
-  document.getElementById(
-    "orderTotal"
-  ).textContent =
-    amount;
-
-  document.getElementById(
-    "payAmount"
-  ).textContent =
-    amount;
-
-
-  if(order.playerId){
-
-    document.getElementById(
-      "orderPlayerId"
-    ).textContent =
-      order.playerId;
-
-  }
-  else{
-
-    document.getElementById(
-      "idRow"
-    ).style.display =
-      "none";
-
-  }
-
-
-  if(order.serverId){
-
-    document.getElementById(
-      "serverRow"
-    ).style.display =
-      "flex";
-
-    document.getElementById(
-      "orderServerId"
-    ).textContent =
-      order.serverId;
-
-  }
-
-}
-
-
-/* QR REAL RECONSTRUIDO DEL QR DE YAPE PROPORCIONADO */
-
-const qrMatrix = [
-"11111110010101111110011010010011101111111",
-"10000010000101000100110100111110101000001",
-"10111010101101110110111110000001001011101",
-"10111010110011010000110010010100001011101",
-"10111010100010011010111110100010101011101",
-"10000010111111000110101001011110001000001",
-"11111110101010101010101010101010101111111",
-"00000000100001101001010110100001100000000",
-"10111110001000101100001001011010001111100",
-"00000101001001100011110010110000000111011",
-"10000110010110110110100001011110100101000",
-"10101000011101101001011110100001010011101",
-"00011011010000100110111011010110101011110",
-"01110000111011010011111100100000010001000",
-"11100110001101000010000111010110010100100",
-"01001100011000100010100010111001101011001",
-"00011110001100001010010011010010110011010",
-"01111100010001100010000110010011011010010",
-"11000111010000111011111111101110110101110",
-"11011100010110111111110000100001001011001",
-"10001011100011001100001001111110100010110",
-"00110101111001011100101001110000001110010",
-"11011010011001010000000101101111110101100",
-"11010001100100011001000001100001001010011",
-"01111110110011010001111111011010110110011",
-"01101001001100100011111110110010001010001",
-"11010010110010100110100001111100100101101",
-"00010100010101111101011110000011011010010",
-"11000111011000111010001010110010111110000",
-"10100001100101000010111010011000100110010",
-"10011010111011110001000010111111010101100",
-"10110100100011001001111010100001101010101",
-"10101111110101111111101000011000111111010",
-"00000000101111100110010000011010100010011",
-"11111110001010100101110011011110101011110",
-"10000010111011001110111000100000100010001",
-"10111010100101111000110001010010111111010",
-"10111010111101110010111000111011110010000",
-"10111010110010000100100011011110010011110",
-"10000010000000011101011100100001000100001",
-"11111110100001011010100001010110011010000"
-];
-
-function drawQr(){
-
-  const canvas =
-    document.getElementById(
-      "yapeQr"
-    );
-
-  const ctx =
-    canvas.getContext(
-      "2d"
-    );
-
-  const quiet = 4;
-  const modules = qrMatrix.length;
-  const total = modules + quiet * 2;
-  const size = canvas.width;
-  const moduleSize = size / total;
-
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0,0,size,size);
-
-  ctx.fillStyle = "#71177f";
-
-  qrMatrix.forEach(
-    (row,y)=>{
-
-      [...row].forEach(
-        (cell,x)=>{
-
-          if(cell === "1"){
-
-            ctx.fillRect(
-              Math.floor(
-                (x + quiet)
-                * moduleSize
-              ),
-              Math.floor(
-                (y + quiet)
-                * moduleSize
-              ),
-              Math.ceil(moduleSize),
-              Math.ceil(moduleSize)
-            );
-
-          }
-
-        }
-      );
-
-    }
-  );
-
-}
-
-drawQr();
-
-
-document.getElementById(
-  "copyPhone"
-).addEventListener(
-  "click",
-  async function(){
-
-    try{
-
-      await navigator.clipboard.writeText(
-        "992515200"
-      );
-
-      this.textContent =
-        "COPIADO ✓";
-
-      setTimeout(
-        ()=>{
-          this.textContent =
-            "COPIAR";
-        },
-        1500
-      );
-
-    }
-    catch(error){
-
-      alert(
-        "Número Yape: 992 515 200"
-      );
-
-    }
-
-  }
-);
-
-
-const sendWhatsApp =
-  document.getElementById(
-    "sendWhatsApp"
-  );
-
-
-sendWhatsApp.addEventListener(
-  "click",
-  function(){
-
-    if(!order){
-      return;
-    }
-
-
-    if (!order.historyId) {
-      order.historyId = crypto.randomUUID();
-      sessionStorage.setItem(
-        "nexoraOrder",
-        JSON.stringify(order)
-      );
-    }
-
-    // Guarda el pedido como pendiente en el historial si el usuario inició sesión.
-    window.saveNexoraOrder(order);
-
-
-    const lines = [
-      "NUEVO PEDIDO NEXORA STORE",
-      "",
-      "PEDIDO: " + order.historyId,
-      "JUEGO: " + order.game,
-      "PRODUCTO: " + order.product
-    ];
-
-
-    if(order.playerId){
-
-      let accountData =
-        order.playerId;
-
-      if(order.serverId){
-        accountData +=
-          " | SERVER ID: " +
-          order.serverId;
-      }
-
-      lines.push(
-        "ID / DATOS DE LA CUENTA: " +
-        accountData
-      );
-
-    }
-    else if(order.serverId){
-
-      lines.push(
-        "DATOS DE LA CUENTA: SERVER ID " +
-        order.serverId
-      );
-
-    }
-
-
-    lines.push(
-      "TOTAL: S/ " +
-      Number(order.price).toFixed(2),
-      "PAGO: YAPE",
-      "",
-      "COMPROBANTE: lo enviaré en este chat."
-    );
-
-
-    const message =
-      encodeURIComponent(
-        lines.join("\n")
-      );
-
-
-    const url =
-      "https://wa.me/51992515200?text=" +
-      message;
-
-
-    window.open(
-      url,
-      "_blank",
-      "noopener,noreferrer"
-    );
-
-  }
-);
-
-</script>
-
-
+<aside class="card">
+<div class="card-head">
+<div class="wallet-title"><span class="wallet-icon">◈</span><h2>Mi saldo NEXORA</h2></div>
+<p>Usaremos únicamente tu saldo aprobado previamente.</p>
+</div>
+<div class="card-body">
+<div class="balance-row"><span>Saldo disponible</span><strong id="walletBalance">Consultando…</strong></div>
+<div class="balance-row"><span>Precio oficial</span><strong id="officialPrice">Consultando…</strong></div>
+<div class="balance-row highlight"><span>Saldo después de comprar</span><strong id="walletRemaining">—</strong></div>
+<div class="actions"><button type="button" class="pay" id="confirmPurchase" disabled>Comprobando saldo…</button></div>
+<p class="status" id="purchaseStatus" role="status" aria-live="polite">Verificaremos el precio y tu saldo con Firebase.</p>
+<p class="small">Si no tienes saldo suficiente, recárgalo con Yape. La recarga será acreditada después de verificar el ingreso.</p>
+<div class="help-links"><a href="recargar-saldo.html">+ Recargar mi saldo con Yape</a><a href="perfil.html">Ver mi saldo e historial de compras</a></div>
+<div id="loginHelp" hidden>
+<p class="small">Necesitas entrar a tu cuenta NEXORA para utilizar tu saldo.</p>
+<a class="secondary" href="login.html" target="_blank" rel="noopener">Iniciar sesión en otra pestaña</a>
+<p class="small">Cuando termines de iniciar sesión, vuelve aquí y actualiza la página.</p>
+</div>
+<div class="success-box" id="purchaseSuccess" hidden>
+<h3>✓ ¡Compra pagada!</h3>
+<p>El dinero se descontó de tu billetera NEXORA.</p>
+<p><b>Estado:</b> Pago verificado · Pendiente de entrega en menos de 24 horas.</p>
+<p id="purchaseCode"></p>
+<p><a href="perfil.html">Revisar mi pedido en el perfil →</a></p>
+</div>
+</div>
+</aside>
+</div>
+</section>
+<section id="missingOrder" class="card error-card" hidden>
+<h2>No encontramos tu pedido</h2>
+<p class="subhead">Regresa a NEXORA STORE, selecciona un producto y pulsa «Finalizar compra».</p>
+<a class="secondary" href="index.html">Volver a la tienda</a>
+</section>
+<noscript><p class="subhead">Activa JavaScript para consultar tu saldo y pagar.</p></noscript>
+</main>
+<footer>© 2026 NEXORA STORE · Compra con saldo confirmado · Entrega en menos de 24 horas</footer>
 <script type="module">
 import { auth } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { buyWithNexoraBalance, getMyWallet, formatSoles } from "./wallet-data.js";
+import { getMyWallet, formatSoles, buyWithNexoraBalance } from "./wallet-data.js";
 
-const walletPanel = document.getElementById("walletCheckout");
-const available = document.getElementById("walletAvailable");
-const payButton = document.getElementById("payWallet");
-const resultBox = document.getElementById("walletResult");
-let paying = false;
-function informWallet(text,error=false){resultBox.textContent=text;resultBox.className=error?"error":"";}
-function currentOrder(){
- try { return JSON.parse(sessionStorage.getItem("nexoraOrder")||"null"); }
- catch{return null;}
+const byId=(id)=>document.getElementById(id);
+const button=byId("confirmPurchase");
+const status=byId("purchaseStatus");
+const db=getFirestore(auth.app);
+let busy=false;
+let paid=false;
+let approvedPriceCents=null;
+let visibleBalance=null;
+let currentUserId=null;
+
+function setStatus(message,type=""){status.textContent=message;status.className="status"+(type?" "+type:"");}
+function readOrder(){
+ try{return JSON.parse(sessionStorage.getItem("nexoraOrder")||"null")}
+ catch{return null}
 }
-function showPaid(orderId,balanceCents){
- payButton.disabled=true;payButton.textContent="Pedido pagado con saldo";
- document.getElementById("sendWhatsApp").disabled=true;
- document.getElementById("sendWhatsApp").textContent="El pedido ya se pagó con saldo";
- available.textContent=formatSoles(balanceCents);
- informWallet("¡Pago registrado! Pedido: "+orderId+". Tu saldo restante es "+formatSoles(balanceCents)+". Verás el estado «Pago verificado» en tu perfil.");
- const anchor=document.getElementById("walletContact");
- if(!anchor){
-   const a=document.createElement("a");a.id="walletContact";a.className="wallet-link";
-   a.textContent="Avisar a NEXORA por WhatsApp sobre mi compra";
-   a.target="_blank";a.rel="noopener noreferrer";
-   a.href="https://wa.me/51992515200?text="+encodeURIComponent("Hola NEXORA, pagué con mi saldo. Pedido: "+orderId+". Por favor, revisen la entrega.");
-   resultBox.after(a);
+function validOrder(value){
+ return value && typeof value==="object"
+  && /^[a-z0-9-]{2,80}$/.test(String(value.gameKey||""))
+  && typeof value.game==="string" && value.game.length>0
+  && typeof value.product==="string" && value.product.length>0
+  && Number.isFinite(Number(value.price)) && Number(value.price)>0;
+}
+function setDisplayOrder(order){
+ byId("orderGame").textContent=order.game;
+ byId("orderProduct").textContent=order.product;
+ byId("orderTotal").textContent="S/ "+Number(order.price).toFixed(2);
+ if(order.playerId){byId("orderPlayerId").textContent=order.playerId;}
+ else byId("idRow").hidden=true;
+ if(order.serverId){byId("serverRow").hidden=false;byId("orderServerId").textContent=order.serverId;}
+}
+function refreshAvailableBalance(cents){
+ visibleBalance=cents;
+ byId("walletBalance").textContent=formatSoles(cents);
+ if(Number.isSafeInteger(approvedPriceCents)){
+  byId("walletRemaining").textContent=formatSoles(Math.max(0,cents-approvedPriceCents));
+ }else byId("walletRemaining").textContent="—";
+}
+function paySucceeded(id,balance){
+ paid=true;busy=false;
+ refreshAvailableBalance(balance);
+ button.disabled=true;button.textContent="Pedido pagado";
+ setStatus("¡Pago confirmado! El pedido quedó registrado y NEXORA lo atenderá en menos de 24 horas.","success");
+ byId("purchaseSuccess").hidden=false;
+ byId("purchaseCode").textContent="Número de pedido: "+id;
+}
+async function readExistingOrder(uid,order){
+ if(!order.historyId || !/^[A-Za-z0-9-]{1,80}$/.test(order.historyId))return false;
+ const ref=doc(db,"users",uid,"orders",order.historyId);
+ const snapshot=await getDoc(ref);
+ if(!snapshot.exists())return false;
+ const prior=snapshot.data();
+ if(prior.paymentMethod==="wallet" && prior.status!=="cancelled"){
+  paySucceeded(order.historyId,await getMyWallet());return true;
  }
+ if(prior.paymentMethod==="wallet" && prior.status==="cancelled"){
+  button.disabled=true;button.textContent="Pedido cancelado";
+  setStatus("Este pedido se canceló. Para volver a comprar, selecciona el producto nuevamente desde el catálogo.","error");return true;
+ }
+ button.disabled=true;button.textContent="Pedido ya registrado";
+ setStatus("Este pedido ya tiene otro método de pago. Selecciona el producto nuevamente para comprar con saldo.","error");
+ return true;
 }
-onAuthStateChanged(auth,async user=>{
- if(!currentOrder())return;
- walletPanel.hidden=false;
- if(!user){
-   payButton.disabled=true;payButton.textContent="Inicia sesión para pagar con saldo";
-   informWallet("Para utilizar tu saldo debes iniciar sesión en NEXORA STORE.");
+async function loadWallet(order,user){
+ const uid=user?.uid||null;
+ currentUserId=uid;
+ approvedPriceCents=null;
+ busy=false;paid=false;button.disabled=true;
+ byId("purchaseSuccess").hidden=true;
+ if(!uid){
+  byId("loginHelp").hidden=false;
+  button.textContent="Inicia sesión para usar tu saldo";
+  byId("walletBalance").textContent="Inicia sesión";
+  byId("officialPrice").textContent="—";
+  byId("walletRemaining").textContent="—";
+  setStatus("Inicia sesión primero. Tu saldo está asociado a tu cuenta NEXORA.");
+  return;
+ }
+ byId("loginHelp").hidden=true;
+ button.textContent="Consultando Firebase…";
+ setStatus("Consultando saldo y precio oficial…");
+ try{
+  const id=encodeURIComponent(String(order.gameKey)+"::"+String(order.product));
+  if(id.length>400)throw new Error("El producto seleccionado es inválido.");
+  const [catalog,wallet]=await Promise.all([
+    getDoc(doc(db,"catalogPrices",id)),
+    getMyWallet()
+  ]);
+  if(currentUserId!==uid)return;
+  refreshAvailableBalance(wallet);
+  if(await readExistingOrder(uid,order))return;
+  if(!catalog.exists()||!catalog.data().enabled)throw new Error("Este producto todavía no está habilitado para pagos con saldo.");
+  const official=catalog.data();
+  if(official.game!==order.game || official.product!==order.product ||
+    !Number.isSafeInteger(official.priceCents) || official.priceCents<100){
+    throw new Error("El catálogo oficial no coincide con el pedido. Selecciona el producto nuevamente.");
+  }
+  approvedPriceCents=official.priceCents;
+  byId("officialPrice").textContent=formatSoles(official.priceCents);
+  if(official.priceCents!==Math.round(Number(order.price)*100)){
+   throw new Error("El precio oficial cambió. Selecciona de nuevo el producto para continuar.");
+  }
+  byId("walletRemaining").textContent=formatSoles(Math.max(0,wallet-official.priceCents));
+  if(wallet<official.priceCents){
+   button.textContent="Saldo insuficiente";
+   setStatus("Te faltan "+formatSoles(official.priceCents-wallet)+". Recarga con Yape y espera a que el saldo se acredite.");
    return;
- }
- try{
-   const existingOrder=currentOrder();
-   const refId=existingOrder.historyId;
-   if(refId && /^[A-Za-z0-9-]{1,80}$/.test(refId)){
-     const snap=await getDoc(doc(getFirestore(auth.app),"users",user.uid,"orders",refId));
-     if(snap.exists() && snap.data().paymentMethod==="wallet"){
-       showPaid(refId,await getMyWallet());return;
-     }
-   }
-   const balanceCents=await getMyWallet();
-   available.textContent=formatSoles(balanceCents);
-   const required=Math.round(Number(existingOrder.price)*100);
-   const sufficient=Number.isSafeInteger(required)&&required>0&&balanceCents>=required;
-   payButton.disabled=!sufficient;
-   payButton.textContent=sufficient?"Pagar con mi saldo":"Saldo insuficiente";
-   if(!sufficient)informWallet("Puedes recargar saldo con Yape y esperar su aprobación.");
- }catch(e){
-   payButton.disabled=true;payButton.textContent="Saldo no disponible";
-   informWallet("No se pudo consultar tu billetera. Inténtalo más tarde.",true);
- }
-});
-payButton.addEventListener("click",async()=>{
- if(paying || !auth.currentUser)return;
- const order=currentOrder();
- if(!order){informWallet("No encontramos el pedido, vuelve al catálogo.",true);return;}
- const amount=Number(order.price);
- if(!Number.isFinite(amount)||amount<=0){informWallet("El total del pedido no es válido.",true);return;}
- if(!confirm("¿Confirmas el pago de S/ "+amount.toFixed(2)+" desde tu saldo NEXORA? Se descontará al completar el pedido."))return;
- if(!order.historyId){
-   order.historyId=crypto.randomUUID();
-   sessionStorage.setItem("nexoraOrder",JSON.stringify(order));
- }
- paying=true;payButton.disabled=true;payButton.textContent="Procesando pago…";
- informWallet("Comprobando el precio y el saldo con Firebase…");
- try{
-   const answer=await buyWithNexoraBalance(order);
-   showPaid(answer.orderId,answer.balanceCents);
+  }
+  button.disabled=false;
+  button.textContent="Confirmar y pagar "+formatSoles(official.priceCents);
+  setStatus("Saldo suficiente. Confirma para registrar el pago y solicitar la entrega.");
  }catch(error){
-   console.error(error);
-   informWallet(error.message||"No se pudo realizar el pago. Tu saldo no debería haber cambiado.",true);
-   payButton.disabled=false;payButton.textContent="Reintentar pago con saldo";
- }finally{paying=false;}
+  console.error(error);
+  button.disabled=true;button.textContent="No se puede pagar";
+  setStatus(error.message||"No pudimos verificar tu saldo. Intenta nuevamente más tarde.","error");
+ }
+}
+
+const originalOrder=readOrder();
+if(!validOrder(originalOrder)){
+ byId("missingOrder").hidden=false;
+}else{
+ byId("checkout").hidden=false;
+ setDisplayOrder(originalOrder);
+ onAuthStateChanged(auth,user=>{
+  loadWallet(originalOrder,user);
+ });
+}
+button.addEventListener("click",async()=>{
+ if(busy||paid||!auth.currentUser||auth.currentUser.uid!==currentUserId||!Number.isSafeInteger(approvedPriceCents)||visibleBalance<approvedPriceCents)return;
+ const order=readOrder();
+ if(!validOrder(order) || order.game!==originalOrder.game || order.product!==originalOrder.product ||
+   order.gameKey!==originalOrder.gameKey || Math.round(Number(order.price)*100)!==approvedPriceCents){
+  setStatus("El pedido cambió. Vuelve al catálogo y selecciónalo otra vez.","error");button.disabled=true;return;
+ }
+ const remaining=visibleBalance-approvedPriceCents;
+ if(!confirm("¿Confirmas que deseas pagar "+formatSoles(approvedPriceCents)+" con tu saldo NEXORA?\n\nSaldo actual: "+formatSoles(visibleBalance)+"\nSaldo después de pagar: "+formatSoles(remaining)+"\n\nEl pedido quedará con PAGO VERIFICADO, pendiente de entrega en menos de 24 horas."))return;
+ if(!order.historyId){
+  order.historyId=crypto.randomUUID();
+  sessionStorage.setItem("nexoraOrder",JSON.stringify(order));
+ }
+ busy=true;button.disabled=true;button.textContent="Procesando pago…";
+ setStatus("Validando precio y descontando el saldo en una sola transacción…");
+ try{
+  const completed=await buyWithNexoraBalance(order);
+  paySucceeded(completed.orderId,completed.balanceCents);
+ }catch(error){
+  console.error(error);
+  button.disabled=true;button.textContent="Revisar saldo";
+  setStatus(error.message||"No pudimos confirmar el pago. Revisa el historial antes de reintentar.","error");
+  busy=false;
+  // Antes de permitir otro intento, lee Firebase de nuevo: quizá el servidor
+  // confirmó la transacción pero se interrumpió la conexión.
+  await loadWallet(originalOrder,auth.currentUser);
+ }
 });
 </script>
-
 </body>
 </html>
