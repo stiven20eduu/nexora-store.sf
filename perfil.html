@@ -26,6 +26,28 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
 .photo-actions{margin-bottom:24px}.photo-actions label{margin-top:0}
 @media(max-width:700px){.dashboard{grid-template-columns:1fr 1fr}}
 @media(max-width:480px){main{margin-top:30px}.card{padding:22px}h1{font-size:30px}.actions>*{width:100%;text-align:center}.dashboard{grid-template-columns:1fr 1fr}.stat{padding:14px}.stat strong{font-size:19px}}
+
+/* Billetera destacada */
+.wallet-feature{background:radial-gradient(circle at top right,rgba(249,168,38,.09),transparent 48%),linear-gradient(140deg,#151e2d,#0e1623);border:1px solid rgba(253,183,72,.25);box-shadow:0 20px 46px rgba(0,0,0,.23);padding:28px}
+.wallet-feature-head{display:flex;justify-content:space-between;align-items:center;gap:15px}
+.wallet-kicker{margin:0 0 8px;color:#ffbd53;font-size:11px;font-weight:900;letter-spacing:1.5px}
+.wallet-feature h2{font-size:25px;margin:0}
+.wallet-feature .detail{line-height:1.65;margin:11px 0 0}
+.wallet-feature-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:rgba(255,178,61,.1);border:1px solid rgba(255,178,61,.22);font-size:25px;color:#ffcb7a}
+.wallet-balance-panel{padding:22px;margin-top:20px;background:linear-gradient(125deg,#192638,#111c2a);border:1px solid rgba(165,190,219,.16);border-radius:16px}
+.wallet-balance-label{display:flex;align-items:center;gap:9px;font-size:12px;color:#b7c9d5}
+.wallet-balance-label:before{content:"";width:8px;height:8px;border-radius:50%;background:#61e9ad;box-shadow:0 0 0 4px rgba(89,224,165,.10)}
+#walletBalance{font-size:clamp(34px,7vw,47px);font-weight:900;line-height:1.2;letter-spacing:-1px;color:#ffc36a;margin:13px 0;font-variant-numeric:tabular-nums}
+.wallet-caption{font-size:12px;color:#9facbb;line-height:1.65}
+.wallet-feature-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:21px}
+.wallet-action{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:13px 17px;border-radius:11px;font-size:13px;font-weight:800;text-align:center;font-family:inherit}
+.wallet-action-primary{color:#161008;background:linear-gradient(110deg,#f5a726,#ffc45d);border:1px solid #f6ad37}
+.wallet-action-secondary{color:#f3f6fa;background:#1b2636;border:1px solid #384559}
+.wallet-action:hover{filter:brightness(1.08)}
+.wallet-action:focus-visible{outline:3px solid #ffcd64;outline-offset:3px}
+.wallet-footnote{font-size:12px;line-height:1.65;color:#afbccb;border-top:1px solid rgba(179,199,224,.12);padding-top:17px;margin:20px 0 0}
+@media(max-width:480px){.wallet-feature{padding:21px}.wallet-feature h2{font-size:22px}.wallet-feature-icon{width:40px;height:40px}.wallet-balance-panel{padding:18px}.wallet-feature-actions>*{width:100%}}
+
 </style>
 </head>
 <body>
@@ -45,6 +67,25 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
   </div>
 </section>
 
+<section class="card wallet-feature" id="walletSection" hidden aria-label="Mi saldo disponible">
+<div class="wallet-feature-head" id="saldo">
+  <div><p class="wallet-kicker">BILLETERA NEXORA</p><h2>Mi saldo disponible</h2></div>
+  <span class="wallet-feature-icon" aria-hidden="true">▣</span>
+</div>
+<p class="detail">Saldo acreditado y listo para comprar productos en NEXORA STORE.</p>
+<div class="wallet-balance-panel">
+  <div class="wallet-balance-label">Saldo confirmado</div>
+  <div id="walletBalance" role="status" aria-live="polite">Cargando…</div>
+  <div class="wallet-caption">Paga directamente desde tu cuenta sin hacer otro Yape por cada compra.</div>
+</div>
+<div class="wallet-feature-actions">
+  <a class="wallet-action wallet-action-primary" href="recargar-saldo.html">＋ Recargar saldo</a>
+  <a class="wallet-action wallet-action-secondary" href="#ordersSection">Mis compras</a>
+  <button class="wallet-action wallet-action-secondary" id="reloadWallet" type="button">↻ Actualizar saldo</button>
+</div>
+<p class="wallet-footnote">Las recargas se acreditan únicamente después de confirmar el ingreso real del dinero por Yape.</p>
+</section>
+
 <section class="card" id="profile" hidden aria-label="Datos de mi cuenta">
 <div class="identity"><div class="avatar" id="avatar" aria-hidden="true"></div><div><h2 id="profileName"></h2><div class="detail" id="profileEmail"></div><div class="account-meta"><span class="meta-pill">Cuenta NEXORA</span><span class="meta-pill" id="memberSince">Miembro</span></div></div></div>
 <div class="photo-actions">
@@ -62,13 +103,6 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
 <div class="actions"><button class="primary" id="save" type="submit">Guardar cambios</button><a class="shop" href="index.html#catalogo">Ir a comprar</a></div>
 </form>
 <div class="actions"><a class="shop" id="mvpPanel" href="admin.html" hidden>Panel MVP</a><button class="secondary" id="logout" type="button">Cerrar sesión</button></div>
-</section>
-<section class="card" id="walletSection" hidden aria-label="Saldo de mi cuenta">
-<h2>Mi saldo NEXORA</h2>
-<p class="detail">Saldo confirmado disponible para futuras compras en la tienda.</p>
-<div id="walletBalance" style="color:#f5a623;font-size:32px;font-weight:900;margin:14px 0">Cargando…</div>
-<a class="shop" href="recargar-saldo.html">Recargar con Yape</a>
-<p class="detail">Las recargas solo se acreditan después de revisar el pago real.</p>
 </section>
 <section class="card" id="ordersSection" hidden>
 <h2>Mis compras</h2><p class="detail">Pedidos recientes iniciados desde tu cuenta. Enviar por WhatsApp no confirma el pago ni la entrega.</p>
@@ -131,15 +165,31 @@ try {
     if (!accountModule) accountModule = import("./account-data.js").catch(error => { accountModule = null; throw error; });
     return accountModule;
   }
+  let walletFetchVersion = 0;
   async function refreshWallet() {
+    const token = ++walletFetchVersion;
+    const uid = auth.currentUser?.uid;
     const el = document.getElementById("walletBalance");
+    if (!uid) return;
+    el.textContent = "Cargando…";
     try {
       const { getMyWallet, formatSoles } = await import("./wallet-data.js");
-      el.textContent = formatSoles(await getMyWallet());
-    } catch {
+      const cents = await getMyWallet();
+      if (token !== walletFetchVersion || auth.currentUser?.uid !== uid) return;
+      if (!Number.isSafeInteger(cents) || cents < 0) throw new Error("Saldo incorrecto");
+      el.textContent = formatSoles(cents);
+    } catch (error) {
+      if (token !== walletFetchVersion || auth.currentUser?.uid !== uid) return;
+      console.error("Error al cargar saldo NEXORA", error);
       el.textContent = "No disponible";
     }
   }
+  document.getElementById("reloadWallet").addEventListener("click", async function() {
+    if (!auth.currentUser || this.disabled) return;
+    this.disabled = true;
+    try { await refreshWallet(); }
+    finally { this.disabled = false; }
+  });
   async function refreshAccount(user) {
     ordersStatus.textContent = "Cargando historial…";
     document.getElementById("ordersList").replaceChildren();
