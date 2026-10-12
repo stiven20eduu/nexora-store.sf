@@ -18,6 +18,77 @@ service cloud.firestore {
         ];
     }
 
+
+    // Soporte NEXORA: cada cliente ve solo sus casos y capturas.
+    // Solo cuentas MVP verificadas pueden abrir la bandeja y responder.
+    function isSupportAdmin() {
+      return isMvp() && request.auth.token.email_verified == true;
+    }
+
+    match /supportTickets/{ticketId} {
+      allow get, list: if isSupportAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid);
+
+      allow create: if signedIn()
+        && ticketId.matches('^[A-Za-z0-9_-]{8,80}$')
+        && request.resource.data.keys().hasOnly([
+          'uid','category','subject','description','orderId','imageCount','status','createdAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'uid','category','subject','description','orderId','imageCount','status','createdAt'
+        ])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.category in ['pedido','saldo','cuenta','producto','otro']
+        && request.resource.data.subject is string
+        && request.resource.data.subject.size() >= 5
+        && request.resource.data.subject.size() <= 100
+        && request.resource.data.description is string
+        && request.resource.data.description.size() >= 20
+        && request.resource.data.description.size() <= 2000
+        && request.resource.data.orderId is string
+        && request.resource.data.orderId.size() <= 80
+        && request.resource.data.imageCount is int
+        && request.resource.data.imageCount >= 0
+        && request.resource.data.imageCount <= 3
+        && request.resource.data.status == 'open'
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if isSupportAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status','adminReply','reviewedBy','updatedAt'])
+        && request.resource.data.keys().hasAll(['status','adminReply','reviewedBy','updatedAt'])
+        && request.resource.data.status in ['open','reviewing','resolved']
+        && request.resource.data.adminReply is string
+        && request.resource.data.adminReply.size() <= 1000
+        && (request.resource.data.status != 'resolved'
+            || request.resource.data.adminReply.size() >= 5)
+        && request.resource.data.reviewedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+
+      allow delete: if false;
+
+      match /images/{imageId} {
+        allow get, list: if isSupportAdmin()
+          || (signedIn() && get(/databases/$(database)/documents/supportTickets/$(ticketId)).data.uid == request.auth.uid);
+
+        allow create: if signedIn()
+          && imageId.matches('^[0-2]$')
+          && request.resource.data.keys().hasOnly(['uid','image','createdAt'])
+          && request.resource.data.keys().hasAll(['uid','image','createdAt'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.image is string
+          && request.resource.data.image.size() <= 155000
+          && request.resource.data.image.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')
+          && request.resource.data.createdAt == request.time
+          && getAfter(/databases/$(database)/documents/supportTickets/$(ticketId)).data.uid == request.auth.uid
+          && getAfter(/databases/$(database)/documents/supportTickets/$(ticketId)).data.imageCount >= (
+            imageId == '0' ? 1 : (imageId == '1' ? 2 : 3)
+          );
+
+        allow update, delete: if false;
+      }
+    }
+
     match /users/{uid} {
       allow read: if owner(uid) || isMvp();
 
