@@ -1,6 +1,6 @@
 /* NEXORA STORE PWA · Cache limitado a recursos públicos del propio sitio.
    No almacena llamadas a Firebase, métodos POST, APIs ni respuestas privadas. */
-const CACHE_NAME = "nexora-public-v5";
+const CACHE_NAME = "nexora-public-v6";
 const SHELL = [
   "./",
   "./index.html",
@@ -55,12 +55,12 @@ self.addEventListener("fetch", event => {
 
   if (!allowedFiles.test(url.pathname)) return;
   event.respondWith(
-    caches.match(request).then(cached => cached || fetch(request).then(response => {
+    fetch(request).then(response => {
       if (response.ok && response.type === "basic") {
         const copy = response.clone();
         event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => {}));
       }
       return response;
-    }))
+    }).catch(() => caches.match(request).then(cached => cached || Response.error()))
   );
 });
