@@ -2187,6 +2187,16 @@ a{
 
 }
 
+/* Billetera NEXORA en la barra principal */
+.wallet-chip{display:flex;align-items:center;gap:9px;padding:7px 12px;min-height:43px;border:1px solid rgba(245,174,57,.26);border-radius:12px;background:linear-gradient(145deg,#1a2232,#101722);box-shadow:inset 0 1px 0 rgba(255,255,255,.045);transition:border-color .18s,transform .18s}
+.wallet-chip:hover{border-color:rgba(255,194,83,.6);transform:translateY(-1px)}
+.wallet-chip:focus-visible{outline:2px solid #ffcb65;outline-offset:3px}
+.wallet-chip-icon{display:grid;place-items:center;flex-shrink:0;width:26px;height:26px;border-radius:8px;background:rgba(245,174,57,.12);color:#ffc267;font-size:17px}
+.wallet-chip-label{display:block;color:#a8b4c7;font-size:9px;line-height:1.25;letter-spacing:1px;text-transform:uppercase;font-weight:700}
+#walletChipAmount{display:block;color:#ffd077;font-size:15px;line-height:1.3;font-weight:900;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:900px){.wallet-chip{gap:6px;padding:7px 9px}.wallet-chip-icon{width:22px;height:22px;font-size:14px}}
+@media(max-width:700px){.wallet-chip{min-height:37px;padding:5px 7px;gap:5px;border-radius:10px}.wallet-chip-icon{display:none}.wallet-chip-label{font-size:8px}#walletChipAmount{font-size:12px}}
+@media(max-width:380px){.nav-actions .country{padding:7px 5px}.wallet-chip{padding:5px}.nav-actions .login{padding:8px 4px}}
 </style>
 </head>
 
@@ -2244,6 +2254,11 @@ a{
       <button class="country">
         🇵🇪 Perú
       </button>
+
+      <a class="wallet-chip" id="walletChip" href="perfil.html#saldo" hidden aria-label="Ver mi saldo NEXORA">
+        <span class="wallet-chip-icon" aria-hidden="true">▣</span>
+        <span><span class="wallet-chip-label">Mi saldo</span><strong id="walletChipAmount" aria-live="polite">Cargando…</strong></span>
+      </a>
 
       <a
         href="login.html"
@@ -4635,17 +4650,39 @@ import { auth } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 const loginLink = document.querySelector(".nav-actions .login");
 const registerLink = document.querySelector(".nav-actions .register");
+const walletChip = document.getElementById("walletChip");
+const walletChipAmount = document.getElementById("walletChipAmount");
+let walletRequest = 0;
+async function refreshHeaderWallet(user, request) {
+  try {
+    const { getMyWallet, formatSoles } = await import("./wallet-data.js");
+    const cents = await getMyWallet();
+    if (request !== walletRequest || auth.currentUser?.uid !== user.uid) return;
+    if (!Number.isSafeInteger(cents) || cents < 0) throw new Error("Saldo inválido");
+    walletChipAmount.textContent = formatSoles(cents);
+  } catch (error) {
+    if (request !== walletRequest || auth.currentUser?.uid !== user.uid) return;
+    console.error("No se pudo consultar el saldo NEXORA", error);
+    walletChipAmount.textContent = "No disponible";
+  }
+}
 onAuthStateChanged(auth, (user) => {
+  const request = ++walletRequest;
   if (user) {
     loginLink.textContent = "Mi perfil";
     loginLink.href = "perfil.html";
     loginLink.title = user.displayName || "Mi cuenta";
     registerLink.hidden = true;
+    walletChip.hidden = false;
+    walletChipAmount.textContent = "Cargando…";
+    refreshHeaderWallet(user, request);
   } else {
     loginLink.textContent = "Ingresar";
     loginLink.href = "login.html";
     loginLink.removeAttribute("title");
     registerLink.hidden = false;
+    walletChip.hidden = true;
+    walletChipAmount.textContent = "";
   }
 });
 </script>
