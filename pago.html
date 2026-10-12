@@ -71,21 +71,103 @@ body.modal-open{overflow:hidden}
 footer{border-top:1px solid #29313d;color:#8894a4;padding:23px max(18px,calc((100% - 1100px)/2));font-size:12px}
 [hidden]{display:none!important}
 @media(max-width:780px){.layout{grid-template-columns:1fr}header{padding:12px 18px}.card-body{padding:17px}}
+
+/* NEXORA — refinamiento visual de checkout (solo interfaz) */
+:root{--bg:#070a11;--card:#111826;--border:#283347;--muted:#a4b1c6;--orange:#ffb12d;--green:#61efb8;--shadow:0 22px 60px rgba(0,0,0,.37)}
+body{background:radial-gradient(ellipse 560px 450px at 78% 3%,rgba(238,112,31,.12),transparent 75%),radial-gradient(ellipse 500px 410px at 2% 27%,rgba(130,42,163,.12),transparent 78%),#070a11;color:#f7f8fc;letter-spacing:.04px}
+header{background:rgba(8,12,19,.94);border-bottom:1px solid rgba(207,219,244,.1);min-height:78px;box-shadow:0 5px 28px rgba(0,0,0,.12);backdrop-filter:blur(16px)}
+.brand{gap:13px;font-size:15px;letter-spacing:.4px}.brand img{width:48px;height:48px;filter:drop-shadow(0 0 12px rgba(229,42,39,.2))}
+.brand-caption{display:block;color:#92a3b9;font-weight:700;font-size:9px;letter-spacing:1.6px;margin-top:3px}
+.back{background:#141b27;border-color:#354055;color:#dee5ef;font-size:12px;transition:background .2s,border-color .2s}
+.back:hover{background:#1a2535;border-color:#5b7188}
+main{max-width:1150px;margin:46px auto 86px}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;color:#ffbf52;background:rgba(246,166,38,.08);border:1px solid rgba(247,181,68,.23);padding:9px 13px;border-radius:999px;font-size:10px;letter-spacing:1.35px}
+.eyebrow:before{content:"";width:7px;height:7px;border-radius:50%;background:#ffb22d;box-shadow:0 0 0 4px rgba(255,178,45,.1)}
+h1{font-size:clamp(31px,4.3vw,47px);line-height:1.1;letter-spacing:-1.6px;margin:18px 0 11px;font-weight:900}
+.subhead{color:#afbbcb;max-width:760px;font-size:14px;line-height:1.75;margin-bottom:24px}
+.checkout-perks{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 26px}
+.checkout-perks span{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(142,166,198,.16);background:rgba(23,32,46,.58);border-radius:999px;padding:8px 12px;color:#c7d0df;font-size:11px;font-weight:700}
+.checkout-perks .perk-symbol{color:#70ecbd;font-size:12px}
+.layout{grid-template-columns:minmax(0,1fr) minmax(310px,400px);gap:20px}
+.card{background:linear-gradient(165deg,#141d2a 0%,#0d131e 100%);border:1px solid rgba(114,139,181,.27);border-radius:21px;box-shadow:var(--shadow)}
+.card-head{padding:23px 25px 20px;border-color:rgba(125,152,198,.13)}
+.card-head h2{font-size:21px;letter-spacing:-.4px}
+.card-head p{font-size:12px;line-height:1.7;color:#a5b1c3}
+.card-body{padding:21px 25px 25px}
+.section-tag{color:var(--orange);font-size:10px;font-weight:900;letter-spacing:1.3px;margin-bottom:9px}
+.order-row{padding:18px 0;border-color:rgba(146,171,210,.1);align-items:center}
+.order-row span{color:#abb9ce;font-size:13px}
+.order-row strong{font-size:14px;line-height:1.5;color:#f4f7fa}
+.order-total{padding:20px 18px;margin:14px -6px 0;background:linear-gradient(90deg,rgba(241,167,38,.08),rgba(241,167,38,.03));border:1px solid rgba(255,191,87,.15);border-radius:12px}
+.order-total strong{font-size:30px;color:#ffc052;letter-spacing:-.7px}
+.notice{background:rgba(244,170,50,.07);border:1px solid rgba(246,176,60,.24);color:#e5d0ac;border-radius:13px;padding:16px 17px;margin-top:20px;line-height:1.65}
+.notice b{color:#ffcc70}
+.wallet-card{position:sticky;top:22px}
+.wallet-card .card-head{padding-bottom:20px}
+.wallet-title{gap:12px;justify-content:space-between;flex-wrap:wrap}
+.wallet-heading{display:flex;align-items:center;gap:10px}
+.wallet-title h2{font-size:20px;color:#d8fff0}
+.wallet-icon{width:39px;height:39px;display:grid;place-items:center;border:1px solid rgba(102,243,184,.24);background:rgba(89,235,173,.1);border-radius:12px;font-size:22px;color:#72eeba}
+.wallet-state{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.15px;border-radius:999px;padding:7px 10px;font-weight:800;border:1px solid transparent;white-space:nowrap}
+.wallet-state.waiting{background:#1d2839;color:#bfcde0;border-color:#35455b}
+.wallet-state.ok{background:rgba(65,204,143,.12);color:#73f5bc;border-color:rgba(65,204,143,.28)}
+.wallet-state.bad{background:rgba(240,84,93,.10);color:#ff999d;border-color:rgba(255,115,118,.28)}
+.wallet-state.paid{background:rgba(65,204,143,.15);color:#8ff7c9;border-color:rgba(65,204,143,.28)}
+.balance-main{border:1px solid rgba(91,133,119,.3);background:linear-gradient(130deg,rgba(20,65,56,.42),rgba(15,34,39,.62));border-radius:16px;padding:19px 18px;margin-bottom:11px}
+.balance-main span{display:block;font-size:12px;color:#b6d6c9;margin-bottom:8px}
+.balance-main strong{display:block;color:#f3fff9;font-size:clamp(29px,4vw,36px);font-weight:900;line-height:1.12;letter-spacing:-1px;white-space:normal}
+.balance-row{padding:17px 1px;border-color:rgba(136,162,203,.1)}
+.balance-row span{font-size:12px}
+.balance-row strong{font-size:18px}
+.balance-row.highlight{background:rgba(54,209,152,.055);padding:16px 15px;border:1px solid rgba(87,226,166,.14);border-radius:12px;margin-top:8px}
+.balance-row.highlight strong{font-size:20px}
+.balance-row.highlight.warning{background:rgba(238,87,103,.045);border-color:rgba(251,126,135,.15)}
+.balance-row.highlight.warning strong{color:#ff949b}
+.balance-row.highlight span{color:#a9d8c7}
+.actions{margin-top:18px}
+.pay{background:linear-gradient(110deg,#f9a928,#ffca59);color:#1e1407;border-radius:12px;font-size:15px;padding:17px 15px;box-shadow:0 11px 22px rgba(244,162,30,.18);transition:transform .18s,filter .18s,box-shadow .18s}
+.pay:not(:disabled):hover{transform:translateY(-2px);filter:brightness(1.045);box-shadow:0 16px 26px rgba(244,162,30,.24)}
+.pay:focus-visible,.modal-approve:focus-visible,.modal-back:focus-visible,.modal-exit:focus-visible,a:focus-visible{outline:3px solid #ffd57a;outline-offset:3px}
+.pay:disabled{background:#334052;color:#aeb9c9;box-shadow:none;transform:none}
+.status{min-height:0;padding:13px 0;font-size:12px;line-height:1.7}
+.status.success{color:#87f1be}
+.status.error{color:#ff9aa5}
+.small{font-size:11px;line-height:1.7;color:#9facbe}
+.help-links{padding-top:15px;margin-top:14px;border-top:1px solid rgba(148,170,198,.13);gap:13px}
+.help-links a{display:flex;align-items:center;gap:7px;text-decoration:none;color:#ffd086;font-size:12px;font-weight:700}
+.help-links a:hover{text-decoration:underline}
+.security-footer{display:flex;gap:20px;flex-wrap:wrap;align-items:center;justify-content:center;text-align:center;margin:30px 0 0;color:#8b9aaa;font-size:11px;line-height:1.6}
+.security-footer span{display:inline-flex;gap:7px;align-items:center}
+.success-box{border-radius:14px}
+.modal-card{border-color:rgba(246,169,40,.45);box-shadow:0 30px 90px rgba(0,0,0,.74),0 0 35px rgba(245,166,35,.08)}
+.modal-heading h2{letter-spacing:-.4px}
+.modal-back:hover{background:#242b39}
+.modal-approve:hover,.modal-recharge:hover{filter:brightness(1.07)}
+footer{border-top:1px solid rgba(176,194,227,.09);font-size:11px}
+@media(max-width:850px){.wallet-card{position:static}.layout{grid-template-columns:1fr}.checkout-perks{gap:7px}}
+@media(max-width:540px){main{margin:25px auto 65px;padding:0 15px}.card-head{padding:20px 19px 16px}.card-body{padding:18px 19px 21px}h1{letter-spacing:-1px}.checkout-perks span{font-size:10px;padding:7px 10px}.layout{gap:15px}.order-row{padding:15px 0}.order-row strong{font-size:13px}.order-total strong{font-size:26px}.wallet-title{gap:7px}.wallet-state{font-size:9px}.security-footer{gap:9px;justify-content:flex-start}.brand img{width:40px;height:40px}header{min-height:67px}}
+@media(prefers-reduced-motion:reduce){.pay,.back{transition:none!important}}
+
 </style>
 </head>
 <body>
 <header>
-<a class="brand" href="index.html"><img src="Emblema%20Nexora%20Store%20SF%20con%20corona.png" alt="Logo NEXORA"><span>NEXORA STORE</span></a>
+<a class="brand" href="index.html"><img src="Emblema%20Nexora%20Store%20SF%20con%20corona.png" alt="Logo NEXORA"><span>NEXORA STORE<small class="brand-caption">GAMING · DIGITAL</small></span></a>
 <a class="back" href="javascript:history.back()">← Volver</a>
 </header>
 <main>
 <section id="checkout" hidden>
-<div class="eyebrow">COMPRA CON BILLETERA NEXORA</div>
-<h1>Confirma tu pedido con tu saldo</h1>
-<p class="subhead">Paga sin hacer otro Yape. Se descuenta solo el importe del producto y el pedido queda registrado con pago verificado para ser atendido en menos de 24 horas.</p>
+<div class="eyebrow">PAGO SEGURO CON NEXORA</div>
+<h1>Paga con tu saldo NEXORA</h1>
+<p class="subhead">Confirma tu compra con el saldo disponible en tu cuenta. Se descontará únicamente el valor del producto y tu pedido se registrará con el pago verificado, listo para su atención.</p>
+<div class="checkout-perks" aria-label="Características de la compra">
+  <span><span class="perk-symbol">✓</span> Precio oficial verificado</span>
+  <span><span class="perk-symbol">✓</span> Descuento automático</span>
+  <span><span class="perk-symbol">◷</span> Atención en menos de 24 horas</span>
+</div>
 <div class="layout">
 <section class="card">
-<div class="card-head"><h2>Resumen de tu compra</h2><p>Verifica el producto y el ID de destino antes de confirmar.</p></div>
+<div class="card-head"><div class="section-tag">01 / DATOS DEL PEDIDO</div><h2>Resumen de tu compra</h2><p>Comprueba que el producto y la cuenta de destino sean correctos.</p></div>
 <div class="card-body">
 <div class="order-row"><span>Juego</span><strong id="orderGame">—</strong></div>
 <div class="order-row"><span>Producto</span><strong id="orderProduct">—</strong></div>
@@ -96,15 +178,19 @@ footer{border-top:1px solid #29313d;color:#8894a4;padding:23px max(18px,calc((10
 <div class="notice"><b>Importante:</b> NEXORA solo confirmará la entrega después de prepararla. Pagar con saldo registra el pago como verificado, pero no marca el producto como entregado.</div>
 </div>
 </section>
-<aside class="card">
+<aside class="card wallet-card">
 <div class="card-head">
-<div class="wallet-title"><span class="wallet-icon">◈</span><h2>Mi saldo NEXORA</h2></div>
-<p>Usaremos únicamente tu saldo aprobado previamente.</p>
+<div class="section-tag">02 / MÉTODO DE PAGO</div>
+<div class="wallet-title">
+  <div class="wallet-heading"><span class="wallet-icon">◈</span><h2>Mi saldo NEXORA</h2></div>
+  <span id="walletStatusBadge" class="wallet-state waiting" aria-live="polite">Comprobando</span>
+</div>
+<p>Saldo acreditado y disponible en tu billetera.</p>
 </div>
 <div class="card-body">
-<div class="balance-row"><span>Saldo disponible</span><strong id="walletBalance">Consultando…</strong></div>
-<div class="balance-row"><span>Precio oficial</span><strong id="officialPrice">Consultando…</strong></div>
-<div class="balance-row highlight"><span>Saldo después de comprar</span><strong id="walletRemaining">—</strong></div>
+<div class="balance-main"><span>Saldo disponible</span><strong id="walletBalance">Consultando…</strong></div>
+<div class="balance-row"><span>Precio oficial del producto</span><strong id="officialPrice">Consultando…</strong></div>
+<div class="balance-row highlight" id="remainingRow"><span>Saldo después de comprar</span><strong id="walletRemaining">—</strong></div>
 <div class="actions"><button type="button" class="pay" id="confirmPurchase" disabled>Comprobando saldo…</button></div>
 <p class="status" id="purchaseStatus" role="status" aria-live="polite">Verificaremos el precio y tu saldo con Firebase.</p>
 <p class="small">Si no tienes saldo suficiente, recárgalo con Yape. La recarga será acreditada después de verificar el ingreso.</p>
@@ -123,6 +209,11 @@ footer{border-top:1px solid #29313d;color:#8894a4;padding:23px max(18px,calc((10
 </div>
 </div>
 </aside>
+</div>
+<div class="security-footer">
+  <span>✓ El precio se valida en Firebase</span>
+  <span>✓ No se descuenta saldo si falla el pedido</span>
+  <span>✓ Entrega gestionada por NEXORA STORE</span>
 </div>
 </section>
 <!-- Diálogos: se abren únicamente después de validar precio y saldo -->
