@@ -51,10 +51,14 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
 </style>
 <link rel="stylesheet" href="nexora-premium.css?v=2">
 <script src="nexora-experience.js?v=2" defer></script>
+<style>
+.mvp-orders-entry{display:flex!important;justify-content:space-between;align-items:center;gap:18px;width:100%;max-width:1120px;margin:20px auto 26px;padding:25px 24px;border:1px solid #ffad59;border-radius:20px;background:linear-gradient(110deg,#ffab49,#ff603d);color:#211007!important;text-decoration:none;box-shadow:0 12px 32px #ff7a2626;box-sizing:border-box;font-family:Arial,sans-serif}.mvp-orders-entry[hidden]{display:none!important}.mvp-orders-entry strong{display:block;font-size:clamp(23px,5vw,34px);font-weight:900;line-height:1.25}.mvp-orders-entry small{display:block;margin-top:8px;font-size:13px;line-height:1.5}.mvp-orders-entry>span:last-child{font-size:30px}.mvp-orders-entry:focus-visible{outline:3px solid #fff;outline-offset:4px}@media(max-width:600px){.mvp-orders-entry{padding:22px 18px}}
+</style>
 </head>
 <body data-nexora-page="profile">
 <header><a class="brand" href="index.html"><img src="Emblema%20Nexora%20Store%20SF%20con%20corona.png" alt="">NEXORA STORE</a><a class="back" href="index.html">Volver a la tienda</a></header>
 <main>
+<a id="mvpOrdersEntry" class="mvp-orders-entry" href="admin-pedidos.html?v=1" hidden><span><strong>📦 Atender pedidos</strong><small>EXCLUSIVO MVP · Abrir la bandeja de pedidos</small></span><span aria-hidden="true">→</span></a>
 <div class="eyebrow">TU CUENTA NEXORA</div>
 <h1>Mi perfil</h1>
 <p>Personaliza tu nombre y administra tu sesión.</p>
@@ -105,7 +109,7 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
 <input id="email" type="email" readonly>
 <div class="actions"><button class="primary" id="save" type="submit">Guardar cambios</button><a class="shop" href="index.html#catalogo">Ir a comprar</a></div>
 </form>
-<div class="actions"><a class="shop" id="mvpPanel" href="admin.html?v=efectivo-1" hidden>Panel MVP</a><button class="secondary" id="logout" type="button">Cerrar sesión</button></div>
+<div class="actions"><a class="shop" id="mvpPanel" href="admin.html?v=pedidos-1" hidden>Panel MVP</a><button class="secondary" id="logout" type="button">Cerrar sesión</button></div>
 </section>
 <section class="card" id="ordersSection" hidden>
 <h2>Mis compras</h2><p class="detail">Pedidos recientes iniciados desde tu cuenta. Enviar por WhatsApp no confirma el pago ni la entrega.</p>
@@ -293,6 +297,7 @@ try {
     if (!user) {
       savedPhoto = "";
       mvpPanel.hidden = true;
+      document.getElementById("mvpOrdersEntry").hidden = true;
       document.getElementById("ordersSection").hidden = true;
       document.getElementById("walletSection").hidden = true;
       document.getElementById("accountDashboard").hidden = true;
@@ -306,6 +311,7 @@ try {
     }
     savedPhoto = "";
     mvpPanel.hidden = !user.email || !MVP_EMAILS.has(user.email.toLowerCase());
+    document.getElementById("mvpOrdersEntry").hidden = mvpPanel.hidden;
     render(user);
     document.getElementById("ordersSection").hidden = false;
     document.getElementById("walletSection").hidden = false;
@@ -368,3 +374,4 @@ try {
 </script>
 </body>
 </html>
+
