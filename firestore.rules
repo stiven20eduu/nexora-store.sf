@@ -2,6 +2,51 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+
+    // Notificaciones: contenido privado para su destinatario; envíos solo desde servidor.
+    match /users/{uid}/notifications/{noticeId} {
+      allow read: if owner(uid);
+      allow create, update: if isSupportAdmin()
+        && request.resource.data.keys().hasOnly(['kind','title','body','orderId','url','createdAt','authorUid'])
+        && request.resource.data.keys().hasAll(['kind','title','body','orderId','url','createdAt','authorUid'])
+        && request.resource.data.kind == 'attention'
+        && request.resource.data.title == 'Tu pedido necesita tu atención'
+        && request.resource.data.body is string
+        && request.resource.data.body.size() >= 5 && request.resource.data.body.size() <= 500
+        && request.resource.data.orderId is string
+        && request.resource.data.orderId.matches('^[A-Za-z0-9-]{1,80}$')
+        && noticeId == 'attention-' + request.resource.data.orderId
+        && request.resource.data.url is string && request.resource.data.url.size() <= 200
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && get(/databases/$(database)/documents/users/$(uid)/orders/$(request.resource.data.orderId)).data.status in ['pending','verified','processing'];
+      allow delete: if false;
+    }
+    match /announcements/{id} {
+      allow read: if signedIn();
+      allow create: if isSupportAdmin()
+        && request.resource.data.keys().hasOnly(['kind','title','body','createdAt','authorUid'])
+        && request.resource.data.keys().hasAll(['kind','title','body','createdAt','authorUid'])
+        && request.resource.data.kind in ['news','update']
+        && request.resource.data.title is string && request.resource.data.title.size() >= 5 && request.resource.data.title.size() <= 80
+        && request.resource.data.body is string && request.resource.data.body.size() >= 5 && request.resource.data.body.size() <= 500
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+    match /notificationConfig/public {
+      allow read: if signedIn();
+      allow create, update: if isSupportAdmin()
+        && request.resource.data.keys().hasOnly(['vapidKey','updatedAt'])
+        && request.resource.data.keys().hasAll(['vapidKey','updatedAt'])
+        && request.resource.data.vapidKey is string
+        && request.resource.data.vapidKey.matches('^[A-Za-z0-9_-]{87,88}$')
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /pushDevices/{id} { allow read, write: if false; }
+    match /notificationDeliveries/{id} { allow read, write: if false; }
+
     function signedIn() {
       return request.auth != null;
     }

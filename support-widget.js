@@ -70,6 +70,12 @@ if(target) {
   const form=el("nx-support-form"), gate=el("nx-support-gate"), feedback=el("nx-support-feedback");
   const filesInput=el("nx-support-files"),preview=el("nx-support-preview"),send=el("nx-support-send");
   const history=el("nx-support-history"),historyList=el("nx-support-history-list");
+  const noticeOrder=new URLSearchParams(location.search).get('orderId');
+  if(noticeOrder && /^[A-Za-z0-9-]{1,80}$/.test(noticeOrder)){
+    el('nx-support-order').value=noticeOrder;
+    el('nx-support-category').value='pedido';
+    el('nx-support-subject').value='Respuesta sobre mi pedido';
+  }
   let files=[],busy=false,currentUid=null,renderId=0;
   const message=(value,error=false)=>{feedback.textContent=value;feedback.dataset.error=String(error)};
   function clearFiles(){files=[];filesInput.value="";drawPreviews();}

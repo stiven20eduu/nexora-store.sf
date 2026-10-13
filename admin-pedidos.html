@@ -10,13 +10,14 @@
 <section id="dashboard" hidden>
 <div class="hero"><div class="kicker">CENTRO DE ATENCIÓN · MVP</div><h1>Atender pedidos</h1><p class="muted">Todos los clientes en una sola bandeja. Atiende primero los pedidos más antiguos.</p></div>
 <div class="stats"><div class="stat"><strong id="openCount">—</strong><span>Por atender</span></div><div class="stat"><strong id="workingCount">—</strong><span>En proceso</span></div><div class="stat"><strong id="doneCount">—</strong><span>Completados</span></div></div>
-<div class="toolbar"><input id="search" type="search" aria-label="Buscar pedidos" placeholder="Buscar cliente, pedido, juego o ID…"></div>
+<p><a class="btn" href="admin-anuncios.html">📣 Publicar anuncio para los usuarios</a></p><div class="toolbar"><input id="search" type="search" aria-label="Buscar pedidos" placeholder="Buscar cliente, pedido, juego o ID…"></div>
 <nav class="tabs" aria-label="Filtrar pedidos"><button data-filter="active" aria-pressed="true">Por atender</button><button data-filter="completed" aria-pressed="false">Completados</button><button data-filter="cancelled" aria-pressed="false">Cancelados</button><button data-filter="all" aria-pressed="false">Todos</button></nav>
 <p id="loadStatus" class="muted" role="status">Cargando pedidos…</p><p id="feedback" role="status" aria-live="polite"></p>
 <div id="orders" class="orders"></div>
 </section></main>
 <script type="module">
 import {auth} from './firebase.js';
+import {requestAttention,isNotificationAdmin} from './notifications.js';
 import {onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 import {getFirestore,collection,doc,onSnapshot,runTransaction,serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
 const db=getFirestore(auth.app),emails=new Set(['nexora.store.sf@gmail.com','stiven20eduu@gmail.com']);
@@ -46,6 +47,11 @@ function render(){
   const details=element('div','','details');details.append(detail('ID del jugador / cuenta',o.playerId),detail('Nombre del jugador',o.playerName),detail('Servidor / región',[o.serverId,o.playerRegion].filter(Boolean).join(' · ')),detail('Pago',o.paymentMethod==='wallet'?'Pagado con saldo NEXORA':o.status==='pending'?'Pendiente de verificación':'Verificar comprobante del cliente'));card.append(details);
   if(o.status==='pending')card.append(element('p','Verifica el pago real antes de entregar el producto.','notice'));
   const actions=element('div','','actions');
+  if(active(o.status)){
+   const attention=element('button','Solicitar atención del cliente','btn');attention.disabled=busy;
+   attention.onclick=async()=>{if(!isNotificationAdmin(auth.currentUser)){feedback('Verifica tu correo MVP para enviar avisos.',true);return;}const message=prompt('¿Qué necesita corregir o confirmar el cliente? (5 a 500 caracteres)');if(!message)return;busy=true;render();try{await requestAttention(o.uid,o.id,message);feedback('Aviso guardado para el cliente.');}catch(e){feedback(e.code==='permission-denied'?'Falta publicar las reglas nuevas de notificaciones en Firebase.':e.message,true);}finally{busy=false;render();}};
+   actions.append(attention);
+  }
   if(active(o.status)){
    for(const [status,title,cls] of [['processing','Poner en proceso','process'],['completed','Marcar completado','complete'],['cancelled','Cancelar pedido','cancel']]){
     if(status==='processing'&&o.status==='processing')continue;
@@ -107,5 +113,6 @@ $('search').addEventListener('input',render);
 document.querySelectorAll('[data-filter]').forEach(btn=>btn.addEventListener('click',()=>{filter=btn.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));render();}));
 window.addEventListener('pagehide',cleanup);
 window.addEventListener('pageshow',event=>{if(event.persisted)location.reload();});
-</script></body></html>
+</script><script type="module" src="notifications.js"></script>
+</body></html>
 

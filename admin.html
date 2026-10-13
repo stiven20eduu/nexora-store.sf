@@ -61,7 +61,7 @@ button,input{font:inherit}.btn{border:0;border-radius:10px;padding:11px 14px;fon
 <header>
 <a class="brand" href="index.html"><img src="Emblema%20Nexora%20Store%20SF%20con%20corona.png" alt="">NEXORA MVP</a>
 <a class="btn secondary" href="perfil.html">Mi perfil</a>
-</header>
+<a href="admin-anuncios.html" style="display:inline-block;padding:14px;color:#ffbc79">📣 Anuncios y notificaciones</a></header>
 <main>
 <section id="gate">
 <div class="eyebrow">ACCESO MVP</div>
@@ -403,6 +403,7 @@ onAuthStateChanged(auth,async user=>{
  catch(e){console.error(e);document.getElementById("message").textContent="No se pudieron cargar los datos. Verifica las reglas de Firestore.";document.getElementById("message").className="error"}
 });
 </script>
+<script type="module" src="notifications.js"></script>
 </body>
 </html>
 

@@ -1,0 +1,1 @@
+{"functions":[{"source":"functions","codebase":"nexora-notifications","ignore":["node_modules",".git","*.log"]}],"firestore":{"rules":"firestore.rules"},"emulators":{"firestore":{"port":8080},"ui":{"enabled":false}}}
