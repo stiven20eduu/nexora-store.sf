@@ -52,7 +52,6 @@ function render(){
     const btn=element('button',title,'btn '+cls);btn.type='button';btn.disabled=busy;btn.addEventListener('click',()=>changeStatus(o,status));actions.append(btn);
    }
   }
-  const chatLink=element('a','💬 Chat privado','btn');chatLink.href='chat.html?uid='+encodeURIComponent(o.uid);actions.append(chatLink);
   card.append(actions);$('orders').append(card);
  }
  if(!list.length&&!pending.size&&!failed.size)$('orders').append(element('p',q?'No hay pedidos que coincidan con tu búsqueda.':filter==='active'?'Todo al día. No hay pedidos pendientes.':'No hay pedidos en esta pestaña.','empty'));

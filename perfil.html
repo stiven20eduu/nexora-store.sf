@@ -58,7 +58,6 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
 <body data-nexora-page="profile">
 <header><a class="brand" href="index.html"><img src="Emblema%20Nexora%20Store%20SF%20con%20corona.png" alt="">NEXORA STORE</a><a class="back" href="index.html">Volver a la tienda</a></header>
 <main>
-<a id="privateChatLink" class="mvp-orders-entry" href="chat.html?v=1" hidden><span><strong>💬 Chat privado</strong><small>Habla con tu contacto · Mensajes que desaparecen en 24 h</small></span><span aria-hidden="true">→</span></a>
 <a id="mvpOrdersEntry" class="mvp-orders-entry" href="admin-pedidos.html?v=1" hidden><span><strong>📦 Atender pedidos</strong><small>EXCLUSIVO MVP · Abrir la bandeja de pedidos</small></span><span aria-hidden="true">→</span></a>
 <div class="eyebrow">TU CUENTA NEXORA</div>
 <h1>Mi perfil</h1>
@@ -205,7 +204,6 @@ try {
       const result = await (await dataModule()).loadAccount();
       if (auth.currentUser?.uid !== user.uid || result.uid !== user.uid) return;
       savedPhoto = result.photo;
-      document.getElementById("privateChatLink").hidden = false;
     render(user);
       const completedCount = result.orders.filter(order => order.status === "completed").length;
       const pendingCount = result.orders.filter(order => !["completed","cancelled"].includes(order.status)).length;
@@ -299,7 +297,6 @@ try {
     if (!user) {
       savedPhoto = "";
       mvpPanel.hidden = true;
-      document.getElementById("privateChatLink").hidden = true;
       document.getElementById("mvpOrdersEntry").hidden = true;
       document.getElementById("ordersSection").hidden = true;
       document.getElementById("walletSection").hidden = true;
