@@ -342,3 +342,20 @@ body[data-nexora-page=admin] .user:hover{transform:translateY(-2px);border-color
 .nx-faq-questions details p{margin:0 21px 21px;padding-top:16px;border-top:1px solid rgba(187,202,227,.09);font-size:13px;line-height:1.8;color:#abb7c7}
 .nx-faq-questions details a{color:#ffbd69;text-decoration:underline}
 @media(max-width:760px){.nx-faq{padding:48px 12px 100px}.nx-faq-wrap{grid-template-columns:minmax(0,1fr);gap:27px}.nx-faq-questions summary{padding:17px 43px 17px 17px;font-size:13px}.nx-faq-questions details p{margin:0 17px 17px}}
+
+/* NEXORA: evitar que WhatsApp y volver arriba se superpongan en móvil. */
+@media (max-width: 700px) {
+  body[data-nexora-page="home"] .floating-support {
+    position: fixed;
+    right: 16px;
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    z-index: 8990;
+  }
+  body[data-nexora-page="home"] #nx-to-top {
+    right: 16px;
+    bottom: calc(164px + env(safe-area-inset-bottom, 0px));
+    z-index: 8991;
+    width: 44px;
+    height: 44px;
+  }
+}
