@@ -2213,6 +2213,9 @@ a{
 <link rel="stylesheet" href="nexora-premium.css?v=2">
 <script src="nexora-experience.js?v=2" defer></script>
 <link rel="stylesheet" href="nexora-redesign-v3.css?v=3">
+<style>
+.mvp-orders-entry{display:flex!important;justify-content:space-between;align-items:center;gap:18px;width:100%;max-width:1120px;margin:20px auto 26px;padding:25px 24px;border:1px solid #ffad59;border-radius:20px;background:linear-gradient(110deg,#ffab49,#ff603d);color:#211007!important;text-decoration:none;box-shadow:0 12px 32px #ff7a2626;box-sizing:border-box;font-family:Arial,sans-serif}.mvp-orders-entry[hidden]{display:none!important}.mvp-orders-entry strong{display:block;font-size:clamp(23px,5vw,34px);font-weight:900;line-height:1.25}.mvp-orders-entry small{display:block;margin-top:8px;font-size:13px;line-height:1.5}.mvp-orders-entry>span:last-child{font-size:30px}.mvp-orders-entry:focus-visible{outline:3px solid #fff;outline-offset:4px}@media(max-width:600px){.mvp-orders-entry{padding:22px 18px}}
+</style>
 </head>
 
 
@@ -2295,6 +2298,7 @@ a{
   </div>
 
 </header>
+<div style="padding:0 18px"><a id="mvpOrdersEntry" class="mvp-orders-entry" href="admin-pedidos.html?v=1" hidden><span><strong>📦 Atender pedidos</strong><small>EXCLUSIVO MVP · Abrir la bandeja de pedidos</small></span><span aria-hidden="true">→</span></a></div>
 
 
 
@@ -4720,6 +4724,7 @@ async function refreshHeaderWallet(user, request) {
   }
 }
 onAuthStateChanged(auth, (user) => {
+  document.getElementById("mvpOrdersEntry").hidden = !user?.email || !["nexora.store.sf@gmail.com","stiven20eduu@gmail.com"].includes(user.email.toLowerCase());
   const request = ++walletRequest;
   if (user) {
     loginLink.textContent = "Mi perfil";
@@ -4840,3 +4845,4 @@ updateInstallUi();
 
 </body>
 </html>
+
