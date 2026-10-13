@@ -4,7 +4,7 @@ const {getAuth}=require('firebase-admin/auth');
 const {getMessaging}=require('firebase-admin/messaging');
 const {onDocumentCreated,onDocumentUpdated}=require('firebase-functions/v2/firestore');
 const {onCall,HttpsError}=require('firebase-functions/v2/https');
-const {ADMINS,eventKey,orderNotice}=require('./notification-model');
+const {ADMINS,eventKey,orderNotice,topupNotice}=require('./notification-model');
 initializeApp();const db=getFirestore();
 const options={region:'us-central1',retry:true,maxInstances:4,timeoutSeconds:540};
 const BASE='https://stiven20eduu.github.io/nexora-store.sf/';
@@ -41,6 +41,20 @@ exports.notifyOrderStatus=onDocumentUpdated({...options,document:'users/{uid}/or
  if(before.status===after.status)return;
  await queue(event.params.uid,event.id,orderNotice(after,event.params.orderId));
 });
+exports.notifyPendingTopup=onDocumentCreated({...options,document:'yapeTopups/{topupId}'},async event=>{
+ const topup=event.data.data();
+ if(topup.status!=='pending')return;
+ const notice=topupNotice(topup,event.params.topupId,true);
+ for(const uid of await adminUids()){
+  await createOnce(db.doc('users/'+uid+'/notifications/new-topup-'+eventKey(event.data.ref.path)),{...notice,createdAt:FieldValue.serverTimestamp()});
+ }
+});
+exports.notifyTopupStatus=onDocumentUpdated({...options,document:'yapeTopups/{topupId}'},async event=>{
+ const before=event.data.before.data(),after=event.data.after.data();
+ if(before.status===after.status||!['approved','rejected'].includes(after.status)||typeof after.uid!=='string')return;
+ const notice=topupNotice(after,event.params.topupId);
+ await createOnce(db.doc('users/'+after.uid+'/notifications/topup-'+eventKey(event.data.ref.path+':'+after.status)),{...notice,createdAt:FieldValue.serverTimestamp()});
+});
 exports.pushPersonalNotice=onDocumentCreated({...options,document:'users/{uid}/notifications/{id}'},async event=>{
  await queue(event.params.uid,event.id,event.data.data());
 });
@@ -56,7 +70,7 @@ exports.deliverNotification=onDocumentCreated({...options,document:'notification
  if((await ref.get()).data()?.sentAt)return;
  // No enviar avisos atrasados después de un día de fallos.
  if(notice.createdAt?.toMillis()<Date.now()-86400000){await ref.update({expiredAt:FieldValue.serverTimestamp()});return;}
- if(notice.kind==='mvp-order'&&!(await adminUids()).includes(notice.uid)){await ref.update({skipped:true});return;}
+ if(['mvp-order','mvp-topup'].includes(notice.kind)&&!(await adminUids()).includes(notice.uid)){await ref.update({skipped:true});return;}
  const devices=await db.collection('pushDevices').where('uid','==',notice.uid).get();
  for(const device of devices.docs){
   const data=device.data();
@@ -64,7 +78,7 @@ exports.deliverNotification=onDocumentCreated({...options,document:'notification
   // Releer al enviar: una cuenta distinta puede haber reclamado este dispositivo.
   if((await device.ref.get()).data()?.uid!==notice.uid)continue;
   try{
-   await getMessaging().send({token:data.token,data:{id:event.params.id,uid:notice.uid,title:'NEXORA STORE',body:notice.kind==='mvp-order'?'Tienes un nuevo pedido por atender.':notice.kind==='attention'?'Un pedido necesita tu atención. Abre NEXORA.':notice.kind==='order'?'El estado de tu pedido cambió. Abre NEXORA.':'Hay un nuevo anuncio de NEXORA.',url:BASE+(notice.kind==='mvp-order'?'admin-pedidos.html':notice.kind==='attention'?'soporte.html?orderId='+encodeURIComponent(notice.orderId||''):notice.kind==='order'?'perfil.html':'index.html')},webpush:{headers:{TTL:'86400',Urgency:'normal'}}});
+   await getMessaging().send({token:data.token,data:{id:event.params.id,uid:notice.uid,title:'NEXORA STORE',body:notice.kind==='mvp-order'?'Tienes un nuevo pedido por atender.':notice.kind==='mvp-topup'?'Hay una recarga de saldo pendiente.':notice.kind==='attention'?'Un pedido necesita tu atención. Abre NEXORA.':notice.kind==='topup'?(notice.title||'Actualización de tu saldo NEXORA.'):notice.kind==='order'?'El estado de tu pedido cambió. Abre NEXORA.':'Hay un nuevo anuncio de NEXORA.',url:BASE+(notice.kind==='mvp-order'?'admin-pedidos.html':notice.kind==='mvp-topup'?'admin-recargas.html':notice.kind==='attention'?'soporte.html?orderId='+encodeURIComponent(notice.orderId||''):notice.kind==='topup'?'recargar-saldo.html':notice.kind==='order'?'perfil.html':'index.html')},webpush:{headers:{TTL:'86400',Urgency:'normal'}}});
   }catch(e){
    if(['messaging/registration-token-not-registered','messaging/invalid-registration-token'].includes(e.code))await device.ref.delete();
    else throw e;
