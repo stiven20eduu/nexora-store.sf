@@ -1,6 +1,6 @@
 import { auth } from './firebase.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
-import { getFirestore, collection, doc, query, orderBy, limit, onSnapshot, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
+import { getFirestore, collection, doc, query, orderBy, limit, where, onSnapshot, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
 const db = getFirestore(auth.app);
 export const isNotificationAdmin = u => !!u?.emailVerified && ['nexora.store.sf@gmail.com','stiven20eduu@gmail.com'].includes(u.email?.toLowerCase());
 export async function requestAttention(uid, orderId, message) {
@@ -24,7 +24,8 @@ const signature=n=>String(n.createdAt?.toMillis?.()||0)+':'+n.body;
 function persist(){try{localStorage.setItem(storageKey(user.uid),JSON.stringify(read));}catch{}}
 function render(){
  if(!user)return;
- const notices=[...sources.values()].flat().sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)).slice(0,100);
+ const fallbackTopups=new Set([...(sources.get('topups')||[]),...(sources.get('pendingTopups')||[])].map(n=>n.topupId));
+ const notices=[...sources.values()].flat().filter(n=>!(n.id.startsWith('personal:')&&['topup','mvp-topup'].includes(n.kind)&&fallbackTopups.has(n.topupId))).sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)).slice(0,100);
  const unread=notices.filter(n=>read[n.id]!==signature(n)).length;
  $('.nx-count').hidden=!unread;$('.nx-count').textContent=unread>99?'99+':String(unread);
  $('.nx-bell').setAttribute('aria-label',`Notificaciones: ${unread} sin leer`);
@@ -33,7 +34,7 @@ function render(){
  for(const n of notices){
   const a=document.createElement('a');a.className='nx-notice'+(read[n.id]!==signature(n)?' nx-unread':'');
   // Solo destinos propios, nunca URLs proporcionadas libremente.
-  a.href=n.kind==='mvp-order'?'admin-pedidos.html':n.kind==='attention'?'soporte.html?orderId='+encodeURIComponent(n.orderId||''):n.kind==='order'?'perfil.html':'index.html';
+  a.href=n.kind==='mvp-order'?'admin-pedidos.html':n.kind==='mvp-topup'?'admin-recargas.html':n.kind==='topup'?'recargar-saldo.html':n.kind==='attention'?'soporte.html?orderId='+encodeURIComponent(n.orderId||''):n.kind==='order'?'perfil.html':'index.html';
   const title=document.createElement('strong');title.textContent=n.title;
   const body=document.createElement('p');body.textContent=n.body;
   const time=document.createElement('small');time.textContent=n.createdAt?.toDate?.().toLocaleString('es-PE')||'Ahora';
@@ -84,6 +85,21 @@ onAuthStateChanged(auth,async next=>{
  function watch(key,ref,map){stops.push(onSnapshot(ref,snap=>{if(version!==epoch)return;sources.set(key,snap.docs.map(d=>map(d)));errors.delete(key);render();},()=>{if(version!==epoch)return;errors.add(key);render();}));}
  watch('personal',query(collection(db,'users',next.uid,'notifications'),orderBy('createdAt','desc'),limit(50)),d=>({...d.data(),id:'personal:'+d.id}));
  watch('announcements',query(collection(db,'announcements'),orderBy('createdAt','desc'),limit(30)),d=>({...d.data(),id:'announcement:'+d.id}));
+ // Estados de recargas visibles sin depender de funciones server-side.
+ watch('topups',query(collection(db,'yapeTopups'),where('uid','==',next.uid),limit(60)),d=>{
+  const t=d.data(),amount=Number.isInteger(t.amountCents)?'S/ '+(t.amountCents/100).toFixed(2):'tu saldo';
+  const approved=t.status==='approved',rejected=t.status==='rejected';
+  return {id:'topup:'+d.id,topupId:d.id,kind:'topup',title:approved?'¡Tu saldo fue acreditado!':rejected?'Recarga no aprobada':'Recarga en revisión',
+    body:approved?'Se acreditaron '+amount+' a tu saldo NEXORA.':rejected?'La solicitud de '+amount+' fue rechazada. Puedes consultar soporte.':'Tu solicitud de '+amount+' está pendiente de verificación.',
+    createdAt:t.processedAt||t.createdAt};
+ });
+ if(isNotificationAdmin(next)){
+  watch('pendingTopups',query(collection(db,'yapeTopups'),where('status','==','pending'),limit(60)),d=>{
+   const t=d.data(),amount=Number.isInteger(t.amountCents)?'S/ '+(t.amountCents/100).toFixed(2):'saldo';
+   return {id:'mvp-topup:'+d.id,topupId:d.id,kind:'mvp-topup',title:'Recarga de saldo pendiente',
+     body:'Solicitud de '+amount+' por revisar. Verifica el pago antes de acreditarlo.',createdAt:t.createdAt};
+  });
+ }
  // Estados de pedidos disponibles incluso antes de desplegar el servidor push.
  const labels={pending:'Pedido recibido',verified:'Pago confirmado',processing:'Tu pedido está en proceso',completed:'¡Tu pedido está completado!',cancelled:'Pedido cancelado'};
  watch('orders',query(collection(db,'users',next.uid,'orders'),orderBy('createdAt','desc'),limit(30)),d=>({id:'order:'+d.id,kind:'order',title:labels[d.data().status]||'Pedido actualizado',body:(d.data().product||'Pedido')+' · '+(labels[d.data().status]||d.data().status),createdAt:d.data().createdAt}));
