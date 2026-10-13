@@ -1,0 +1,105 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Chat privado | NEXORA</title><link rel="icon" href="icon-192.png">
+<style>
+:root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:#080c13;color:#f3f6fb}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0}a{color:inherit;text-decoration:none}button,input,textarea{font:inherit}header{padding:18px 5%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #30394a}.brand{font-weight:900}main{max-width:1120px;margin:30px auto;padding:0 18px 50px}.kicker{color:#ffa65e;font-size:12px;font-weight:bold;letter-spacing:2px}h1{font-size:36px;margin:10px 0}p{line-height:1.6}.muted{color:#a7b3c5}.layout{display:grid;grid-template-columns:300px 1fr;gap:18px;margin-top:24px}.panel{background:#111a27;border:1px solid #303e52;border-radius:18px;overflow:hidden}.contacts-head{padding:20px}.contacts-head h2{font-size:18px;margin:0 0 14px}input{padding:13px;width:100%;border:1px solid #35465d;border-radius:10px;background:#0b111c;color:#fff}.contacts{max-height:550px;overflow:auto;padding:0 10px 15px}.contact{width:100%;display:block;text-align:left;padding:15px;border:1px solid transparent;border-radius:12px;margin:5px 0;background:#162234;color:#f3f6fb;cursor:pointer}.contact strong,.contact small{display:block;overflow-wrap:anywhere}.contact small{color:#9eacc1;font-size:10px;margin-top:6px}.contact[aria-pressed=true]{border-color:#ffb46d;background:#39291f}.chat-head{padding:20px;border-bottom:1px solid #303e52}.chat-head h2{font-size:20px;margin:0 0 6px;overflow-wrap:anywhere}.chat-head p{margin:0;font-size:12px}.messages{height:430px;max-height:60vh;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px}.bubble{align-self:flex-start;background:#1e2d42;border:1px solid #354a65;border-radius:16px 16px 16px 3px;padding:13px 15px;max-width:88%;overflow-wrap:anywhere}.bubble.mine{align-self:flex-end;background:#45291b;border-color:#88522e;border-radius:16px 16px 3px 16px}.bubble p{white-space:pre-wrap;margin:0;line-height:1.5}.bubble small{display:block;color:#bac3d0;font-size:10px;margin-top:8px}.empty{margin:auto;text-align:center;color:#a7b3c5;line-height:1.7}.composer{border-top:1px solid #303e52;padding:16px}.composer textarea{display:block;width:100%;min-height:80px;max-height:200px;resize:vertical;border:1px solid #35465d;border-radius:12px;background:#0b111c;color:white;padding:13px}.send-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}.btn{border:0;border-radius:11px;padding:13px 20px;background:#ffad60;color:#241409;font-weight:800;cursor:pointer}.btn:disabled{opacity:.45;cursor:not-allowed}.error{color:#ffabb9}.success{color:#9ce7c4}.status{font-size:13px;margin:12px 0 0}.setup{border:1px solid #725232;border-radius:14px;background:#241b13;padding:20px;margin-top:20px}.setup a{text-decoration:underline}.setup .btn{margin:8px 8px 8px 0}.counter{font-size:11px;color:#a7b3c5}button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid #ffa65e;outline-offset:3px}@media(max-width:700px){.layout{grid-template-columns:1fr}.contacts{max-height:200px}.contacts-head{padding:16px}h1{font-size:30px}.messages{height:390px;padding:15px}.bubble{max-width:92%}}
+</style></head><body><header><a class="brand" href="index.html">NEXORA STORE</a><a href="perfil.html?v=chat-1">Mi perfil</a></header><main><div class="kicker">CONVERSACIONES PERSONALES</div><h1>Chat privado</h1><p class="muted">Habla directamente con tu contacto. Cada mensaje desaparece del chat 24 horas después de enviarse.</p>
+<p id="gate" role="status">Verificando sesión…</p><a id="login" class="btn" href="login.html" hidden>Iniciar sesión</a>
+<div id="app" hidden><div class="layout"><aside class="panel"><div class="contacts-head"><h2 id="contactsTitle">Tus conversaciones</h2><input id="search" type="search" placeholder="Buscar contacto" aria-label="Buscar contacto"></div><div id="contacts" class="contacts"></div></aside>
+<section id="chatPanel" class="panel"><div class="chat-head"><h2 id="recipient">Selecciona una conversación</h2><p class="muted" id="privacy">Solo tú y el otro participante pueden leer los mensajes.</p></div><div id="messages" class="messages" aria-live="polite" aria-label="Mensajes"><p class="empty">Selecciona un contacto para comenzar.</p></div><form id="composer" class="composer"><label for="text" class="muted">Mensaje</label><textarea id="text" maxlength="2000" placeholder="Escribe aquí…" disabled required></textarea><div class="send-row"><span class="counter">Máximo 2,000 caracteres · Caducan en 24 h</span><button id="send" type="submit" class="btn" disabled>Enviar</button></div><p id="status" class="status" role="status"></p></form></section></div>
+<div id="setup" class="setup" hidden><strong>Activación del chat · Solo MVP</strong><p>Si todavía no publicaste las reglas del chat, cópialas y pégalas en Firebase → Firestore Database → Reglas → Publicar. Las reglas incluyen las funciones actuales de la tienda.</p><button id="copyRules" class="btn" type="button">Copiar reglas completas</button><a href="https://console.firebase.google.com/project/nexora-store-6857a/firestore/rules" target="_blank" rel="noopener">Abrir reglas de Firebase ↗</a><p id="setupStatus" role="status"></p></div></div>
+<script type="module">
+import {auth} from './firebase.js';
+import {onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+import {getFirestore,collection,doc,getDocs,getDocFromServer,onSnapshot,query,where,orderBy,limit,Timestamp,runTransaction,writeBatch,serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
+const db=getFirestore(auth.app),$=id=>document.getElementById(id),DAY=86400000;
+const isMvp=user=>!!user?.email&&['nexora.store.sf@gmail.com','stiven20eduu@gmail.com'].includes(user.email.toLowerCase());
+let contacts=[],room=null,stopRooms=null,stopIndex=null,epoch=0,sessionEpoch=0,sending=false,draft=null;
+let bodies=new Map(),loading=new Set(),indexes=new Map(),indexLoaded=false;
+function node(tag,text,cls){const el=document.createElement(tag);el.textContent=text;if(cls)el.className=cls;return el;}
+function status(text,error=false){$('status').textContent=text;$('status').className='status '+(error?'error':'success');}
+function accessError(error){if(error.code==='permission-denied'){if(isMvp(auth.currentUser))$('setup').hidden=false;return 'No se pudo acceder al chat. Los permisos de esta conversación aún no están disponibles.';}return 'No se pudo conectar. Comprueba tu conexión e inténtalo de nuevo.';}
+function roomRef(memberUid,adminUid){return doc(db,'users',memberUid,'privateChats',adminUid);}
+function isLive(createdAt,now=Date.now()){const time=createdAt?.toMillis?.();return Number.isFinite(time)&&time+DAY>now;}
+function renderContacts(){
+ const q=$('search').value.trim().toLowerCase();$('contacts').replaceChildren();
+ for(const c of contacts.filter(c=>[c.name,c.memberUid,c.adminUid].join(' ').toLowerCase().includes(q))){const btn=node('button','','contact');btn.type='button';btn.setAttribute('aria-pressed',String(room?.memberUid===c.memberUid&&room?.adminUid===c.adminUid));btn.append(node('strong',c.name),node('small','Cuenta: '+(isMvp(auth.currentUser)?c.memberUid:c.adminUid)));btn.addEventListener('click',()=>openChat(c));$('contacts').append(btn);}
+ if(!$('contacts').children.length)$('contacts').append(node('p',q?'No hay coincidencias.':isMvp(auth.currentUser)?'No hay miembros disponibles.':'Cuando un MVP abra un chat contigo, aparecerá aquí.','muted'));
+}
+function renderMessages(){
+ const box=$('messages'),nearBottom=box.scrollHeight-box.scrollTop-box.clientHeight<100;box.replaceChildren();
+ const list=[...bodies.entries()].filter(([,m])=>isLive(m.createdAt)).sort((a,b)=>a[1].createdAt.toMillis()-b[1].createdAt.toMillis());
+ for(const [id,m] of list){const el=node('article','','bubble'+(m.senderUid===auth.currentUser?.uid?' mine':''));el.append(node('p',m.text));const remaining=Math.max(1,Math.ceil((m.createdAt.toMillis()+DAY-Date.now())/60000));el.append(node('small',(m.senderUid===auth.currentUser?.uid?'Tú':'Contacto')+' · '+m.createdAt.toDate().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'})+' · '+(remaining>=60?Math.ceil(remaining/60)+' h':remaining+' min')+' para desaparecer'));box.append(el);}
+ if(!list.length)box.append(node('p',!room?'Selecciona un contacto para comenzar.':!indexLoaded||loading.size?'Cargando mensajes…':'No hay mensajes activos. Saluda a tu contacto.','empty'));
+ if(nearBottom)box.scrollTop=box.scrollHeight;
+}
+function stopChat(){epoch++;stopIndex?.();stopIndex=null;room=null;bodies.clear();indexes.clear();loading.clear();indexLoaded=false;draft=null;$('text').value='';$('text').disabled=true;$('send').disabled=true;renderMessages();}
+async function openChat(contact){
+ if(sending){status('Espera a que termine el envío.',true);return;}
+ if(room?.memberUid===contact.memberUid&&room?.adminUid===contact.adminUid)return;
+ stopChat();const ticket=epoch,actor=auth.currentUser;if(!actor)return;
+ $('recipient').textContent=contact.name;status('Abriendo conversación…');
+ try{
+  const ref=roomRef(contact.memberUid,contact.adminUid);
+  if(isMvp(actor)&&actor.uid===contact.adminUid){
+   if(!actor.emailVerified)throw new Error('Verifica tu correo MVP para iniciar un chat privado.');
+   await runTransaction(db,async tx=>{const existing=await tx.get(ref);if(!existing.exists())tx.set(ref,{memberUid:contact.memberUid,adminUid:actor.uid,createdAt:serverTimestamp()});});
+  }else{const existing=await getDocFromServer(ref);if(!existing.exists())throw new Error('La conversación no existe.');}
+  if(ticket!==epoch||actor.uid!==auth.currentUser?.uid)return;
+  room=contact;$('text').disabled=false;$('send').disabled=false;renderContacts();status('Chat privado conectado. Se muestran hasta 100 mensajes activos.');
+  const feed=query(collection(ref,'messageIndex'),where('createdAt','>',Timestamp.fromMillis(Date.now()-DAY)),orderBy('createdAt','desc'),limit(100));
+  stopIndex=onSnapshot(feed,async snapshot=>{
+   if(ticket!==epoch)return;indexLoaded=true;
+   const ids=new Set(snapshot.docs.map(d=>d.id));
+   for(const id of bodies.keys())if(!ids.has(id))bodies.delete(id);
+   for(const id of indexes.keys())if(!ids.has(id))indexes.delete(id);
+   for(const d of snapshot.docs){
+    const meta=d.data();indexes.set(d.id,meta);
+    if(d.metadata.hasPendingWrites||!isLive(meta.createdAt)||bodies.has(d.id)||loading.has(d.id))continue;
+    loading.add(d.id);
+    getDocFromServer(doc(ref,'privateMessages',d.id)).then(message=>{
+     if(ticket!==epoch||!indexes.has(d.id))return;
+     const data=message.data();if(message.exists()&&isLive(data.createdAt))bodies.set(d.id,data);
+    }).catch(error=>{if(ticket===epoch&&isLive(meta.createdAt))status(accessError(error),true);}).finally(()=>{if(ticket===epoch){loading.delete(d.id);renderMessages();}});
+   }
+   renderMessages();
+  },error=>{if(ticket!==epoch)return;bodies.clear();indexes.clear();indexLoaded=true;renderMessages();$('text').disabled=true;$('send').disabled=true;status(accessError(error),true);room=null;});
+  $('chatPanel').scrollIntoView({behavior:'smooth',block:'start'});$('text').focus({preventScroll:true});
+ }catch(error){if(ticket!==epoch)return;status(error.code?accessError(error):error.message,true);}
+}
+$('composer').addEventListener('submit',async event=>{
+ event.preventDefault();const user=auth.currentUser,body=$('text').value.trim();if(sending||!room||!user||!body||body.length>2000)return;
+ const ref=roomRef(room.memberUid,room.adminUid),ticket=epoch;
+ if(!draft||draft.text!==body)draft={text:body,ref:doc(collection(ref,'privateMessages'))};
+ const attempt=draft;let confirmed=false;sending=true;$('send').disabled=true;$('text').disabled=true;status('Enviando…');
+ try{const batch=writeBatch(db);batch.set(attempt.ref,{senderUid:user.uid,text:body,createdAt:serverTimestamp()});batch.set(doc(ref,'messageIndex',attempt.ref.id),{senderUid:user.uid,createdAt:serverTimestamp()});await batch.commit();confirmed=true;}
+ catch(error){
+  // Un reintento conserva el ID para no crear dos mensajes tras una respuesta perdida.
+  try{const existing=await getDocFromServer(attempt.ref);confirmed=existing.exists()&&existing.data().senderUid===user.uid&&existing.data().text===body&&isLive(existing.data().createdAt);}catch{}
+  if(!confirmed&&ticket===epoch)status(accessError(error)+' Puedes reintentar el mismo mensaje.',true);
+ }finally{
+  sending=false;if(ticket===epoch){$('send').disabled=!room;$('text').disabled=!room;if(confirmed){$('text').value='';draft=null;status('Mensaje enviado. Desaparecerá en 24 horas.');$('messages').scrollTop=$('messages').scrollHeight;}}
+ }
+});
+onAuthStateChanged(auth,async user=>{
+ sessionEpoch++;const session=sessionEpoch;stopRooms?.();stopRooms=null;stopChat();contacts=[];$('app').hidden=true;$('setup').hidden=true;$('login').hidden=!!user;$('gate').hidden=false;$('recipient').textContent='Selecciona una conversación';
+ if(!user){$('gate').textContent='Inicia sesión para ver tus chats privados.';return;}
+ $('gate').textContent='Cargando contactos…';
+ try{
+  if(isMvp(user)){
+   const snapshot=await getDocs(collection(db,'users'));if(session!==sessionEpoch)return;
+   contacts=snapshot.docs.filter(d=>d.id!==user.uid).map(d=>({memberUid:d.id,adminUid:user.uid,name:d.data().displayName||'Miembro NEXORA'}));
+   $('contactsTitle').textContent='Hablar con un miembro';renderContacts();
+  }else{
+   $('contactsTitle').textContent='Tus conversaciones';
+   stopRooms=onSnapshot(collection(db,'users',user.uid,'privateChats'),snapshot=>{if(session!==sessionEpoch)return;contacts=snapshot.docs.map(d=>({memberUid:user.uid,adminUid:d.id,name:'MVP NEXORA'}));renderContacts();},error=>{if(session===sessionEpoch)status(accessError(error),true);});
+  }
+  if(session!==sessionEpoch)return;$('gate').hidden=true;$('app').hidden=false;renderContacts();
+  const selected=new URLSearchParams(location.search).get('uid');const c=contacts.find(c=>c.memberUid===selected);if(c)openChat(c);
+ }catch(error){if(session!==sessionEpoch)return;$('gate').textContent=accessError(error);}
+});
+$('search').addEventListener('input',renderContacts);
+$('copyRules').addEventListener('click',async()=>{try{const response=await fetch('firestore.rules?v=chat-1',{cache:'no-store'});if(!response.ok)throw new Error();const text=await response.text();if(!text.startsWith("rules_version"))throw new Error();await navigator.clipboard.writeText(text);$('setupStatus').textContent='Reglas copiadas. Pégalas completas en Firebase y pulsa Publicar. Luego recarga el chat.';}catch{$('setupStatus').textContent='No se pudieron copiar. Abre firestore.rules desde el repositorio de la tienda.';}});
+setInterval(()=>{let changed=false;for(const [id,m]of bodies)if(!isLive(m.createdAt)){bodies.delete(id);indexes.delete(id);changed=true;}if(room&&changed)renderMessages();},1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderMessages();});
+window.addEventListener('pagehide',()=>{sessionEpoch++;stopRooms?.();stopChat();});
+window.addEventListener('pageshow',event=>{if(event.persisted)location.reload();});
+</script></body></html>
