@@ -16,7 +16,7 @@ export async function requestAttention(uid, orderId, message) {
 }
 const css=document.createElement('link');css.rel='stylesheet';css.href=new URL('./notifications.css',import.meta.url);document.head.append(css);
 const host=document.createElement('div');host.id='nx-notifications';host.hidden=true;
-host.innerHTML=`<button class="nx-bell" aria-label="Notificaciones" aria-expanded="false">🔔 <span class="nx-count" hidden>0</span></button><section class="nx-notice-panel" aria-label="Notificaciones de NEXORA" hidden><div class="nx-notice-heading"><h2>Notificaciones</h2><button class="nx-close" aria-label="Cerrar notificaciones">×</button></div><p class="nx-state" role="status"></p><div class="nx-tools"><button class="nx-enable">Activar en este celular</button><button class="nx-read">Marcar como leídas</button></div><p class="nx-device-state" role="status"></p><a class="nx-admin" href="admin-anuncios.html" hidden>Publicar anuncio · MVP →</a><div class="nx-feed"></div></section>`;
+host.innerHTML=`<button class="nx-bell" aria-label="Notificaciones" aria-expanded="false">🔔 <span class="nx-count" hidden>0</span></button><section class="nx-notice-panel" aria-label="Notificaciones de NEXORA" hidden><div class="nx-notice-heading"><h2>Notificaciones</h2><button class="nx-close" aria-label="Cerrar notificaciones">×</button></div><p class="nx-state" role="status"></p><div class="nx-tools"><button class="nx-enable">Activar en este celular</button><button class="nx-read">Marcar como leídas</button></div><p class="nx-device-state" role="status"></p><a class="nx-admin" href="admin-anuncios.html" hidden>Centro de mensajes MVP →</a><div class="nx-feed"></div></section>`;
 document.body.append(host);
 const $=s=>host.querySelector(s),sources=new Map(),errors=new Set();let stops=[],user=null,epoch=0,read={};
 const storageKey=uid=>'nexora-notices-read:'+uid;
@@ -29,7 +29,8 @@ function render(){
  const unread=notices.filter(n=>read[n.id]!==signature(n)).length;
  $('.nx-count').hidden=!unread;$('.nx-count').textContent=unread>99?'99+':String(unread);
  $('.nx-bell').setAttribute('aria-label',`Notificaciones: ${unread} sin leer`);
- $('.nx-state').textContent=errors.size?'Algunos avisos no están disponibles. Falta activar sus permisos en Firebase o reconectar.': 'Tus pedidos y las novedades de NEXORA.';
+ $('.nx-notice-heading h2').textContent=isNotificationAdmin(user)?'Avisos MVP / ADM':'Notificaciones';
+ $('.nx-state').textContent=errors.size?'Algunos avisos no están disponibles. Revisa tus permisos de Firebase o reconecta.':isNotificationAdmin(user)?'Pedidos, recargas pendientes y anuncios de NEXORA.':'Tus pedidos, recargas de saldo y novedades de NEXORA.';
  const feed=$('.nx-feed');feed.replaceChildren();
  for(const n of notices){
   const a=document.createElement('a');a.className='nx-notice'+(read[n.id]!==signature(n)?' nx-unread':'');
