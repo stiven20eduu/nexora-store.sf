@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atender pedidos | NEXORA MVP</title><meta name="robots" content="noindex">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;color:#f4f6fa;background:#080b11}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0}a{color:inherit;text-decoration:none}button,input{font:inherit}button,a{touch-action:manipulation}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}header{border-bottom:1px solid #2b3341;padding:18px max(18px,calc((100% - 1120px)/2));display:flex;justify-content:space-between;gap:16px;align-items:center;background:#0e131c}.brand{font-weight:900;letter-spacing:1px}.back{font-size:14px;color:#bec6d2}main{max-width:1120px;margin:auto;padding:28px 18px 70px}.hero{background:linear-gradient(120deg,#512316,#201510 70%);border:1px solid #7c4226;border-radius:22px;padding:28px}.kicker{color:#ffb76b;font-size:12px;letter-spacing:2px;font-weight:bold}h1{font-size:clamp(30px,6vw,48px);margin:10px 0}p{line-height:1.6}.muted{color:#aeb8c8}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}.stat{background:#111924;border:1px solid #2c3949;padding:18px;border-radius:16px}.stat strong{display:block;font-size:32px;color:#ffb66c}.stat span{font-size:13px;color:#aeb8c8}.toolbar{display:flex;gap:12px;flex-wrap:wrap;margin:22px 0}.toolbar input{flex:1;min-width:180px;padding:15px;border:1px solid #364256;border-radius:12px;background:#101722;color:#fff}.tabs{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}.tabs button,.btn{border:1px solid #364256;border-radius:12px;padding:14px 18px;background:#162131;color:#eaf0fa;font-weight:700;min-height:48px}.tabs button{white-space:nowrap}.tabs [aria-pressed=true]{background:#ffab52;border-color:#ffab52;color:#201008}.orders{display:grid;gap:18px;margin-top:20px}.order{background:#111822;border:1px solid #304055;border-radius:20px;padding:22px;overflow-wrap:anywhere}.order-head{display:flex;justify-content:space-between;gap:16px;align-items:start}.order h2{font-size:23px;margin:8px 0}.price{font-size:23px;font-weight:900;white-space:nowrap;color:#ffc383}.badge{display:inline-block;border-radius:30px;padding:8px 12px;background:#3c2d17;color:#ffd58a;font-size:12px;font-weight:800}.badge.completed{background:#12372b;color:#8cf0c1}.badge.cancelled{background:#401f2a;color:#ffafbb}.details{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}.detail{background:#0b111b;border:1px solid #253247;padding:13px;border-radius:12px}.detail small{display:block;color:#94a4bb;margin-bottom:8px}.detail strong{font-size:15px}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}.complete{background:#34ce95;color:#072418;border-color:#34ce95}.process{background:#ffb15c;color:#251507;border-color:#ffb15c}.cancel{background:#321c25;color:#ffb6c2;border-color:#68404b}.notice{padding:14px 18px;border-radius:12px;background:#142433;color:#c0dbfa}.error{color:#ffaaaa}.success{color:#87e5b6}.empty{text-align:center;padding:48px 20px;border:1px dashed #354258;border-radius:18px;color:#aeb8c8}.gate{text-align:center;padding:70px 20px}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #ffb15c;outline-offset:4px}@media(max-width:560px){.hero{padding:22px}.stat{padding:13px}.stat strong{font-size:27px}.stat span{font-size:11px}.order{padding:18px}.order-head{display:block}.price{margin-top:12px}.details{grid-template-columns:1fr}.actions .btn{width:100%}.stats{gap:8px}}
+</style></head><body>
+<header><a class="brand" href="index.html">NEXORA MVP</a><a class="back" href="admin.html?v=pedidos-1">← Panel MVP</a></header>
+<main><section id="gate" class="gate"><h1>Verificando acceso…</h1><p>Área exclusiva para cuentas MVP.</p></section>
+<section id="dashboard" hidden>
+<div class="hero"><div class="kicker">CENTRO DE ATENCIÓN · MVP</div><h1>Atender pedidos</h1><p class="muted">Todos los clientes en una sola bandeja. Atiende primero los pedidos más antiguos.</p></div>
+<div class="stats"><div class="stat"><strong id="openCount">—</strong><span>Por atender</span></div><div class="stat"><strong id="workingCount">—</strong><span>En proceso</span></div><div class="stat"><strong id="doneCount">—</strong><span>Completados</span></div></div>
+<div class="toolbar"><input id="search" type="search" aria-label="Buscar pedidos" placeholder="Buscar cliente, pedido, juego o ID…"></div>
+<nav class="tabs" aria-label="Filtrar pedidos"><button data-filter="active" aria-pressed="true">Por atender</button><button data-filter="completed" aria-pressed="false">Completados</button><button data-filter="cancelled" aria-pressed="false">Cancelados</button><button data-filter="all" aria-pressed="false">Todos</button></nav>
+<p id="loadStatus" class="muted" role="status">Cargando pedidos…</p><p id="feedback" role="status" aria-live="polite"></p>
+<div id="orders" class="orders"></div>
+</section></main>
+<script type="module">
+import {auth} from './firebase.js';
+import {onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+import {getFirestore,collection,doc,onSnapshot,runTransaction,serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
+const db=getFirestore(auth.app),emails=new Set(['nexora.store.sf@gmail.com','stiven20eduu@gmail.com']);
+const $=id=>document.getElementById(id),isMvp=user=>!!user?.email&&emails.has(user.email.toLowerCase());
+const labels={pending:'Pago por verificar',verified:'Pago verificado',processing:'En proceso',completed:'Completado',cancelled:'Cancelado'};
+const active=status=>['pending','verified','processing'].includes(status);
+const money=value=>'S/ '+Number(value||0).toFixed(2);
+let clients=new Map(),listeners=new Map(),stopUsers=null,filter='active',busy=false,generation=0;
+const pending=new Set(),failed=new Set();
+function element(tag,text,cls){const el=document.createElement(tag);el.textContent=text;if(cls)el.className=cls;return el;}
+function feedback(text,error=false){$('feedback').textContent=text;$('feedback').className=error?'error':'success';}
+function detail(label,value){const el=element('div','','detail');el.append(element('small',label),element('strong',value||'No registrado'));return el;}
+function allOrders(){return [...clients.values()].flatMap(c=>c.orders.map(o=>({...o,uid:c.uid,customer:c.name})));}
+function render(){
+ const all=allOrders();$('openCount').textContent=all.filter(o=>active(o.status)).length;$('workingCount').textContent=all.filter(o=>o.status==='processing').length;$('doneCount').textContent=all.filter(o=>o.status==='completed').length;
+ const q=$('search').value.trim().toLowerCase();
+ const list=all.filter(o=>(filter==='all'||(filter==='active'?active(o.status):o.status===filter))&&[o.customer,o.id,o.game,o.product,o.playerId,o.playerName,o.uid].join(' ').toLowerCase().includes(q));
+ list.sort((a,b)=>{if(filter==='all'&&active(a.status)!==active(b.status))return active(a.status)?-1:1;const diff=(a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0);return filter==='completed'||filter==='cancelled'?-diff:diff;});
+ $('orders').replaceChildren();
+ $('loadStatus').textContent=failed.size?'No se pudieron cargar todos los pedidos. Recarga la página para reintentar.':pending.size?'Cargando pedidos de los clientes…':list.length+' pedido(s) · Actualización en tiempo real';
+ $('loadStatus').className=failed.size?'error':'muted';
+ for(const o of list){
+  const card=element('article','','order'),head=element('div','','order-head'),left=element('div');
+  left.append(element('span',labels[o.status]||'Estado desconocido','badge '+(o.status==='completed'?'completed':o.status==='cancelled'?'cancelled':'')),element('h2',o.product||'Producto'),element('div',(o.game||'Juego')+' · '+o.customer,'muted'));
+  head.append(left,element('div',money(o.price),'price'));card.append(head);
+  const date=o.createdAt?.toDate?.();card.append(element('p','Pedido: '+o.id+(date?' · '+date.toLocaleString('es-PE'):''),'muted'));
+  const details=element('div','','details');details.append(detail('ID del jugador / cuenta',o.playerId),detail('Nombre del jugador',o.playerName),detail('Servidor / región',[o.serverId,o.playerRegion].filter(Boolean).join(' · ')),detail('Pago',o.paymentMethod==='wallet'?'Pagado con saldo NEXORA':o.status==='pending'?'Pendiente de verificación':'Verificar comprobante del cliente'));card.append(details);
+  if(o.status==='pending')card.append(element('p','Verifica el pago real antes de entregar el producto.','notice'));
+  const actions=element('div','','actions');
+  if(active(o.status)){
+   for(const [status,title,cls] of [['processing','Poner en proceso','process'],['completed','Marcar completado','complete'],['cancelled','Cancelar pedido','cancel']]){
+    if(status==='processing'&&o.status==='processing')continue;
+    const btn=element('button',title,'btn '+cls);btn.type='button';btn.disabled=busy;btn.addEventListener('click',()=>changeStatus(o,status));actions.append(btn);
+   }
+  }
+  card.append(actions);$('orders').append(card);
+ }
+ if(!list.length&&!pending.size&&!failed.size)$('orders').append(element('p',q?'No hay pedidos que coincidan con tu búsqueda.':filter==='active'?'Todo al día. No hay pedidos pendientes.':'No hay pedidos en esta pestaña.','empty'));
+}
+async function saveStatus(uid,id,next,expectedStatus){
+ if(!isMvp(auth.currentUser))throw new Error('Acceso exclusivo para MVP.');
+ if(!['processing','completed','cancelled'].includes(next))throw new Error('Estado inválido.');
+ return runTransaction(db,async tx=>{
+  const ref=doc(db,'users',uid,'orders',id),snap=await tx.get(ref);
+  if(!snap.exists())throw new Error('El pedido ya no existe.');
+  const current=snap.data();
+  if(!active(current.status)||current.status!==expectedStatus)throw new Error('Otro administrador actualizó este pedido. Revisa su estado antes de continuar.');
+  if(next==='cancelled'&&current.paymentMethod==='wallet'){
+   if(!auth.currentUser.emailVerified)throw new Error('Verifica tu correo de administrador para reembolsar.');
+   const cost=current.priceCents,walletRef=doc(db,'users',uid,'wallet','main'),wallet=await tx.get(walletRef),balance=wallet.data()?.balanceCents;
+   if(!wallet.exists()||!Number.isSafeInteger(cost)||cost<100||!Number.isSafeInteger(balance)||balance<0||balance+cost>100000000)throw new Error('No se pudo validar el saldo para el reembolso.');
+   tx.update(walletRef,{balanceCents:balance+cost,updatedAt:serverTimestamp()});
+  }
+  tx.update(ref,{status:next});
+ });
+}
+async function changeStatus(order,next){
+ if(busy||!isMvp(auth.currentUser))return;
+ const question=next==='completed'?'¿Confirmas que el pago está verificado y ya entregaste el producto?':next==='processing'?'¿Confirmas que el pago está verificado y vas a atender este pedido?':order.paymentMethod==='wallet'?'¿Cancelar este pedido y devolver el importe a su saldo?':'¿Cancelar este pedido? No se realizará un reembolso automático.';
+ if(!window.confirm(order.customer+' · '+order.product+'\nPedido: '+order.id+'\n\n'+question))return;
+ busy=true;render();feedback('Guardando cambio…');
+ try{await saveStatus(order.uid,order.id,next,order.status);feedback(next==='cancelled'&&order.paymentMethod==='wallet'?'Pedido cancelado y saldo reembolsado.':'Pedido actualizado: '+labels[next]+'.');}
+ catch(error){feedback(error.code==='permission-denied'?'Tu cuenta no tiene permiso para realizar esta acción.':error.message||'No se pudo confirmar el cambio. Revisa el estado antes de reintentar.',true);}
+ finally{busy=false;render();}
+}
+function cleanup(){generation++;stopUsers?.();stopUsers=null;for(const stop of listeners.values())stop();listeners.clear();clients.clear();pending.clear();failed.clear();$('orders').replaceChildren();}
+onAuthStateChanged(auth,user=>{
+ cleanup();$('dashboard').hidden=true;$('gate').hidden=false;
+ if(!user){$('gate').replaceChildren(element('h1','Inicia sesión'),element('p','Usa tu cuenta MVP para atender pedidos.'));const a=element('a','Iniciar sesión','btn');a.href='login.html';$('gate').append(a);return;}
+ if(!isMvp(user)){$('gate').replaceChildren(element('h1','Acceso exclusivo para MVP'),element('p','Esta cuenta no puede gestionar pedidos.'));return;}
+ $('gate').hidden=true;$('dashboard').hidden=false;const epoch=generation;
+ stopUsers=onSnapshot(collection(db,'users'),snapshot=>{
+  if(epoch!==generation)return;
+  const ids=new Set(snapshot.docs.map(d=>d.id));
+  for(const [uid,stop] of listeners){if(!ids.has(uid)){stop();listeners.delete(uid);clients.delete(uid);pending.delete(uid);failed.delete(uid);}}
+  for(const member of snapshot.docs){
+   const uid=member.id,old=clients.get(uid);clients.set(uid,{uid,name:member.data().displayName||'Usuario NEXORA',orders:old?.orders||[]});
+   if(listeners.has(uid))continue;pending.add(uid);
+   listeners.set(uid,onSnapshot(collection(db,'users',uid,'orders'),orders=>{
+    if(epoch!==generation||!clients.has(uid))return;
+    clients.get(uid).orders=orders.docs.map(d=>({...d.data(),id:d.id}));pending.delete(uid);failed.delete(uid);render();
+   },()=>{if(epoch!==generation)return;pending.delete(uid);failed.add(uid);render();}));
+  }
+  render();
+ },()=>{if(epoch!==generation)return;$('loadStatus').textContent='No se pudieron cargar los clientes. Revisa tu acceso y recarga la página.';$('loadStatus').className='error';});
+});
+$('search').addEventListener('input',render);
+document.querySelectorAll('[data-filter]').forEach(btn=>btn.addEventListener('click',()=>{filter=btn.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));render();}));
+window.addEventListener('pagehide',cleanup);
+window.addEventListener('pageshow',event=>{if(event.persisted)location.reload();});
+</script></body></html>
