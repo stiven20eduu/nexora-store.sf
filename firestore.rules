@@ -89,6 +89,57 @@ service cloud.firestore {
       }
     }
 
+    // Chat privado: solo el miembro y el MVP que abrió su conversación.
+    function chatParticipant(uid, adminUid) {
+      return signedIn() && (request.auth.uid == uid || request.auth.uid == adminUid);
+    }
+
+    match /users/{uid}/privateChats/{adminUid} {
+      allow get: if chatParticipant(uid, adminUid);
+      allow list: if owner(uid);
+      allow create: if isWalletAdmin() && request.auth.uid == adminUid && uid != adminUid
+        && exists(/databases/$(database)/documents/users/$(uid))
+        && request.resource.data.keys().hasOnly(['memberUid', 'adminUid', 'createdAt'])
+        && request.resource.data.keys().hasAll(['memberUid', 'adminUid', 'createdAt'])
+        && request.resource.data.memberUid == uid
+        && request.resource.data.adminUid == adminUid
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+
+      // El índice contiene únicamente identificadores y fechas, nunca texto.
+      // Permite localizar mensajes recientes sin exponer los ya caducados.
+      match /messageIndex/{messageId} {
+        allow read: if chatParticipant(uid, adminUid);
+        allow create: if chatParticipant(uid, adminUid)
+          && exists(/databases/$(database)/documents/users/$(uid)/privateChats/$(adminUid))
+          && request.resource.data.keys().hasOnly(['senderUid','createdAt'])
+          && request.resource.data.keys().hasAll(['senderUid','createdAt'])
+          && request.resource.data.senderUid == request.auth.uid
+          && request.resource.data.createdAt == request.time
+          && getAfter(/databases/$(database)/documents/users/$(uid)/privateChats/$(adminUid)/privateMessages/$(messageId)).data.senderUid == request.auth.uid
+          && getAfter(/databases/$(database)/documents/users/$(uid)/privateChats/$(adminUid)/privateMessages/$(messageId)).data.createdAt == request.time;
+        allow update, delete: if false;
+      }
+
+      match /privateMessages/{messageId} {
+        allow get: if chatParticipant(uid, adminUid)
+          && request.time < resource.data.createdAt + duration.value(24, 'h');
+        allow list: if false;
+        allow create: if chatParticipant(uid, adminUid)
+          && exists(/databases/$(database)/documents/users/$(uid)/privateChats/$(adminUid))
+          && request.resource.data.keys().hasOnly(['senderUid','text','createdAt'])
+          && request.resource.data.keys().hasAll(['senderUid','text','createdAt'])
+          && request.resource.data.senderUid == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() >= 1
+          && request.resource.data.text.size() <= 2000
+          && request.resource.data.createdAt == request.time
+          && getAfter(/databases/$(database)/documents/users/$(uid)/privateChats/$(adminUid)/messageIndex/$(messageId)).data.senderUid == request.auth.uid
+          && getAfter(/databases/$(database)/documents/users/$(uid)/privateChats/$(adminUid)/messageIndex/$(messageId)).data.createdAt == request.time;
+        allow update, delete: if false;
+      }
+    }
+
     match /users/{uid} {
       allow read: if owner(uid) || isMvp();
 
@@ -357,3 +408,4 @@ service cloud.firestore {
     }
   }
 }
+
