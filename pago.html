@@ -155,6 +155,15 @@ footer{border-top:1px solid rgba(176,194,227,.09);font-size:11px}
 @media(max-width:540px){main{margin:25px auto 65px;padding:0 15px}.card-head{padding:20px 19px 16px}.card-body{padding:18px 19px 21px}h1{letter-spacing:-1px}.checkout-perks span{font-size:10px;padding:7px 10px}.layout{gap:15px}.order-row{padding:15px 0}.order-row strong{font-size:13px}.order-total strong{font-size:26px}.wallet-title{gap:7px}.wallet-state{font-size:9px}.security-footer{gap:9px;justify-content:flex-start}.brand img{width:40px;height:40px}header{min-height:67px}}
 @media(prefers-reduced-motion:reduce){.pay,.back{transition:none!important}}
 
+
+.robux-payment-notice[hidden]{display:none!important}
+.robux-payment-notice{
+  background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.38);
+  color:#f5d6a0;border-radius:15px;padding:17px 19px;margin:17px 0 23px;
+  line-height:1.6;font-size:14px
+}
+.robux-payment-notice strong{display:block;color:#fff;font-size:17px;margin-bottom:3px}
+
 </style>
 <link rel="stylesheet" href="nexora-premium.css?v=2">
 <link rel="stylesheet" href="nexora-shop-ambience.css?v=1">
@@ -175,6 +184,7 @@ footer{border-top:1px solid rgba(176,194,227,.09);font-size:11px}
 </header>
 <main>
 <section id="checkout" hidden>
+<div id="robuxCheckoutNotice" class="robux-payment-notice" role="status" hidden><strong>Por ahora no hay Robux (mantenimiento)</strong>Las recargas de Robux están suspendidas temporalmente. No se aceptan pagos para Roblox hasta que se restablezca el servicio.</div>
 <div class="eyebrow">PAGO SEGURO CON NEXORA</div>
 <h1>Paga con tu saldo NEXORA</h1>
 <p class="subhead">Confirma tu compra con el saldo disponible en tu cuenta. Se descontará únicamente el valor del producto y tu pedido se registrará con el pago verificado, listo para su atención.</p>
@@ -465,17 +475,27 @@ async function loadWallet(order,user){
 }
 
 const originalOrder=readOrder();
+const robuxInMaintenance=validOrder(originalOrder)&&originalOrder.gameKey==="roblox";
 if(!validOrder(originalOrder)){
  byId("missingOrder").hidden=false;
 }else{
  document.body.dataset.gameTheme=originalOrder.gameKey;
  byId("checkout").hidden=false;
  setDisplayOrder(originalOrder);
- onAuthStateChanged(auth,user=>{
-  loadWallet(originalOrder,user);
- });
+ if(robuxInMaintenance){
+  byId("robuxCheckoutNotice").hidden=false;
+  button.disabled=true;
+  button.textContent="Robux en mantenimiento";
+  setWalletState("Mantenimiento","waiting");
+  setStatus("Por ahora no hay Robux (mantenimiento). No se puede continuar con este pago.","error");
+ }else{
+  onAuthStateChanged(auth,user=>{
+   loadWallet(originalOrder,user);
+  });
+ }
 }
 button.addEventListener("click",()=>{
+ if(robuxInMaintenance)return;
  if(busy||paid||!auth.currentUser||auth.currentUser.uid!==currentUserId||!Number.isSafeInteger(approvedPriceCents)||!Number.isSafeInteger(visibleBalance))return;
  const order=readOrder();
  if(!validOrder(order) || order.game!==originalOrder.game || order.product!==originalOrder.product ||
@@ -486,6 +506,7 @@ button.addEventListener("click",()=>{
  showConfirmation(order);
 });
 byId("modalApprove").addEventListener("click",async()=>{
+ if(robuxInMaintenance)return;
  if(busy||paid||!auth.currentUser||auth.currentUser.uid!==currentUserId)return;
  const order=readOrder();
  if(!validOrder(order) || order.game!==originalOrder.game || order.product!==originalOrder.product ||
