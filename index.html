@@ -2215,10 +2215,129 @@ a{
 <style>
 .mvp-orders-entry{display:flex!important;justify-content:space-between;align-items:center;gap:18px;width:100%;max-width:1120px;margin:20px auto 26px;padding:25px 24px;border:1px solid #ffad59;border-radius:20px;background:linear-gradient(110deg,#ffab49,#ff603d);color:#211007!important;text-decoration:none;box-shadow:0 12px 32px #ff7a2626;box-sizing:border-box;font-family:Arial,sans-serif}.mvp-orders-entry[hidden]{display:none!important}.mvp-orders-entry strong{display:block;font-size:clamp(23px,5vw,34px);font-weight:900;line-height:1.25}.mvp-orders-entry small{display:block;margin-top:8px;font-size:13px;line-height:1.5}.mvp-orders-entry>span:last-child{font-size:30px}.mvp-orders-entry:focus-visible{outline:3px solid #fff;outline-offset:4px}@media(max-width:600px){.mvp-orders-entry{padding:22px 18px}}
 </style>
+
+<style id="nx-gaming-premium-style">
+/* NEXORA STORE • Gaming premium: decoración no interactiva, solo portada. */
+body[data-nexora-page="home"] {
+  isolation: isolate;
+  background: #080b13;
+}
+body[data-nexora-page="home"] .nx-gaming-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% -16%, rgba(255,151,66,.065), transparent 85%),
+    radial-gradient(ellipse 50% 55% at 102% 55%, rgba(41,99,161,.055), transparent 80%),
+    linear-gradient(156deg, #080a11 0%, #0b1120 48%, #070910 100%);
+  contain: paint;
+}
+body[data-nexora-page="home"] .nx-gaming-grid {
+  position: absolute;
+  inset: -55% -35%;
+  background-image:
+    linear-gradient(rgba(149,180,214,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(149,180,214,.07) 1px, transparent 1px);
+  background-size: 78px 78px;
+  transform: perspective(900px) rotateX(62deg) scale(1.42) translateY(0);
+  transform-origin: center 26%;
+  opacity: .36;
+  animation: nx-gaming-grid-flow 30s linear infinite;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 2%, #000 38%, #000 70%, transparent 99%);
+  mask-image: linear-gradient(to bottom, transparent 2%, #000 38%, #000 70%, transparent 99%);
+}
+body[data-nexora-page="home"] .nx-gaming-orb {
+  position: absolute;
+  display: block;
+  width: min(58vw, 670px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(42px);
+  opacity: .52;
+  will-change: transform;
+}
+body[data-nexora-page="home"] .nx-gaming-orb--orange {
+  top: -23%;
+  left: -18%;
+  background: radial-gradient(circle, rgba(255,127,39,.26), rgba(255,104,39,.075) 49%, transparent 72%);
+  animation: nx-gaming-float-left 25s ease-in-out infinite alternate;
+}
+body[data-nexora-page="home"] .nx-gaming-orb--blue {
+  top: 8%;
+  right: -23%;
+  background: radial-gradient(circle, rgba(47,127,222,.22), rgba(27,66,166,.085) 48%, transparent 72%);
+  animation: nx-gaming-float-right 29s ease-in-out infinite alternate;
+}
+body[data-nexora-page="home"] .nx-gaming-orb--violet {
+  bottom: -43%;
+  left: 23%;
+  background: radial-gradient(circle, rgba(118,65,203,.22), rgba(69,53,160,.065) 48%, transparent 72%);
+  animation: nx-gaming-float-bottom 32s ease-in-out infinite alternate;
+}
+body[data-nexora-page="home"] .nx-gaming-light-trace {
+  position: absolute;
+  width: 1px;
+  height: 140vh;
+  top: -25vh;
+  left: 25%;
+  background: linear-gradient(to bottom, transparent, rgba(248,158,84,.11), transparent);
+  transform: rotate(22deg);
+  opacity: .4;
+  animation: nx-gaming-light-drift 19s ease-in-out infinite alternate;
+}
+body[data-nexora-page="home"] .nx-gaming-light-trace--blue {
+  left: auto;
+  right: 18%;
+  background: linear-gradient(to bottom, transparent, rgba(87,157,237,.11), transparent);
+  animation-duration: 26s;
+  animation-direction: alternate-reverse;
+}
+@keyframes nx-gaming-grid-flow {
+  from { transform: perspective(900px) rotateX(62deg) scale(1.42) translateY(0); }
+  to { transform: perspective(900px) rotateX(62deg) scale(1.42) translateY(78px); }
+}
+@keyframes nx-gaming-float-left {
+  to { transform: translate3d(9vw, 8vh, 0) scale(1.1); }
+}
+@keyframes nx-gaming-float-right {
+  to { transform: translate3d(-11vw, 12vh, 0) scale(.93); }
+}
+@keyframes nx-gaming-float-bottom {
+  to { transform: translate3d(4vw, -10vh, 0) scale(1.08); }
+}
+@keyframes nx-gaming-light-drift {
+  to { transform: translateX(10vw) rotate(22deg); opacity: .16; }
+}
+@media (max-width: 700px) {
+  body[data-nexora-page="home"] .nx-gaming-grid { background-size: 56px 56px; opacity: .26; }
+  body[data-nexora-page="home"] .nx-gaming-orb { width: 82vw; filter: blur(35px); opacity: .38; }
+  body[data-nexora-page="home"] .nx-gaming-orb--violet { display: none; }
+  body[data-nexora-page="home"] .nx-gaming-light-trace { opacity: .19; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-nexora-page="home"] .nx-gaming-backdrop *,
+  body[data-nexora-page="home"] .nx-gaming-backdrop *::before,
+  body[data-nexora-page="home"] .nx-gaming-backdrop *::after {
+    animation: none !important;
+    will-change: auto;
+  }
+}
+</style>
 </head>
 
 
 <body data-nexora-page="home">
+<div class="nx-gaming-backdrop" aria-hidden="true">
+  <span class="nx-gaming-grid"></span>
+  <span class="nx-gaming-orb nx-gaming-orb--orange"></span>
+  <span class="nx-gaming-orb nx-gaming-orb--blue"></span>
+  <span class="nx-gaming-orb nx-gaming-orb--violet"></span>
+  <span class="nx-gaming-light-trace"></span>
+  <span class="nx-gaming-light-trace nx-gaming-light-trace--blue"></span>
+</div>
+
 
 
 <!-- ========================================================
