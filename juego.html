@@ -1321,6 +1321,7 @@ a{
 <script src="nexora-experience.js?v=3" defer></script>
 <link rel="stylesheet" href="nexora-redesign-v3.css?v=3">
 <link rel="stylesheet" href="nexora-shop-ambience.css?v=1">
+<link rel="stylesheet" href="nexora-buy-flow.css?v=1">
 </head>
 
 
@@ -1457,6 +1458,19 @@ a{
     <span>01. Datos del jugador · 02. Paquete · 03. Pago con saldo</span>
   </div>
 
+
+  <section class="nx-buy-route" aria-labelledby="nxBuyGuideTitle">
+    <div class="nx-buy-route-head">
+      <strong class="nx-buy-eyebrow" id="nxBuyGuideTitle">COMPRA FÁCIL · 3 PASOS</strong>
+      <a class="nx-buy-recharge" href="recargar-saldo.html">¿Aún no tienes saldo? Recargar con Yape ↗</a>
+    </div>
+    <ol class="nx-buy-steps">
+      <li><span class="nx-buy-number" aria-hidden="true">01</span><div><strong>Indica tu cuenta</strong><small>Escribe el ID y servidor si el juego los solicita.</small></div></li>
+      <li><span class="nx-buy-number" aria-hidden="true">02</span><div><strong>Elige el paquete</strong><small>Toca tu producto y comprueba el total en el resumen.</small></div></li>
+      <li><span class="nx-buy-number" aria-hidden="true">03</span><div><strong>Revisa y paga</strong><small>En la siguiente pantalla pagarás con saldo NEXORA acreditado.</small></div></li>
+    </ol>
+    <p class="nx-buy-note"><strong>Importante:</strong> elegir un paquete no cobra dinero. Las recargas de saldo por Yape necesitan aprobación antes de poder usarse.</p>
+  </section>
 
   <div class="top-heading">
 
@@ -1604,6 +1618,7 @@ a{
               <input
                 type="text"
                 id="playerId"
+                aria-label="ID del jugador"
                 inputmode="numeric"
                 placeholder="Ej: 3451470467"
               >
@@ -1634,6 +1649,7 @@ a{
               <input
                 type="text"
                 id="mlPlayerId"
+                aria-label="ID del jugador de Mobile Legends"
                 inputmode="numeric"
                 placeholder="ID del jugador"
               >
@@ -1646,6 +1662,7 @@ a{
               <input
                 type="text"
                 id="mlServerId"
+                aria-label="Server ID de Mobile Legends"
                 inputmode="numeric"
                 placeholder="Server ID"
               >
@@ -1811,10 +1828,12 @@ a{
       <button
         class="continue-btn"
         id="continueBtn"
+        type="button"
         disabled
       >
         Selecciona un paquete
       </button>
+      <p class="nx-continue-explain">Primero revisarás los datos y el saldo. El pago solo se realiza cuando lo confirmes.</p>
 
     </aside>
 
@@ -2772,7 +2791,7 @@ function selectProduct(
 
 
   continueBtn.textContent =
-    "Finalizar compra";
+    "Revisar pedido y pago →";
 
 
   updateSummary();
