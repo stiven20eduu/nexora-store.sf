@@ -35,11 +35,12 @@
   schedule();
 
   // Navegación rápida en móvil: links reales que funcionan aunque no haya sesión.
-  if (["home", "game", "profile"].includes(page)) {
+  if (["home", "game", "profile", "purchases"].includes(page)) {
     const icons = {
       home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
       games: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h12c2 0 3.4 1.7 4 5.7.2 1.5-1.1 2.4-2.4 1.7l-3.2-2.1H7.6l-3.2 2.1c-1.3.7-2.6-.2-2.4-1.7C2.6 13.7 4 12 6 12Z"/><path d="M7 15v4m-2-2h4m8-1h.01m2 2h.01"/></svg>',
-      profile: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>'
+      profile: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+      purchases: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>'
     };
     const nav = doc.createElement("nav");
     nav.className = "nx-bottom-nav";
@@ -47,6 +48,7 @@
     const items = [
       { label: "Inicio", href: "index.html", current: page === "home", icon: icons.home },
       { label: "Juegos", href: "index.html#catalogo", current: page === "game", icon: icons.games },
+      { label: "Compras", href: "compras.html", current: page === "purchases", icon: icons.purchases },
       { label: "Mi cuenta", href: "perfil.html", current: page === "profile", icon: icons.profile }
     ];
     for (const item of items) {
