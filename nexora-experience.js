@@ -127,7 +127,7 @@
           <details><summary>¿Cuándo aparece mi recarga de saldo?</summary><p>Cuando NEXORA confirma que el pago por Yape realmente fue recibido, acredita el saldo a tu cuenta. Enviar un comprobante no significa que ya esté aprobado.</p></details>
           <details><summary>¿Puedo pagar con el saldo de mi cuenta?</summary><p>Sí. Si tienes saldo suficiente, al confirmar la compra se descuenta el importe y se registra un pedido pendiente de entrega.</p></details>
           <details><summary>¿Cuánto tarda la entrega?</summary><p>Los pedidos pagados se atienden en menos de 24 horas. Puedes revisar el estado de tu pedido desde tu perfil.</p></details>
-          <details><summary>¿Dónde veo mis compras?</summary><p>Inicia sesión y entra en <a href="perfil.html">Mi perfil</a> para ver el historial y el estado de tus pedidos.</p></details>
+          <details><summary>¿Dónde veo mis compras?</summary><p>Inicia sesión y entra en <a href="compras.html">Compras</a> para ver el historial y el estado de tus pedidos.</p></details>
         </div>
       </div>`;
     if (reference) reference.parentNode.insertBefore(area, reference);
