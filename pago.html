@@ -158,6 +158,7 @@ footer{border-top:1px solid rgba(176,194,227,.09);font-size:11px}
 </style>
 <link rel="stylesheet" href="nexora-premium.css?v=2">
 <link rel="stylesheet" href="nexora-shop-ambience.css?v=1">
+<link rel="stylesheet" href="nexora-buy-flow.css?v=1">
 <script src="nexora-experience.js?v=2" defer></script>
 </head>
 <body data-nexora-page="checkout">
@@ -181,6 +182,11 @@ footer{border-top:1px solid rgba(176,194,227,.09);font-size:11px}
   <span><span class="perk-symbol">✓</span> Descuento automático</span>
   <span><span class="perk-symbol">◷</span> Atención en menos de 24 horas</span>
 </div>
+<ol class="nx-buy-steps" aria-label="Pasos de esta compra">
+  <li><span class="nx-buy-number" aria-hidden="true">01</span><div><strong>Revisa el pedido</strong><small>Comprueba juego, paquete, ID y total.</small></div></li>
+  <li><span class="nx-buy-number" aria-hidden="true">02</span><div><strong>Comprueba tu saldo</strong><small>Debe estar acreditado en tu billetera NEXORA.</small></div></li>
+  <li><span class="nx-buy-number" aria-hidden="true">03</span><div><strong>Confirma el pago</strong><small>El descuento se hará solo cuando confirmes.</small></div></li>
+</ol>
 <div class="layout">
 <section class="card">
 <div class="card-head"><div class="section-tag">01 / DATOS DEL PEDIDO</div><h2>Resumen de tu compra</h2><p>Comprueba que el producto y la cuenta de destino sean correctos.</p></div>
@@ -205,6 +211,8 @@ footer{border-top:1px solid rgba(176,194,227,.09);font-size:11px}
 </div>
 <div class="card-body">
 <div class="balance-main"><span>Saldo disponible</span><strong id="walletBalance">Consultando…</strong></div>
+<div class="nx-wallet-help">¿No tienes saldo suficiente? Puedes solicitar una recarga por Yape. <strong>No se acredita automáticamente:</strong> debes esperar su aprobación antes de comprar.
+<a href="recargar-saldo.html">Solicitar recarga de saldo →</a></div>
 <div class="balance-row"><span>Precio oficial del producto</span><strong id="officialPrice">Consultando…</strong></div>
 <div class="balance-row highlight" id="remainingRow"><span>Saldo después de comprar</span><strong id="walletRemaining">—</strong></div>
 <div class="actions"><button type="button" class="pay" id="confirmPurchase" disabled>Comprobando saldo…</button></div>
