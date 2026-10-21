@@ -1,0 +1,83 @@
+/* NEXORA STORE · orientación en la compra. Solo presentación. */
+body[data-nexora-page] .nx-buy-route,
+body[data-nexora-page] .nx-return-checkout{
+  border:1px solid rgba(245,166,59,.22);
+  border-radius:18px;
+  background:linear-gradient(118deg,rgba(29,37,51,.93),rgba(14,21,33,.94));
+  box-shadow:0 13px 32px rgba(0,0,0,.14);
+}
+body[data-nexora-page=game] .nx-buy-route{
+  padding:19px 22px;
+  margin:15px 0 29px;
+}
+.nx-buy-route-head{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.nx-buy-eyebrow{font-size:11px;font-weight:900;letter-spacing:1.1px;color:#ffd28e}
+.nx-buy-recharge{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:9px 12px;border-radius:10px;
+  border:1px solid rgba(252,182,90,.38);
+  background:rgba(255,162,57,.105);color:#ffd494;
+  text-decoration:none;font-weight:800;font-size:12px;line-height:1.45;
+}
+.nx-buy-recharge:hover,.nx-buy-recharge:focus-visible{
+  background:rgba(255,162,57,.20);border-color:#ffbf75;
+}
+.nx-buy-steps{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;margin:17px 0 0;padding:0;list-style:none;
+}
+.nx-buy-steps li{
+  display:flex;align-items:flex-start;gap:11px;
+  background:rgba(5,10,20,.33);
+  border:1px solid rgba(170,190,226,.12);
+  padding:13px 12px;border-radius:12px;min-width:0;
+}
+.nx-buy-number{
+  display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;
+  border:1px solid rgba(255,190,112,.3);border-radius:9px;
+  color:#ffca80;background:rgba(255,165,63,.13);
+  font-weight:900;font-size:11px;
+}
+.nx-buy-steps strong{display:block;font-size:12px;color:#f9f7fa;margin-bottom:4px;line-height:1.35}
+.nx-buy-steps small{display:block;font-size:11px;line-height:1.55;color:#b0becf}
+.nx-buy-note{font-size:11px;color:#c9d2df;line-height:1.6;margin:13px 0 0}
+.nx-buy-note strong{color:#fbd097}
+.nx-continue-explain{
+  margin-top:11px!important;
+  line-height:1.55!important;font-size:11px!important;
+  color:#b7c4d7!important;text-align:center;
+}
+body[data-nexora-page=checkout] .nx-buy-steps{margin:0 0 24px}
+body[data-nexora-page=checkout] .nx-buy-steps li{
+  background:rgba(15,22,34,.8);
+}
+.nx-wallet-help{
+  margin:12px 0 4px;padding:13px 14px;border-radius:12px;
+  border:1px solid rgba(255,182,79,.22);background:rgba(250,161,60,.07);
+  font-size:12px;line-height:1.6;color:#d7dee9;
+}
+.nx-wallet-help a{
+  display:inline-block;margin-top:7px;color:#ffd28d;
+  text-decoration:underline;text-underline-offset:3px;font-weight:800;
+}
+body[data-nexora-page=topup] .nx-return-checkout{
+  padding:18px 20px;margin:18px 0 0;
+}
+.nx-return-checkout strong{display:block;color:#ffce88;font-size:14px;margin-bottom:6px}
+.nx-return-checkout p{margin:0 0 13px;font-size:12px;color:#c5d0dc;line-height:1.65}
+.nx-return-checkout a{
+  display:inline-block;border-radius:10px;padding:10px 14px;
+  background:linear-gradient(120deg,#f3a33b,#ffc267);
+  color:#211409;text-decoration:none;font-size:12px;font-weight:900;
+}
+.nx-buy-route a:focus-visible,.nx-wallet-help a:focus-visible,
+.nx-return-checkout a:focus-visible{outline:3px solid #ffd48b;outline-offset:3px}
+@media(max-width:700px){
+  .nx-buy-steps{grid-template-columns:1fr;gap:8px}
+  body[data-nexora-page=game] .nx-buy-route{padding:16px 15px;margin:12px 0 23px}
+  .nx-buy-recharge{width:100%;text-align:center}
+  .nx-buy-route-head{align-items:stretch}
+  .nx-buy-steps li{padding:11px 12px}
+}
