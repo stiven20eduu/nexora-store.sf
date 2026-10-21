@@ -61,7 +61,7 @@ button,input{font:inherit}.btn{border:0;border-radius:10px;padding:11px 14px;fon
 <header>
 <a class="brand" href="index.html"><img src="Emblema%20Nexora%20Store%20SF%20con%20corona.png" alt="">NEXORA MVP</a>
 <a class="btn secondary" href="perfil.html">Mi perfil</a>
-<a href="admin-anuncios.html" style="display:inline-block;padding:14px;color:#ffbc79">📨 Centro de mensajes MVP</a></header>
+</header>
 <main>
 <section id="gate">
 <div class="eyebrow">ACCESO MVP</div>
@@ -72,10 +72,9 @@ button,input{font:inherit}.btn{border:0;border-radius:10px;padding:11px 14px;fon
 <section id="dashboard" hidden>
 <div class="eyebrow">ADMINISTRACIÓN NEXORA</div>
 <h1>Panel MVP</h1>
-<p class="muted">Resumen de miembros y pedidos registrados en NEXORA.</p>
+<p class="muted">Estadísticas desde el reinicio del 20/10/2026. El historial anterior se conserva.</p>
 <a id="mvpOrdersEntry" class="mvp-orders-entry" href="admin-pedidos.html?v=1"><span><strong>📦 Atender pedidos</strong><small>EXCLUSIVO MVP · Abrir la bandeja de pedidos</small></span><span aria-hidden="true">→</span></a>
 <nav class="admin-quick-actions" aria-label="Acciones principales de administración">
-  <a class="btn admin-primary-action" href="admin-anuncios.html" style="background:linear-gradient(120deg,#f8b358,#f07840);color:#211006;">📨 Centro de mensajes · Enviar avisos y ver notificaciones <span aria-hidden="true">→</span></a>
   <a class="btn admin-primary-action" href="admin-recargas.html">💜 Revisar recargas Yape y acreditar saldo <span aria-hidden="true">→</span></a>
   <a class="btn admin-primary-action" href="admin-soporte.html" style="background:linear-gradient(120deg,#182839,#22394c);color:#e7eef8;border:1px solid #3b546d;box-shadow:none;">📩 Atención al cliente · Ver reclamos y capturas <span aria-hidden="true">→</span></a>
 </nav>
@@ -271,14 +270,21 @@ function avatar(name,photo){
  return el;
 }
 
+// Reinicio de indicadores: el historial de cuentas y compras se conserva.
+const STATS_RESET_AT=Date.parse("2026-10-21T02:27:00Z");
+function afterStatsReset(value){
+  const timestamp=typeof value?.toMillis==="function" ? value.toMillis() : new Date(value).getTime();
+  return Number.isFinite(timestamp)&&timestamp>=STATS_RESET_AT;
+}
 function renderStats(){
- const all=members.flatMap(m=>m.orders);
- const pending=all.filter(o=>!["completed","cancelled"].includes(o.status)).length;
- const total=all.filter(o=>o.status==="completed").reduce((s,o)=>s+Number(o.price||0),0);
- document.getElementById("usersCount").textContent=members.length;
- document.getElementById("ordersCount").textContent=all.length;
- document.getElementById("pendingCount").textContent=pending;
- document.getElementById("salesTotal").textContent=money(total);
+  const recentMembers=members.filter(m=>afterStatsReset(m.joinedAt));
+  const all=members.flatMap(m=>m.orders).filter(o=>afterStatsReset(o.createdAt));
+  const pending=all.filter(o=>!["completed","cancelled"].includes(o.status)).length;
+  const total=all.filter(o=>o.status==="completed").reduce((sum,o)=>sum+Number(o.price||0),0);
+  document.getElementById("usersCount").textContent=recentMembers.length;
+  document.getElementById("ordersCount").textContent=all.length;
+  document.getElementById("pendingCount").textContent=pending;
+  document.getElementById("salesTotal").textContent=money(total);
 }
 
 function renderUsers(){
