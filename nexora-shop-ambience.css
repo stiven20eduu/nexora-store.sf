@@ -1,0 +1,120 @@
+/* NEXORA STORE — fondo premium para todas las tiendas y el checkout.
+   Decoración visual; no contiene scripts ni modifica compras. */
+body[data-nexora-page="game"],
+body[data-nexora-page="checkout"]{
+  --nx-shop-primary:255,167,77;
+  --nx-shop-secondary:66,110,188;
+  position:relative;
+  isolation:isolate;
+  background:#080b13;
+}
+body[data-game-theme="free-fire"]{--nx-shop-primary:255,164,65;--nx-shop-secondary:215,101,56}
+body[data-game-theme="blood-strike"]{--nx-shop-primary:244,81,105;--nx-shop-secondary:66,130,208}
+body[data-game-theme="mobile-legends"]{--nx-shop-primary:159,112,244;--nx-shop-secondary:58,156,238}
+body[data-game-theme="roblox"]{--nx-shop-primary:76,156,249;--nx-shop-secondary:63,202,212}
+body[data-game-theme="fc-mobile"]{--nx-shop-primary:84,198,145;--nx-shop-secondary:237,181,81}
+
+/* Capa decorativa siempre detrás del contenido. */
+.nx-shop-ambience{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  overflow:hidden;
+  contain:paint;
+  background:
+    radial-gradient(ellipse 68% 43% at 48% -10%,rgba(var(--nx-shop-primary),.10),transparent 78%),
+    radial-gradient(ellipse 55% 60% at 105% 62%,rgba(var(--nx-shop-secondary),.07),transparent 76%),
+    linear-gradient(160deg,#080b13 0%,#0b1422 55%,#080a11 100%);
+}
+.nx-shop-mesh{
+  position:absolute;
+  inset:-55% -45%;
+  background-image:
+    linear-gradient(rgba(147,172,210,.075) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(147,172,210,.075) 1px,transparent 1px);
+  background-size:76px 76px;
+  transform:perspective(900px) rotateX(63deg) scale(1.38);
+  transform-origin:50% 25%;
+  opacity:.36;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 32%,#000 75%,transparent);
+  mask-image:linear-gradient(180deg,transparent,#000 32%,#000 75%,transparent);
+  animation:nx-shop-grid 36s linear infinite;
+}
+.nx-shop-glow{
+  position:absolute;
+  display:block;
+  width:min(56vw,650px);
+  aspect-ratio:1;
+  border-radius:50%;
+  filter:blur(48px);
+  will-change:transform;
+}
+.nx-shop-glow--main{
+  left:-18%;
+  top:-18%;
+  opacity:.52;
+  background:radial-gradient(circle,rgba(var(--nx-shop-primary),.31),rgba(var(--nx-shop-primary),.07) 50%,transparent 72%);
+  animation:nx-shop-drift-a 26s ease-in-out infinite alternate;
+}
+.nx-shop-glow--side{
+  right:-23%;
+  top:13%;
+  opacity:.54;
+  background:radial-gradient(circle,rgba(var(--nx-shop-secondary),.28),rgba(var(--nx-shop-secondary),.06) 52%,transparent 74%);
+  animation:nx-shop-drift-b 31s ease-in-out infinite alternate;
+}
+.nx-shop-glow--low{
+  left:27%;
+  bottom:-47%;
+  opacity:.28;
+  background:radial-gradient(circle,rgba(var(--nx-shop-primary),.24),transparent 69%);
+  animation:nx-shop-drift-c 34s ease-in-out infinite alternate;
+}
+.nx-shop-ambience::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,transparent 45%,rgba(3,6,12,.17) 100%);
+}
+@keyframes nx-shop-grid{
+  from{transform:perspective(900px) rotateX(63deg) scale(1.38) translateY(0)}
+  to{transform:perspective(900px) rotateX(63deg) scale(1.38) translateY(76px)}
+}
+@keyframes nx-shop-drift-a{to{transform:translate3d(9vw,11vh,0) scale(1.1)}}
+@keyframes nx-shop-drift-b{to{transform:translate3d(-10vw,8vh,0) scale(.93)}}
+@keyframes nx-shop-drift-c{to{transform:translate3d(3vw,-11vh,0) scale(1.08)}}
+
+/* Reflejos y paneles translúcidos conservando contraste y legibilidad. */
+body[data-nexora-page="game"] .game-hero{
+  box-shadow:0 23px 60px rgba(0,0,0,.22),0 1px 0 rgba(var(--nx-shop-primary),.14);
+}
+body[data-nexora-page="game"] :is(.main .box,.main .summary){
+  background:linear-gradient(148deg,rgba(23,31,45,.94),rgba(10,16,27,.96));
+  border-color:rgba(var(--nx-shop-primary),.19);
+  box-shadow:0 20px 50px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.035);
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+}
+body[data-nexora-page="checkout"] .card{
+  background:linear-gradient(152deg,rgba(23,33,47,.94),rgba(11,17,28,.96));
+  border-color:rgba(var(--nx-shop-primary),.19);
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+}
+body[data-nexora-page="checkout"] .wallet-card{
+  border-color:rgba(var(--nx-shop-primary),.28);
+}
+
+/* En móviles, reducir efectos para cuidar rendimiento y batería. */
+@media(max-width:700px){
+  .nx-shop-mesh{background-size:55px 55px;opacity:.24}
+  .nx-shop-glow{width:83vw;filter:blur(36px);opacity:.33}
+  .nx-shop-glow--low{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .nx-shop-ambience *, .nx-shop-ambience *::before, .nx-shop-ambience *::after{
+    animation:none!important;
+    will-change:auto;
+  }
+}
