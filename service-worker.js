@@ -1,12 +1,12 @@
 /* NEXORA STORE PWA · Cache limitado a recursos públicos del propio sitio.
    No almacena llamadas a Firebase, métodos POST, APIs ni respuestas privadas. */
-const CACHE_NAME = "nexora-public-v11";
+const CACHE_NAME = "nexora-public-v12";
 const SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./nexora-premium.css?v=3",
-  "./nexora-experience.js?v=2",
+  "./nexora-premium.css?v=4",
+  "./nexora-experience.js?v=3",
   "./icon-192.png",
   "./icon-512.png",
   "./Emblema%20Nexora%20Store%20SF%20con%20corona.png"
