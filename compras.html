@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#090c15">
+  <meta name="description" content="Consulta de forma privada el historial y estado de tus compras en NEXORA STORE.">
+  <title>Mis compras | NEXORA STORE</title>
+  <link rel="icon" href="icon-192.png">
+  <link rel="stylesheet" href="nexora-premium.css?v=4">
+  <script src="nexora-experience.js?v=3" defer></script>
+  <style>
+    :root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;color:#f4f6fc;background:#070a12}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(ellipse 80% 45% at 78% -5%,rgba(245,117,49,.17),transparent 70%),radial-gradient(ellipse 70% 60% at 0 100%,rgba(45,73,132,.12),transparent 65%),#080b13}
+    [hidden]{display:none!important}
+    a{color:inherit;text-decoration:none}
+    button{font:inherit;cursor:pointer}
+    :focus-visible{outline:3px solid #ffc36c;outline-offset:3px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:17px max(19px,calc((100% - 1080px)/2));border-bottom:1px solid rgba(185,205,235,.11);background:rgba(12,16,26,.88)}
+    .brand{display:inline-flex;align-items:center;gap:11px;font-size:14px;font-weight:900;letter-spacing:.055em}
+    .brand img{width:43px;height:43px;object-fit:cover;border-radius:50%;border:1px solid rgba(250,171,73,.25)}
+    .back{color:#c6d0df;font-size:13px;border:1px solid #3b4457;background:#141d2c;border-radius:12px;padding:11px 14px}
+    .back:hover{border-color:#f5b15a}
+    main{width:min(1060px,calc(100% - 36px));margin:0 auto;padding:48px 0 72px}
+    .intro{padding:31px;overflow:hidden;position:relative;border:1px solid rgba(245,174,94,.23);border-radius:25px;background:linear-gradient(125deg,rgba(39,37,39,.93),rgba(19,27,40,.93));box-shadow:0 22px 70px rgba(0,0,0,.2)}
+    .intro:after{content:"";pointer-events:none;position:absolute;right:-70px;top:-110px;width:310px;height:310px;border-radius:50%;background:radial-gradient(circle,rgba(255,157,58,.15),transparent 69%)}
+    .kicker{display:block;font-size:11px;font-weight:900;letter-spacing:2.5px;color:#ffc077}
+    h1{font-size:clamp(31px,5vw,48px);letter-spacing:-.04em;line-height:1.1;margin:13px 0 12px}
+    .intro p{max-width:610px;color:#bac6d7;font-size:14px;line-height:1.7;margin:0}
+    .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:20px 0}
+    .stat{border:1px solid rgba(172,195,226,.15);border-radius:17px;background:linear-gradient(135deg,#171f2c,#111723);padding:21px}
+    .stat strong{display:block;color:#ffbf70;font-size:29px;font-variant-numeric:tabular-nums}
+    .stat span{display:block;color:#b1bfd0;font-size:12px;margin-top:6px}
+    .list-panel{border:1px solid rgba(181,200,229,.16);border-radius:21px;padding:23px;background:linear-gradient(130deg,rgba(18,24,36,.96),rgba(11,16,25,.95))}
+    .list-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .list-heading h2{font-size:21px;letter-spacing:-.02em;margin:0}
+    .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 16px}
+    .filter-row button{padding:10px 13px;min-height:41px;border:1px solid #364154;background:#141c2b;color:#c7d1df;border-radius:11px;font-size:12px;font-weight:800}
+    .filter-row button[aria-pressed=true]{background:linear-gradient(125deg,#ffc06a,#ff9d49);border-color:#ffb45b;color:#211509}
+    .message{font-size:13px;line-height:1.7;color:#b6c4d5}
+    .error{color:#ffaaa9}
+    .order-list{display:grid;gap:13px}
+    .purchase{border:1px solid rgba(174,195,222,.16);background:#0d1522;border-radius:17px;padding:21px;overflow-wrap:anywhere}
+    .purchase-head{display:flex;justify-content:space-between;align-items:start;gap:14px}
+    .purchase-game{font-size:11px;font-weight:900;color:#ffb45d;letter-spacing:.08em;text-transform:uppercase}
+    .purchase h3{font-size:18px;line-height:1.4;margin:6px 0 0}
+    .price{color:#fff2d7;font-size:19px;font-weight:900;white-space:nowrap}
+    .purchase-meta{display:flex;flex-wrap:wrap;gap:10px 18px;color:#aebed0;font-size:12px;margin:17px 0 0}
+    .purchase-id{margin-top:15px;padding-top:13px;border-top:1px solid rgba(186,200,226,.11);font-size:11px;color:#92a1b8;overflow-wrap:anywhere}
+    .status{display:inline-flex;align-items:center;gap:7px;width:max-content;margin-top:15px;padding:8px 11px;border-radius:999px;background:rgba(255,175,80,.10);border:1px solid rgba(255,175,80,.3);color:#ffc074;font-size:11px;font-weight:850}
+    .status.completed{background:rgba(55,210,147,.10);border-color:rgba(55,210,147,.3);color:#8defc5}
+    .status.cancelled{background:rgba(246,96,120,.12);border-color:rgba(246,96,120,.32);color:#ffb4bf}
+    .status.processing{background:rgba(91,164,251,.12);border-color:rgba(91,164,251,.32);color:#9dc8ff}
+    .empty{text-align:center;padding:38px 12px 45px;color:#b7c7d7}
+    .empty-icon{font-size:34px;display:block;margin-bottom:12px}
+    .empty strong{display:block;color:#f7f8fc;font-size:17px;margin-bottom:9px}
+    .empty p{margin:0 auto 19px;font-size:13px;line-height:1.6;max-width:400px}
+    .action{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:43px;padding:12px 17px;background:linear-gradient(110deg,#ffaf4c,#ffcd75);color:#211307;font-weight:900;border-radius:11px;font-size:13px}
+    .help{font-size:13px;color:#b2c0d0;line-height:1.75;text-align:center;margin:23px 0}
+    .help a{color:#ffc176;text-decoration:underline;text-underline-offset:3px}
+    @media(max-width:650px){
+      main{width:calc(100% - 24px);padding:22px 0 40px}
+      header{padding:14px 13px}
+      .brand{font-size:11px;letter-spacing:0}
+      .brand img{width:37px;height:37px}
+      .back{font-size:11px;padding:10px}
+      .intro{padding:24px 20px}
+      .stats{gap:8px}
+      .stat{padding:14px 10px}
+      .stat strong{font-size:25px}
+      .stat span{font-size:10px}
+      .list-panel{padding:16px}
+      .purchase{padding:16px}
+      .purchase h3{font-size:16px}
+      .price{font-size:16px}
+      .filter-row{gap:6px}
+      .filter-row button{padding:9px 10px;font-size:11px}
+    }
+  </style>
+</head>
+<body data-nexora-page="purchases">
+<header>
+  <a href="index.html" class="brand"><img src="Emblema%20Nexora%20Store%20SF%20con%20corona.png" alt="">NEXORA STORE</a>
+  <a href="index.html#catalogo" class="back">Ver juegos →</a>
+</header>
+<main>
+  <section class="intro" aria-labelledby="page-title">
+    <span class="kicker">TU CUENTA NEXORA</span>
+    <h1 id="page-title">Mis compras</h1>
+    <p>Consulta tus pedidos, el estado de cada compra y sus detalles. Solo puedes ver los pedidos asociados con tu cuenta.</p>
+  </section>
+  <section class="stats" id="stats" aria-label="Resumen de pedidos" hidden>
+    <div class="stat"><strong id="totalCount">0</strong><span>Pedidos recientes</span></div>
+    <div class="stat"><strong id="pendingCount">0</strong><span>En atención</span></div>
+    <div class="stat"><strong id="completedCount">0</strong><span>Completados</span></div>
+  </section>
+  <section class="list-panel" aria-labelledby="history-title">
+    <div class="list-heading"><h2 id="history-title">Historial de compras</h2></div>
+    <div id="authGate" class="empty" hidden>
+      <span class="empty-icon" aria-hidden="true">🔒</span>
+      <strong>Ingresa a tu cuenta</strong>
+      <p>Inicia sesión para consultar tu historial privado de pedidos.</p>
+      <a href="login.html" class="action">Iniciar sesión</a>
+    </div>
+    <div id="historyArea" hidden>
+      <div class="filter-row" role="group" aria-label="Filtrar compras">
+        <button type="button" data-filter="all" aria-pressed="true">Todas</button>
+        <button type="button" data-filter="pending" aria-pressed="false">En atención</button>
+        <button type="button" data-filter="completed" aria-pressed="false">Completadas</button>
+        <button type="button" data-filter="cancelled" aria-pressed="false">Canceladas</button>
+      </div>
+      <p id="historyStatus" class="message" role="status" aria-live="polite">Cargando tus compras…</p>
+      <div id="ordersList" class="order-list"></div>
+    </div>
+    <p id="initialStatus" class="message" role="status">Comprobando tu sesión…</p>
+  </section>
+  <p class="help">¿Necesitas ayuda con una compra? <a href="soporte.html">Contacta con soporte NEXORA</a>.</p>
+  <noscript><p class="message">Activa JavaScript para consultar tus compras.</p></noscript>
+</main>
+<script type="module">
+import {auth} from "./firebase.js";
+import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import {getFirestore,collection,query,orderBy,limit,onSnapshot} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+const db=getFirestore(auth.app);
+const $=id=>document.getElementById(id);
+const money=new Intl.NumberFormat("es-PE",{style:"currency",currency:"PEN"});
+const statuses={
+  pending:{label:"Pendiente",group:"pending"},
+  verified:{label:"Verificado",group:"pending"},
+  processing:{label:"En proceso",group:"pending"},
+  completed:{label:"Completado",group:"completed"},
+  cancelled:{label:"Cancelado",group:"cancelled"}
+};
+let orders=[],activeFilter="all",unsubscribe=null,generation=0;
+const add=(tag,content,classname)=>{
+  const el=document.createElement(tag);
+  if(content!==undefined&&content!==null)el.textContent=String(content);
+  if(classname)el.className=classname;
+  return el;
+};
+function setMessage(value,error=false){
+  $("historyStatus").textContent=value;
+  $("historyStatus").className=error?"message error":"message";
+}
+function render(){
+  $("totalCount").textContent=String(orders.length);
+  $("pendingCount").textContent=String(orders.filter(o=>!["completed","cancelled"].includes(o.status)).length);
+  $("completedCount").textContent=String(orders.filter(o=>o.status==="completed").length);
+  const list=$("ordersList");
+  list.replaceChildren();
+  const filtered=orders.filter(o=>{
+    const group=statuses[o.status]?.group||"pending";
+    return activeFilter==="all"||group===activeFilter;
+  });
+  setMessage(orders.length?"Mostrando "+filtered.length+" de "+orders.length+" pedidos recientes. Los cambios de estado se actualizan automáticamente.":"No tienes compras registradas todavía.");
+  if(!filtered.length){
+    const empty=add("div",null,"empty");
+    empty.append(add("span","📦","empty-icon"),add("strong",orders.length?"Sin pedidos en este filtro":"Tu historial está vacío"),add("p",orders.length?"Selecciona otro filtro para revisar tus pedidos.":"Cuando realices una compra desde tu cuenta, aparecerá aquí."));
+    if(!orders.length){const a=add("a","Explorar juegos","action");a.href="index.html#catalogo";empty.append(a);}
+    list.append(empty);
+    return;
+  }
+  for(const order of filtered){
+    const card=add("article",null,"purchase");
+    const head=add("div",null,"purchase-head");
+    const title=add("div");
+    title.append(add("span",order.game||"Juego","purchase-game"),add("h3",order.product||"Producto digital"));
+    head.append(title);
+    const value=Number.isSafeInteger(order.priceCents)?order.priceCents/100:Number(order.price);
+    head.append(add("div",Number.isFinite(value)&&value>=0?money.format(value):"Importe no disponible","price"));
+    card.append(head);
+    const meta=add("div",null,"purchase-meta");
+    const created=order.createdAt?.toDate?.();
+    meta.append(add("span",created&&!Number.isNaN(created.getTime())?created.toLocaleString("es-PE",{dateStyle:"medium",timeStyle:"short"}):"Fecha pendiente"));
+    if(order.paymentMethod==="wallet")meta.append(add("span","Pago con saldo NEXORA"));
+    if(order.playerId)meta.append(add("span","ID jugador: "+order.playerId));
+    if(order.serverId)meta.append(add("span","Servidor: "+order.serverId));
+    card.append(meta);
+    const state=statuses[order.status]||{label:"En revisión",group:"pending"};
+    card.append(add("span",state.label,"status "+(order.status==="processing"||order.status==="verified"?"processing":state.group)));
+    card.append(add("div","Pedido #"+order.id,"purchase-id"));
+    list.append(card);
+  }
+}
+document.querySelectorAll("[data-filter]").forEach(button=>button.addEventListener("click",()=>{
+  activeFilter=button.dataset.filter;
+  document.querySelectorAll("[data-filter]").forEach(item=>item.setAttribute("aria-pressed",String(item===button)));
+  if($("historyArea").dataset.loaded==="true")render();
+}));
+onAuthStateChanged(auth,user=>{
+  const current=++generation;
+  if(unsubscribe){unsubscribe();unsubscribe=null;}
+  orders=[];activeFilter="all";
+  document.querySelectorAll("[data-filter]").forEach(item=>item.setAttribute("aria-pressed",String(item.dataset.filter==="all")));
+  $("ordersList").replaceChildren();
+  $("initialStatus").hidden=true;
+  $("stats").hidden=!user;
+  $("authGate").hidden=!!user;
+  $("historyArea").hidden=!user;
+  $("historyArea").dataset.loaded="false";
+  if(!user)return;
+  setMessage("Cargando tus compras…");
+  const ref=query(collection(db,"users",user.uid,"orders"),orderBy("createdAt","desc"),limit(100));
+  unsubscribe=onSnapshot(ref,snapshot=>{
+    if(current!==generation||auth.currentUser?.uid!==user.uid)return;
+    orders=snapshot.docs.map(d=>({...d.data(),id:d.id}));
+    $("historyArea").dataset.loaded="true";
+    render();
+  },error=>{
+    if(current!==generation)return;
+    $("ordersList").replaceChildren();
+    setMessage(error.code==="permission-denied"?"No se pudo acceder a tus pedidos. Revisa tu sesión e inténtalo de nuevo.":"No pudimos cargar tus compras. Actualiza la página para reintentar.",true);
+  });
+},()=>{
+  $("initialStatus").textContent="No se pudo comprobar la sesión. Actualiza la página.";
+});
+</script>
+</body>
+</html>
