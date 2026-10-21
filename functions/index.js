@@ -1,5 +1,5 @@
 const {initializeApp}=require('firebase-admin/app');
-const {getFirestore,FieldValue,FieldPath,Timestamp}=require('firebase-admin/firestore');
+const {getFirestore,FieldValue,Timestamp}=require('firebase-admin/firestore');
 const {getAuth}=require('firebase-admin/auth');
 const {getMessaging}=require('firebase-admin/messaging');
 const {onDocumentCreated,onDocumentUpdated}=require('firebase-functions/v2/firestore');
@@ -16,10 +16,6 @@ exports.registerPushDevice=onCall({region:'us-central1',maxInstances:3},async re
  await db.collection('pushDevices').doc(eventKey(token)).set({uid:request.auth.uid,token,updatedAt:FieldValue.serverTimestamp()});
  return {ok:true};
 });
-async function eachUser(run){
- let last=null;
- for(;;){let q=db.collection('users').orderBy(FieldPath.documentId()).limit(200);if(last)q=q.startAfter(last);const page=await q.get();if(page.empty)return;for(const user of page.docs)await run(user.id);last=page.docs.at(-1);}
-}
 async function adminUids(){
  const users=await Promise.all(ADMINS.map(async email=>{try{return await getAuth().getUserByEmail(email);}catch(e){if(e.code==='auth/user-not-found')return null;throw e;}}));
  return users.filter(u=>u?.emailVerified&&!u.disabled).map(u=>u.uid);
@@ -61,12 +57,12 @@ exports.pushPersonalNotice=onDocumentCreated({...options,document:'users/{uid}/n
 exports.pushUpdatedAttention=onDocumentUpdated({...options,document:'users/{uid}/notifications/{id}'},async event=>{
  const after=event.data.after.data();if(after.kind==='attention')await queue(event.params.uid,event.id,after);
 });
-exports.pushAnnouncement=onDocumentCreated({...options,document:'announcements/{id}'},async event=>{
- const data=event.data.data();
- await eachUser(uid=>queue(uid,'announcement:'+event.params.id,{kind:data.kind,title:data.title,body:data.body,url:'index.html'}));
-});
 exports.deliverNotification=onDocumentCreated({...options,document:'notificationDeliveries/{id}'},async event=>{
  const ref=event.data.ref,notice=event.data.data();
+  // Rechazar avisos generales incluso si quedaron en cola antes del retiro.
+  if(['news','update'].includes(notice.kind)||String(notice.eventId||'').startsWith('announcement:')){
+    await ref.update({skipped:true});return;
+  }
  if((await ref.get()).data()?.sentAt)return;
  // No enviar avisos atrasados después de un día de fallos.
  if(notice.createdAt?.toMillis()<Date.now()-86400000){await ref.update({expiredAt:FieldValue.serverTimestamp()});return;}
