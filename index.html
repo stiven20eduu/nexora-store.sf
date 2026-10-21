@@ -2208,6 +2208,11 @@ a{
 @media(max-width:900px){.wallet-chip{gap:6px;padding:7px 9px}.wallet-chip-icon{width:22px;height:22px;font-size:14px}}
 @media(max-width:700px){.wallet-chip{min-height:37px;padding:5px 7px;gap:5px;border-radius:10px}.wallet-chip-icon{display:none}.wallet-chip-label{font-size:8px}#walletChipAmount{font-size:12px}}
 @media(max-width:380px){.nav-actions .country{padding:7px 5px}.wallet-chip{padding:5px}.nav-actions .login{padding:8px 4px}}
+/* Tarjetas clicables completas del catálogo (ratón, tacto y teclado). */
+.catalog-card{cursor:pointer;text-decoration:none;color:inherit}
+.catalog-card .catalog-btn{display:inline-flex;align-items:center;justify-content:center;pointer-events:none}
+.catalog-card:focus-visible{outline:3px solid #ffc16a;outline-offset:4px;border-color:#ffc16a}
+.catalog-card:focus-visible img{transform:scale(1.05)}
 </style>
 <link rel="stylesheet" href="nexora-premium.css?v=3">
 <script src="nexora-experience.js?v=2" defer></script>
@@ -2802,11 +2807,7 @@ body[data-nexora-page="home"] .nx-gaming-light-trace--blue {
 
         <!-- FREE FIRE -->
 
-        <article
-          class="catalog-card"
-          data-game="free fire"
-          data-category="mobile"
-        >
+        <a class="catalog-card" data-game="free fire" data-category="mobile" href="juego.html?game=free-fire" aria-label="Ver productos de Free Fire">
 
           <img
             src="card-free-fire.png"
@@ -2841,27 +2842,18 @@ body[data-nexora-page="home"] .nx-gaming-light-trace--blue {
             </p>
 
 
-            <button
-              class="catalog-btn"
-              onclick="openGame('free-fire')"
-            >
-              Ver productos →
-            </button>
+            <span class="catalog-btn" aria-hidden="true">Ver productos →</span>
 
 
           </div>
 
-        </article>
+        </a>
 
 
 
         <!-- BLOOD STRIKE -->
 
-        <article
-          class="catalog-card"
-          data-game="blood strike"
-          data-category="mobile"
-        >
+        <a class="catalog-card" data-game="blood strike" data-category="mobile" href="juego.html?game=blood-strike" aria-label="Ver productos de Blood Strike">
 
           <img
             src="card-blood-strike.png"
@@ -2896,27 +2888,18 @@ body[data-nexora-page="home"] .nx-gaming-light-trace--blue {
             </p>
 
 
-            <button
-              class="catalog-btn"
-              onclick="openGame('blood-strike')"
-            >
-              Ver productos →
-            </button>
+            <span class="catalog-btn" aria-hidden="true">Ver productos →</span>
 
 
           </div>
 
-        </article>
+        </a>
 
 
 
         <!-- MOBILE LEGENDS -->
 
-        <article
-          class="catalog-card"
-          data-game="mobile legends"
-          data-category="mobile"
-        >
+        <a class="catalog-card" data-game="mobile legends" data-category="mobile" href="juego.html?game=mobile-legends" aria-label="Ver productos de Mobile Legends">
 
           <img
             src="card-mobile-legends.png"
@@ -2951,27 +2934,18 @@ body[data-nexora-page="home"] .nx-gaming-light-trace--blue {
             </p>
 
 
-            <button
-              class="catalog-btn"
-              onclick="openGame('mobile-legends')"
-            >
-              Ver productos →
-            </button>
+            <span class="catalog-btn" aria-hidden="true">Ver productos →</span>
 
 
           </div>
 
-        </article>
+        </a>
 
 
 
         <!-- ROBLOX -->
 
-        <article
-          class="catalog-card"
-          data-game="roblox"
-          data-category="digital"
-        >
+        <a class="catalog-card" data-game="roblox" data-category="digital" href="juego.html?game=roblox" aria-label="Ver productos de Roblox">
 
           <img
             src="card-roblox.png"
@@ -3006,27 +2980,18 @@ body[data-nexora-page="home"] .nx-gaming-light-trace--blue {
             </p>
 
 
-            <button
-              class="catalog-btn"
-              onclick="openGame('roblox')"
-            >
-              Ver productos →
-            </button>
+            <span class="catalog-btn" aria-hidden="true">Ver productos →</span>
 
 
           </div>
 
-        </article>
+        </a>
 
 
 
         <!-- FC MOBILE -->
 
-        <article
-          class="catalog-card"
-          data-game="fc mobile"
-          data-category="mobile"
-        >
+        <a class="catalog-card" data-game="fc mobile" data-category="mobile" href="juego.html?game=fc-mobile" aria-label="Ver productos de FC Mobile">
 
           <img
             src="card-fc-mobile.png"
@@ -3061,17 +3026,12 @@ body[data-nexora-page="home"] .nx-gaming-light-trace--blue {
             </p>
 
 
-            <button
-              class="catalog-btn"
-              onclick="openGame('fc-mobile')"
-            >
-              Ver productos →
-            </button>
+            <span class="catalog-btn" aria-hidden="true">Ver productos →</span>
 
 
           </div>
 
-        </article>
+        </a>
 
 
       </div>
