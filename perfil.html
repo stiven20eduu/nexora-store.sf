@@ -52,13 +52,69 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
 <link rel="stylesheet" href="nexora-premium.css?v=2">
 <script src="nexora-experience.js?v=2" defer></script>
 <style>
-.mvp-orders-entry{display:flex!important;justify-content:space-between;align-items:center;gap:18px;width:100%;max-width:1120px;margin:20px auto 26px;padding:25px 24px;border:1px solid #ffad59;border-radius:20px;background:linear-gradient(110deg,#ffab49,#ff603d);color:#211007!important;text-decoration:none;box-shadow:0 12px 32px #ff7a2626;box-sizing:border-box;font-family:Arial,sans-serif}.mvp-orders-entry[hidden]{display:none!important}.mvp-orders-entry strong{display:block;font-size:clamp(23px,5vw,34px);font-weight:900;line-height:1.25}.mvp-orders-entry small{display:block;margin-top:8px;font-size:13px;line-height:1.5}.mvp-orders-entry>span:last-child{font-size:30px}.mvp-orders-entry:focus-visible{outline:3px solid #fff;outline-offset:4px}@media(max-width:600px){.mvp-orders-entry{padding:22px 18px}}
+/* Acceso MVP compacto; no tapa las tarjetas ni la navegación. */
+.mvp-orders-entry{
+  position:fixed;
+  top:128px;
+  right:18px;
+  left:auto;
+  bottom:auto;
+  z-index:8900;
+  display:flex!important;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  width:60px;
+  height:60px;
+  max-width:none;
+  margin:0;
+  padding:7px;
+  border:1px solid rgba(255,183,92,.53);
+  border-radius:17px;
+  background:linear-gradient(150deg,rgba(34,43,57,.98),rgba(13,18,29,.98));
+  color:#ffd39c!important;
+  text-decoration:none;
+  box-shadow:0 12px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.07);
+  box-sizing:border-box;
+  line-height:1.1;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.mvp-orders-entry[hidden]{display:none!important}
+.mvp-orders-entry:hover{
+  transform:translateY(-2px);
+  border-color:#ffb85a;
+  box-shadow:0 15px 35px rgba(0,0,0,.38),0 0 17px rgba(255,151,61,.14);
+}
+.mvp-orders-entry .mvp-orders-icon{font-size:24px;line-height:1}
+.mvp-orders-entry .mvp-orders-label{
+  display:block;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.7px;
+  color:#ffc27a;
+}
+.mvp-orders-entry:focus-visible{outline:3px solid #fff;outline-offset:3px}
+@media(max-width:700px){
+  .mvp-orders-entry{
+    top:auto;
+    bottom:calc(94px + env(safe-area-inset-bottom,0px));
+    right:auto;
+    left:12px;
+    width:56px;
+    height:56px;
+    border-radius:15px;
+  }
+}
+@media(prefers-reduced-motion:reduce){.mvp-orders-entry{transition:none}}
 </style>
 </head>
 <body data-nexora-page="profile">
 <header><a class="brand" href="index.html"><img src="Emblema%20Nexora%20Store%20SF%20con%20corona.png" alt="">NEXORA STORE</a><a class="back" href="index.html">Volver a la tienda</a></header>
 <main>
-<a id="mvpOrdersEntry" class="mvp-orders-entry" href="admin-pedidos.html?v=1" hidden><span><strong>📦 Atender pedidos</strong><small>EXCLUSIVO MVP · Abrir la bandeja de pedidos</small></span><span aria-hidden="true">→</span></a>
+<a id="mvpOrdersEntry" class="mvp-orders-entry" href="admin-pedidos.html?v=1" hidden aria-label="Atender pedidos, exclusivo MVP" title="Atender pedidos · Panel MVP"><span class="mvp-orders-icon" aria-hidden="true">📦</span><small class="mvp-orders-label" aria-hidden="true">MVP</small></a>
 <div class="eyebrow">TU CUENTA NEXORA</div>
 <h1>Mi perfil</h1>
 <p>Personaliza tu nombre y administra tu sesión.</p>
