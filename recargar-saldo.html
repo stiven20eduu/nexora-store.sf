@@ -32,6 +32,7 @@ button.secondary,.action.secondary{background:#1b2430;color:#fff;border:1px soli
 <link rel="stylesheet" href="nexora-premium.css?v=2">
 <link rel="stylesheet" href="nexora-buy-flow.css?v=1">
 <script src="nexora-experience.js?v=2" defer></script>
+<link rel="stylesheet" href="nexora-mobile.css?v=1">
 </head>
 <body data-nexora-page="topup">
 <header><a class="brand" href="index.html">NEXORA STORE</a><a class="back" href="perfil.html">← Mi perfil</a></header>
@@ -45,6 +46,7 @@ button.secondary,.action.secondary{background:#1b2430;color:#fff;border:1px soli
 </section>
 <div id="gate" class="card"><p id="gateText">Comprobando tu cuenta…</p><a id="loginLink" class="action" href="login.html" hidden>Iniciar sesión</a></div>
 <div id="content" hidden>
+  <a class="nx-mobile-yape-link" href="#nxYapeDatos">Ver QR y datos de Yape ↓</a>
   <div class="layout">
     <section class="card">
       <h2>Solicitar recarga</h2>
@@ -67,7 +69,7 @@ button.secondary,.action.secondary{background:#1b2430;color:#fff;border:1px soli
       </form>
       <p class="message" id="message" role="status" aria-live="polite"></p>
     </section>
-    <aside class="card yape">
+    <aside class="card yape" id="nxYapeDatos">
       <h2>Datos para yapear</h2><p>Escanea el QR o utiliza el número.</p>
       <div class="qr"><canvas id="yapeQr" width="360" height="360" aria-label="QR de Yape NEXORA"></canvas></div>
       <p class="muted">A nombre de</p><div class="payee">Lea Ticona Coila</div>
