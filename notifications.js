@@ -16,7 +16,7 @@ export async function requestAttention(uid, orderId, message) {
 }
 const css=document.createElement('link');css.rel='stylesheet';css.href=new URL('./notifications.css',import.meta.url);document.head.append(css);
 const host=document.createElement('div');host.id='nx-notifications';host.hidden=true;
-host.innerHTML=`<button class="nx-bell" aria-label="Notificaciones" aria-expanded="false">🔔 <span class="nx-count" hidden>0</span></button><section class="nx-notice-panel" aria-label="Notificaciones de NEXORA" hidden><div class="nx-notice-heading"><h2>Notificaciones</h2><button class="nx-close" aria-label="Cerrar notificaciones">×</button></div><p class="nx-state" role="status"></p><div class="nx-tools"><button class="nx-enable">Activar en este celular</button><button class="nx-read">Marcar como leídas</button></div><p class="nx-device-state" role="status"></p><a class="nx-admin" href="admin-anuncios.html" hidden>Centro de mensajes MVP →</a><div class="nx-feed"></div></section>`;
+host.innerHTML=`<button class="nx-bell" aria-label="Notificaciones" aria-expanded="false">🔔 <span class="nx-count" hidden>0</span></button><section class="nx-notice-panel" aria-label="Notificaciones de NEXORA" hidden><div class="nx-notice-heading"><h2>Notificaciones</h2><button class="nx-close" aria-label="Cerrar notificaciones">×</button></div><p class="nx-state" role="status"></p><div class="nx-tools"><button class="nx-enable">Activar en este celular</button><button class="nx-read">Marcar como leídas</button></div><p class="nx-device-state" role="status"></p><div class="nx-feed"></div></section>`;
 document.body.append(host);
 const $=s=>host.querySelector(s),sources=new Map(),errors=new Set();let stops=[],user=null,epoch=0,read={};
 const storageKey=uid=>'nexora-notices-read:'+uid;
@@ -30,7 +30,7 @@ function render(){
  $('.nx-count').hidden=!unread;$('.nx-count').textContent=unread>99?'99+':String(unread);
  $('.nx-bell').setAttribute('aria-label',`Notificaciones: ${unread} sin leer`);
  $('.nx-notice-heading h2').textContent=isNotificationAdmin(user)?'Avisos MVP / ADM':'Notificaciones';
- $('.nx-state').textContent=errors.size?'Algunos avisos no están disponibles. Revisa tus permisos de Firebase o reconecta.':isNotificationAdmin(user)?'Pedidos, recargas pendientes y anuncios de NEXORA.':'Tus pedidos, recargas de saldo y novedades de NEXORA.';
+ $('.nx-state').textContent=errors.size?'Algunos avisos no están disponibles. Revisa tus permisos de Firebase o reconecta.':isNotificationAdmin(user)?'Pedidos y recargas pendientes de NEXORA.':'Tus pedidos y recargas de saldo de NEXORA.';
  const feed=$('.nx-feed');feed.replaceChildren();
  for(const n of notices){
   const a=document.createElement('a');a.className='nx-notice'+(read[n.id]!==signature(n)?' nx-unread':'');
@@ -82,10 +82,8 @@ onAuthStateChanged(auth,async next=>{
  bindWorker(next?.uid||null).then(()=>{if(version!==epoch)bindWorker(user?.uid||null).catch(()=>{});}).catch(()=>{});
  if(!next)return;
  try{read=JSON.parse(localStorage.getItem(storageKey(next.uid))||'{}');}catch{read={};}
- $('.nx-admin').hidden=!isNotificationAdmin(next);
  function watch(key,ref,map){stops.push(onSnapshot(ref,snap=>{if(version!==epoch)return;sources.set(key,snap.docs.map(d=>map(d)));errors.delete(key);render();},()=>{if(version!==epoch)return;errors.add(key);render();}));}
  watch('personal',query(collection(db,'users',next.uid,'notifications'),orderBy('createdAt','desc'),limit(50)),d=>({...d.data(),id:'personal:'+d.id}));
- watch('announcements',query(collection(db,'announcements'),orderBy('createdAt','desc'),limit(30)),d=>({...d.data(),id:'announcement:'+d.id}));
  // Estados de recargas visibles sin depender de funciones server-side.
  watch('topups',query(collection(db,'yapeTopups'),where('uid','==',next.uid),limit(60)),d=>{
   const t=d.data(),amount=Number.isInteger(t.amountCents)?'S/ '+(t.amountCents/100).toFixed(2):'tu saldo';
