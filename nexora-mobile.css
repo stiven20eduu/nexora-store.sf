@@ -319,3 +319,298 @@
     animation:none!important;will-change:auto!important;
   }
 }
+/* ============================================================
+   NEXORA MOBILE V2 · 2026-10
+   Adaptación para teléfonos actuales, con controles amplios y
+   compra legible. Sólo presentación: no modifica Firebase,
+   precios, sesiones, inventario ni procesamiento de pagos.
+   ============================================================ */
+@media (max-width:760px){
+  :root{scroll-padding-top:104px}
+  body[data-nexora-page]{
+    padding-bottom:max(102px,calc(86px + env(safe-area-inset-bottom,0px)));
+  }
+  body[data-nexora-page]:is([data-nexora-page="checkout"],[data-nexora-page="topup"],[data-nexora-page="login"],[data-nexora-page="register"],[data-nexora-page="support"]){
+    padding-bottom:0;
+  }
+  body[data-nexora-page] :is(.nav-inner,.container,.main,.shop-layout,.layout,.card,.box,.box-body,.product-info,.summary,.nx-buy-route,.nx-support-card){
+    min-width:0;
+  }
+  body[data-nexora-page] :is(a,button,[role="button"]){-webkit-tap-highlight-color:rgba(255,174,82,.13)}
+  body[data-nexora-page] :is(a,button,[role="button"]):focus-visible{
+    outline:3px solid #ffd28c;
+    outline-offset:2px;
+  }
+  body[data-nexora-page] :is(input:not([type="checkbox"]),select,textarea){
+    font-size:16px;
+    max-width:100%;
+  }
+  body[data-nexora-page] :is(.nx-bottom-nav,.navbar){-webkit-transform:translateZ(0)}
+  body[data-nexora-page] .nx-bottom-nav{
+    left:max(9px,env(safe-area-inset-left,0px));
+    right:max(9px,env(safe-area-inset-right,0px));
+    bottom:calc(7px + env(safe-area-inset-bottom,0px));
+    padding:7px 6px;
+    gap:4px;
+    border-radius:20px;
+    background:rgba(13,18,29,.96);
+    box-shadow:0 13px 38px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.07);
+  }
+  body[data-nexora-page] .nx-bottom-nav a{
+    min-height:54px;min-width:0;gap:3px;
+    padding:6px 2px;
+    border-radius:14px;
+    line-height:1.2;
+    font-size:clamp(10px,2.6vw,12px);
+    transition:background .18s,color .18s;
+  }
+  body[data-nexora-page] .nx-bottom-nav a svg{width:21px;height:21px}
+  body[data-nexora-page] .nx-bottom-nav a[aria-current="page"]{
+    background:linear-gradient(145deg,rgba(255,158,66,.25),rgba(255,100,69,.12));
+    color:#ffcc91;
+    box-shadow:inset 0 0 0 1px rgba(255,178,90,.2);
+  }
+  body[data-nexora-page=home] .floating-support{
+    right:12px;bottom:calc(106px + env(safe-area-inset-bottom,0px));
+  }
+  body[data-nexora-page=home] #nx-to-top{
+    right:13px;bottom:calc(175px + env(safe-area-inset-bottom,0px));
+  }
+
+  /* Accesos al catálogo: dos columnas utilizables en la mano. */
+  body[data-nexora-page=home] .nxv3-picks{margin-top:0}
+  body[data-nexora-page=home] .nxv3-picks-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+  }
+  body[data-nexora-page=home] .nxv3-pick{
+    min-width:0;
+    min-height:88px;
+    padding:10px;
+    gap:9px;
+    border-radius:16px;
+    background:linear-gradient(135deg,#1e2533,#10151f);
+    border-color:rgba(217,229,252,.17);
+  }
+  body[data-nexora-page=home] .nxv3-pick img{
+    width:48px;height:56px;
+    border-radius:10px;
+    object-fit:cover;
+  }
+  body[data-nexora-page=home] .nxv3-pick-info{min-width:0}
+  body[data-nexora-page=home] .nxv3-pick b{
+    font-size:clamp(11px,3.2vw,14px);
+    line-height:1.24;
+    overflow-wrap:anywhere;
+  }
+  body[data-nexora-page=home] .nxv3-pick small{
+    font-size:10px;line-height:1.3;margin-top:4px;
+  }
+  body[data-nexora-page=home] .nxv3-pick:active{transform:scale(.985)}
+  body[data-nexora-page=home] .trust-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+  }
+  body[data-nexora-page=home] .trust-item{min-width:0;padding:12px;gap:9px}
+  body[data-nexora-page=home] .trust-item strong{
+    overflow-wrap:anywhere;font-size:12px;line-height:1.35;
+  }
+  body[data-nexora-page=home] .trust-item span{font-size:10px;line-height:1.4}
+  body[data-nexora-page=home] .toolbar{border-radius:17px}
+  body[data-nexora-page=home] .filter{font-size:12px;font-weight:750}
+  body[data-nexora-page=home] #catalogo .catalog-card{
+    display:block;
+    overflow:hidden;
+    border-radius:18px;
+  }
+  body[data-nexora-page=home] #catalogo .catalog-content h3{
+    font-size:clamp(23px,6vw,29px);
+    line-height:1.12;
+  }
+  body[data-nexora-page=home] #catalogo .catalog-content h4{
+    font-size:12px;line-height:1.4;
+  }
+  body[data-nexora-page=home] #catalogo .catalog-card:active{
+    transform:scale(.99);
+  }
+  body[data-nexora-page=home] .nx-faq{
+    padding-bottom:35px;
+  }
+
+  /* Selección de paquetes: imagen a la izquierda, precio visible
+     y marca de selección que no desplaza el texto. */
+  body[data-nexora-page=game] .main{width:calc(100% - 24px)}
+  body[data-nexora-page=game] .box-header{gap:10px}
+  body[data-nexora-page=game] .box-header h3{
+    font-size:clamp(16px,4.6vw,21px);
+    line-height:1.28;
+  }
+  body[data-nexora-page=game] .box-header p{font-size:12px;line-height:1.5}
+  body[data-nexora-page=game] .products-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+  }
+  body[data-nexora-page=game] .product{
+    position:relative;
+    display:grid;
+    grid-template-columns:56px minmax(0,1fr);
+    align-items:center;
+    gap:11px;
+    min-height:98px;
+    text-align:left;
+    padding:11px 30px 11px 10px;
+    border-radius:15px;
+    background:linear-gradient(130deg,#1b2636,#111926);
+  }
+  body[data-nexora-page=game] .product-media{
+    width:56px;height:56px;
+    flex:0 0 auto;
+    border-radius:12px;
+  }
+  body[data-nexora-page=game] .product-media img{
+    width:100%;height:100%;
+    object-fit:contain;
+  }
+  body[data-nexora-page=game] .product-info{min-width:0}
+  body[data-nexora-page=game] .product-name{
+    font-size:12px;line-height:1.35;
+    overflow-wrap:anywhere;
+  }
+  body[data-nexora-page=game] .product-desc{font-size:10px;line-height:1.35}
+  body[data-nexora-page=game] .product-price{
+    font-size:15px;
+    line-height:1.25;
+    white-space:nowrap;
+  }
+  body[data-nexora-page=game] .product-check{
+    position:absolute;top:9px;right:9px;
+    width:19px;height:19px;font-size:11px;
+  }
+  body[data-nexora-page=game] .product.selected{
+    background:linear-gradient(135deg,#2b2a28,#1a2029);
+    border-color:#ffb45e;
+    box-shadow:inset 0 0 0 1px rgba(255,174,76,.4),0 0 0 3px rgba(255,174,76,.08);
+  }
+  body[data-nexora-page=game] .summary{scroll-margin-top:100px}
+  body[data-nexora-page=game] .summary-row strong{
+    min-width:0;max-width:62%;
+    overflow-wrap:anywhere;text-align:right;
+  }
+  body[data-nexora-page=game] .nx-buy-route{border-radius:16px}
+  body[data-nexora-page=game] .nx-buy-route-head{gap:9px;flex-wrap:wrap}
+  body[data-nexora-page=game] .nx-buy-recharge{
+    display:inline-flex;align-items:center;min-height:42px;
+  }
+
+  /* Confirmación, saldo e historial, sin texto ni controles cortados. */
+  body[data-nexora-page=checkout] header,
+  body[data-nexora-page=topup] header,
+  body[data-nexora-page=profile] header,
+  body[data-nexora-page=purchases] header{
+    min-width:0;gap:10px;
+  }
+  body[data-nexora-page=checkout] .brand,
+  body[data-nexora-page=purchases] .brand,
+  body[data-nexora-page=profile] .brand{
+    min-width:0;font-size:12px;
+  }
+  body[data-nexora-page=checkout] .brand img,
+  body[data-nexora-page=purchases] .brand img{
+    width:38px;height:38px;
+  }
+  body[data-nexora-page=checkout] .back,
+  body[data-nexora-page=purchases] .back,
+  body[data-nexora-page=profile] .back{
+    flex-shrink:0;
+    display:inline-flex;align-items:center;justify-content:center;
+    min-height:44px;
+  }
+  body[data-nexora-page=checkout] .order-row,
+  body[data-nexora-page=checkout] .balance-row{gap:9px}
+  body[data-nexora-page=checkout] .modal-card{
+    max-width:min(100%,560px);
+    max-height:calc(100dvh - 28px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+    overscroll-behavior:contain;
+  }
+  body[data-nexora-page=topup] .history article{
+    flex-wrap:wrap;row-gap:7px;
+  }
+  body[data-nexora-page=topup] .proof-preview{
+    width:auto;max-width:100%;height:auto;
+  }
+  body[data-nexora-page=purchases] .intro{padding:21px 18px}
+  body[data-nexora-page=purchases] .stat{min-width:0}
+  body[data-nexora-page=purchases] .stat span{overflow-wrap:anywhere}
+  body[data-nexora-page=purchases] .purchase-head{gap:9px}
+  body[data-nexora-page=purchases] .filter-row{
+    display:flex;flex-wrap:nowrap;
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:8px;
+  }
+  body[data-nexora-page=purchases] .filter-row button{
+    flex:0 0 auto;
+  }
+  body[data-nexora-page=profile] .card{
+    padding:clamp(15px,4vw,23px);
+    overflow-wrap:anywhere;
+  }
+  body[data-nexora-page=support] .help-header-inner{
+    padding:10px 13px;
+  }
+  body[data-nexora-page=support] .help-header-actions{gap:5px}
+  body[data-nexora-page=support] .help-header-actions a{padding:10px 11px;font-size:11px}
+}
+@media (max-width:560px){
+  body[data-nexora-page=home] #catalogo .catalog-track{
+    display:grid;grid-template-columns:minmax(0,1fr);
+    gap:12px;
+  }
+  body[data-nexora-page=home] #catalogo .catalog-card,
+  body[data-nexora-page=home] #catalogo .catalog-card:first-child{
+    grid-column:auto;
+    height:245px;
+  }
+  body[data-nexora-page=game] .products-grid{
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-nexora-page=game] .product{
+    grid-template-columns:68px minmax(0,1fr);
+    min-height:96px;
+  }
+  body[data-nexora-page=game] .product-media{width:68px;height:68px}
+}
+@media (max-width:390px){
+  body[data-nexora-page=home] .nxv3-pick{
+    padding:8px;gap:7px;min-height:81px;
+  }
+  body[data-nexora-page=home] .nxv3-pick img{
+    width:43px;height:51px;
+  }
+  body[data-nexora-page=home] .nxv3-pick small{font-size:9px}
+  body[data-nexora-page=home] .nxv3-pick b{font-size:11px}
+  body[data-nexora-page=game] .hero-info h1{font-size:clamp(28px,8vw,37px)}
+  body[data-nexora-page=purchases] .stat{padding:10px 7px}
+  body[data-nexora-page=purchases] .stat strong{font-size:19px}
+}
+@media (max-width:340px){
+  body[data-nexora-page=home] .nxv3-picks-grid{grid-template-columns:minmax(0,1fr)}
+  body[data-nexora-page=home] .nxv3-pick b{font-size:13px}
+  body[data-nexora-page=home] .nav-actions :is(.login,.register),
+  body[data-nexora-page=game] .nav-actions :is(.login,.register){
+    font-size:10px;padding:7px 5px;
+  }
+  body[data-nexora-page=home] .trust-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (hover:none) and (pointer:coarse){
+  body[data-nexora-page=home] .nxv3-pick:hover,
+  body[data-nexora-page=game] .product:hover{
+    transform:none;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  body[data-nexora-page] .nx-bottom-nav a,
+  body[data-nexora-page=home] .nxv3-pick{
+    transition:none!important;
+  }
+}
