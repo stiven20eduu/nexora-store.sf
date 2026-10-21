@@ -1320,10 +1320,17 @@ a{
 <link rel="stylesheet" href="nexora-premium.css?v=2">
 <script src="nexora-experience.js?v=2" defer></script>
 <link rel="stylesheet" href="nexora-redesign-v3.css?v=3">
+<link rel="stylesheet" href="nexora-shop-ambience.css?v=1">
 </head>
 
 
 <body data-nexora-page="game">
+<div class="nx-shop-ambience" aria-hidden="true">
+  <span class="nx-shop-mesh"></span>
+  <span class="nx-shop-glow nx-shop-glow--main"></span>
+  <span class="nx-shop-glow nx-shop-glow--side"></span>
+  <span class="nx-shop-glow nx-shop-glow--low"></span>
+</div>
 
 
 <!-- ==========================================================
@@ -2237,6 +2244,9 @@ if(
     "free-fire";
 
 }
+
+// La estética del fondo cambia con el juego elegido; los productos no se alteran.
+document.body.dataset.gameTheme = gameKey;
 
 const game =
   games[gameKey];
