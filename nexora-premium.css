@@ -287,7 +287,7 @@ body[data-nexora-page=admin] .user:hover{transform:translateY(-2px);border-color
   body[data-nexora-page=admin] .admin-primary-action{width:100%}
   #nx-to-top{bottom:85px;right:13px}
   .nx-bottom-nav{
-    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;
     position:fixed;z-index:8999;left:10px;right:10px;bottom:calc(8px + env(safe-area-inset-bottom,0px));
     padding:7px;border:1px solid rgba(201,210,230,.18);border-radius:18px;
     background:rgba(18,22,31,.93);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
@@ -300,7 +300,7 @@ body[data-nexora-page=admin] .user:hover{transform:translateY(-2px);border-color
   }
   .nx-bottom-nav a svg{width:19px;height:19px}
   .nx-bottom-nav a[aria-current=page]{background:linear-gradient(135deg,rgba(255,154,54,.18),rgba(245,75,55,.10));color:#ffc476}
-  body[data-nexora-page=home],body[data-nexora-page=game],body[data-nexora-page=profile]{padding-bottom:75px}
+  body[data-nexora-page=home],body[data-nexora-page=game],body[data-nexora-page=profile],body[data-nexora-page=purchases]{padding-bottom:85px}
   body[data-nexora-page=home] .floating-support{bottom:85px}
 }
 @media(max-width:520px){
