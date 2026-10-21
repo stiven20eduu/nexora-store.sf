@@ -23,16 +23,8 @@ service cloud.firestore {
       allow delete: if false;
     }
     match /announcements/{id} {
-      allow read: if signedIn();
-      allow create: if isSupportAdmin()
-        && request.resource.data.keys().hasOnly(['kind','title','body','createdAt','authorUid'])
-        && request.resource.data.keys().hasAll(['kind','title','body','createdAt','authorUid'])
-        && request.resource.data.kind in ['news','update']
-        && request.resource.data.title is string && request.resource.data.title.size() >= 5 && request.resource.data.title.size() <= 80
-        && request.resource.data.body is string && request.resource.data.body.size() >= 5 && request.resource.data.body.size() <= 500
-        && request.resource.data.authorUid == request.auth.uid
-        && request.resource.data.createdAt == request.time;
-      allow update, delete: if false;
+      // No admitir nuevos mensajes generales.
+      allow read, write: if false;
     }
     match /notificationConfig/public {
       allow read: if signedIn();
