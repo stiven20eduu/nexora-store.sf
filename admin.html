@@ -335,6 +335,10 @@ function showMember(uid){
      const completed=document.createElement("button");completed.className="btn complete";completed.type="button";completed.textContent="Marcar completado";
      const cancelled=document.createElement("button");cancelled.className="btn cancel-order";cancelled.type="button";cancelled.textContent="Cancelar pedido";
      completed.disabled=cancelled.disabled=savingOrder;
+      if(isRobloxOrder(o)&&o.status==='pending'){
+       completed.disabled=true;
+       completed.title='Verifica el pago y pasa el pedido a En proceso desde la bandeja MVP.';
+      }
      completed.addEventListener("click",()=>changeOrderStatus(m.uid,o.id,"completed"));
      cancelled.addEventListener("click",()=>changeOrderStatus(m.uid,o.id,"cancelled"));
      actions.append(completed,cancelled);item.append(actions);
