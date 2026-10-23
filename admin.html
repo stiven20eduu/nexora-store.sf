@@ -331,12 +331,19 @@ function showMember(uid){
    }
    if(!["completed","cancelled"].includes(o.status)){
      const actions=document.createElement("div");actions.className="order-actions";
-     const completed=document.createElement("button");completed.className="btn complete";completed.type="button";completed.textContent="Marcar completado";
      const cancelled=document.createElement("button");cancelled.className="btn cancel-order";cancelled.type="button";cancelled.textContent="Cancelar pedido";
-     completed.disabled=cancelled.disabled=savingOrder;
-     completed.addEventListener("click",()=>changeOrderStatus(m.uid,o.id,"completed"));
+     cancelled.disabled=savingOrder;
      cancelled.addEventListener("click",()=>changeOrderStatus(m.uid,o.id,"cancelled"));
-     actions.append(completed,cancelled);item.append(actions);
+     if(String(o.game||"").trim().toLowerCase()==="roblox"){
+       const deliver=document.createElement("a");deliver.className="btn complete";deliver.href="admin-pedidos.html";deliver.textContent="🎁 Entregar código Roblox";
+       deliver.style.display="inline-flex";deliver.style.alignItems="center";actions.append(deliver);
+     }else{
+       const completed=document.createElement("button");completed.className="btn complete";completed.type="button";completed.textContent="Marcar completado";
+       completed.disabled=savingOrder;
+       completed.addEventListener("click",()=>changeOrderStatus(m.uid,o.id,"completed"));
+       actions.append(completed);
+     }
+     actions.append(cancelled);item.append(actions);
    }
    ordersBox.append(item);
  }
@@ -351,6 +358,9 @@ async function changeOrderStatus(uid,orderId,nextStatus){
  const order=member?.orders.find(o=>o.id===orderId);
  if(!order || ["completed","cancelled"].includes(order.status))return;
  const isComplete=nextStatus==="completed";
+  if(isComplete&&String(order.game||"").trim().toLowerCase()==="roblox"){
+    message("Los pedidos de Roblox se completan entregando el código desde «Atender pedidos».",true);return;
+  }
  const question=isComplete
    ?"¿Confirmas que entregaste "+(order.product||"el producto")+" al cliente y que el pago real está verificado?\n\nEl pedido pasará a COMPLETADO."
    :"¿Seguro que quieres CANCELAR el pedido "+(order.product||orderId)+"?\n\n"+(order.paymentMethod==="wallet"?"Se reembolsará el importe a la billetera del cliente.":"No se modificará su saldo NEXORA.")+"";
