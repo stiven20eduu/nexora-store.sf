@@ -27,8 +27,8 @@ export function parseSoles(input) {
   const value = String(input).trim().replace(",", ".");
   if (!/^\d{1,4}(?:\.\d{1,2})?$/.test(value)) throw new Error("Escribe un monto válido, por ejemplo 20.00.");
   const cents = Math.round(Number(value) * 100);
-  if (!Number.isSafeInteger(cents) || cents < 100 || cents > 100000) {
-    throw new Error("La recarga debe ser entre S/ 1 y S/ 1000.");
+  if (!Number.isSafeInteger(cents) || cents < 1000 || cents > 100000) {
+    throw new Error("La recarga mínima por Yape es S/ 10.00 (máximo S/ 1,000.00).");
   }
   return cents;
 }
