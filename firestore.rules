@@ -289,9 +289,44 @@ service cloud.firestore {
           'verified',
           'completed',
           'cancelled'
-        ];
+        ]
+        // Roblox: completar y entregar el codigo es una sola transaccion.
+        && (
+          !(resource.data.game in ['Roblox', 'roblox', 'ROBLOX'])
+          || request.resource.data.status != 'completed'
+          || (
+            resource.data.status in ['verified', 'processing']
+            && !exists(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)/delivery/roblox)
+            && existsAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)/delivery/roblox)
+            && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)/delivery/roblox).data.createdAt == request.time
+            && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)/delivery/roblox).data.deliveredBy == request.auth.uid
+          )
+        );
 
       allow delete: if false;
+    }
+
+    // Un codigo solo se escribe al completar el pedido correspondiente.
+    match /users/{uid}/orders/{orderId}/delivery/{deliveryId} {
+      allow get: if deliveryId == 'roblox' &&
+        (isMvp() || (
+          owner(uid)
+          && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.status == 'completed'
+        ));
+      allow list: if false;
+      allow create: if deliveryId == 'roblox'
+        && isSupportAdmin()
+        && exists(/databases/$(database)/documents/users/$(uid)/orders/$(orderId))
+        && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.game in ['Roblox','roblox','ROBLOX']
+        && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.status in ['verified','processing']
+        && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.status == 'completed'
+        && request.resource.data.keys().hasOnly(['code','deliveredBy','createdAt'])
+        && request.resource.data.keys().hasAll(['code','deliveredBy','createdAt'])
+        && request.resource.data.code is string
+        && request.resource.data.code.matches('^[A-Za-z0-9-]{6,80}$')
+        && request.resource.data.deliveredBy == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
     }
 
     // Las recargas de dinero solo pueden aprobarse con una cuenta administradora verificada.

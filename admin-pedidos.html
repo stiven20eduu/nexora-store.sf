@@ -4,6 +4,12 @@
 <link rel="icon" href="icon-192.png">
 <style>
 :root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;color:#f4f6fa;background:#080b11}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0}a{color:inherit;text-decoration:none}button,input{font:inherit}button,a{touch-action:manipulation}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}header{border-bottom:1px solid #2b3341;padding:18px max(18px,calc((100% - 1120px)/2));display:flex;justify-content:space-between;gap:16px;align-items:center;background:#0e131c}.brand{font-weight:900;letter-spacing:1px}.back{font-size:14px;color:#bec6d2}main{max-width:1120px;margin:auto;padding:28px 18px 70px}.hero{background:linear-gradient(120deg,#512316,#201510 70%);border:1px solid #7c4226;border-radius:22px;padding:28px}.kicker{color:#ffb76b;font-size:12px;letter-spacing:2px;font-weight:bold}h1{font-size:clamp(30px,6vw,48px);margin:10px 0}p{line-height:1.6}.muted{color:#aeb8c8}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}.stat{background:#111924;border:1px solid #2c3949;padding:18px;border-radius:16px}.stat strong{display:block;font-size:32px;color:#ffb66c}.stat span{font-size:13px;color:#aeb8c8}.toolbar{display:flex;gap:12px;flex-wrap:wrap;margin:22px 0}.toolbar input{flex:1;min-width:180px;padding:15px;border:1px solid #364256;border-radius:12px;background:#101722;color:#fff}.tabs{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}.tabs button,.btn{border:1px solid #364256;border-radius:12px;padding:14px 18px;background:#162131;color:#eaf0fa;font-weight:700;min-height:48px}.tabs button{white-space:nowrap}.tabs [aria-pressed=true]{background:#ffab52;border-color:#ffab52;color:#201008}.orders{display:grid;gap:18px;margin-top:20px}.order{background:#111822;border:1px solid #304055;border-radius:20px;padding:22px;overflow-wrap:anywhere}.order-head{display:flex;justify-content:space-between;gap:16px;align-items:start}.order h2{font-size:23px;margin:8px 0}.price{font-size:23px;font-weight:900;white-space:nowrap;color:#ffc383}.badge{display:inline-block;border-radius:30px;padding:8px 12px;background:#3c2d17;color:#ffd58a;font-size:12px;font-weight:800}.badge.completed{background:#12372b;color:#8cf0c1}.badge.cancelled{background:#401f2a;color:#ffafbb}.details{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}.detail{background:#0b111b;border:1px solid #253247;padding:13px;border-radius:12px}.detail small{display:block;color:#94a4bb;margin-bottom:8px}.detail strong{font-size:15px}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}.complete{background:#34ce95;color:#072418;border-color:#34ce95}.process{background:#ffb15c;color:#251507;border-color:#ffb15c}.cancel{background:#321c25;color:#ffb6c2;border-color:#68404b}.notice{padding:14px 18px;border-radius:12px;background:#142433;color:#c0dbfa}.error{color:#ffaaaa}.success{color:#87e5b6}.empty{text-align:center;padding:48px 20px;border:1px dashed #354258;border-radius:18px;color:#aeb8c8}.gate{text-align:center;padding:70px 20px}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #ffb15c;outline-offset:4px}@media(max-width:560px){.hero{padding:22px}.stat{padding:13px}.stat strong{font-size:27px}.stat span{font-size:11px}.order{padding:18px}.order-head{display:block}.price{margin-top:12px}.details{grid-template-columns:1fr}.actions .btn{width:100%}.stats{gap:8px}}
+.delivery-form{display:grid;gap:10px;margin-top:17px;border:1px solid #73502c;background:#221a14;border-radius:16px;padding:17px}
+.delivery-form label{font-size:13px;font-weight:800;color:#ffcb91}
+.delivery-form input{width:100%;min-height:47px;padding:12px;border:1px solid #855b33;border-radius:10px;background:#0e121b;color:#fff;font-size:16px;letter-spacing:.03em}
+.delivery-form small{font-size:12px;color:#cbbba9;line-height:1.6}
+.delivery-form button{justify-self:start;background:#ffb15c;border-color:#ffb15c;color:#291608}
+@media(max-width:560px){.delivery-form button{width:100%}}
 </style></head><body>
 <header><a class="brand" href="index.html">NEXORA MVP</a><a class="back" href="admin.html?v=pedidos-1">← Panel MVP</a></header>
 <main><section id="gate" class="gate"><h1>Verificando acceso…</h1><p>Área exclusiva para cuentas MVP.</p></section>
@@ -24,6 +30,7 @@ const db=getFirestore(auth.app),emails=new Set(['nexora.store.sf@gmail.com','sti
 const $=id=>document.getElementById(id),isMvp=user=>!!user?.email&&emails.has(user.email.toLowerCase());
 const labels={pending:'Pago por verificar',verified:'Pago verificado',processing:'En proceso',completed:'Completado',cancelled:'Cancelado'};
 const active=status=>['pending','verified','processing'].includes(status);
+const isRoblox=order=>String(order.game||'').trim().toLowerCase()==='roblox';
 const money=value=>'S/ '+Number(value||0).toFixed(2);
 let clients=new Map(),listeners=new Map(),stopUsers=null,filter='active',busy=false,generation=0;
 const pending=new Set(),failed=new Set();
@@ -46,10 +53,25 @@ function render(){
   const date=o.createdAt?.toDate?.();card.append(element('p','Pedido: '+o.id+(date?' · '+date.toLocaleString('es-PE'):''),'muted'));
   const details=element('div','','details');details.append(detail('ID del jugador / cuenta',o.playerId),detail('Nombre del jugador',o.playerName),detail('Servidor / región',[o.serverId,o.playerRegion].filter(Boolean).join(' · ')),detail('Pago',o.paymentMethod==='wallet'?'Pagado con saldo NEXORA':o.status==='pending'?'Pendiente de verificación':'Verificar comprobante del cliente'));card.append(details);
   if(o.status==='pending')card.append(element('p','Verifica el pago real antes de entregar el producto.','notice'));
+  if(isRoblox(o)&&['verified','processing'].includes(o.status)){
+   const form=element('form','','delivery-form');
+   const label=element('label','Código privado de Roblox · Solo para este comprador');
+   const input=document.createElement('input');
+   input.type='text';input.name='robloxCode';input.placeholder='Introduce el código de tarjeta regalo';
+   input.autocomplete='off';input.spellcheck=false;input.maxLength=80;input.minLength=6;
+   input.required=true;input.pattern='[A-Za-z0-9-]{6,80}';input.id='code-'+o.uid+'-'+o.id;
+   label.htmlFor=input.id;
+   const help=element('small','Se entrega una sola vez al cliente en «Mis compras». Comprueba que el código sea válido, no utilizado y obtenido de un proveedor autorizado. No se publicará en el catálogo.');
+   const submit=element('button','Entregar código y completar pedido','btn');submit.type='submit';submit.disabled=busy;
+   form.append(label,input,help,submit);
+   form.addEventListener('submit',event=>{event.preventDefault();deliverRobloxCode(o,input.value);});
+   card.append(form);
+  }
   const actions=element('div','','actions');
   if(active(o.status)){
    for(const [status,title,cls] of [['processing','Poner en proceso','process'],['completed','Marcar completado','complete'],['cancelled','Cancelar pedido','cancel']]){
     if(status==='processing'&&o.status==='processing')continue;
+    if(status==='completed'&&isRoblox(o))continue;
     const btn=element('button',title,'btn '+cls);btn.type='button';btn.disabled=busy;btn.addEventListener('click',()=>changeStatus(o,status));actions.append(btn);
    }
   }
@@ -65,6 +87,7 @@ async function saveStatus(uid,id,next,expectedStatus){
   if(!snap.exists())throw new Error('El pedido ya no existe.');
   const current=snap.data();
   if(!active(current.status)||current.status!==expectedStatus)throw new Error('Otro administrador actualizó este pedido. Revisa su estado antes de continuar.');
+  if(next==='completed'&&isRoblox(current))throw new Error('Entrega el código de Roblox desde la opción privada del panel.');
   if(next==='cancelled'&&current.paymentMethod==='wallet'){
    if(!auth.currentUser.emailVerified)throw new Error('Verifica tu correo de administrador para reembolsar.');
    const cost=current.priceCents,walletRef=doc(db,'users',uid,'wallet','main'),wallet=await tx.get(walletRef),balance=wallet.data()?.balanceCents;
@@ -74,8 +97,34 @@ async function saveStatus(uid,id,next,expectedStatus){
   tx.update(ref,{status:next});
  });
 }
+async function deliverRobloxCode(order,rawCode){
+ if(busy||!isMvp(auth.currentUser))return;
+ if(!auth.currentUser.emailVerified){feedback('Verifica tu correo MVP antes de entregar códigos.',true);return;}
+ const code=String(rawCode||'').trim();
+ if(!/^[A-Za-z0-9-]{6,80}$/.test(code)){feedback('El código debe tener entre 6 y 80 caracteres: letras, números o guiones.',true);return;}
+ if(!['verified','processing'].includes(order.status)||!isRoblox(order)){feedback('Verifica el pago del pedido de Roblox antes de entregar el código.',true);return;}
+ if(!window.confirm('¿Confirmas que el código pertenece a este pedido, está sin usar y el pago está verificado?\n\nCliente: '+order.customer+'\nPedido: '+order.id+'\n\nSe mostrará de forma privada en Mis compras.'))return;
+ busy=true;render();feedback('Entregando el código privado…');
+ try{
+  await runTransaction(db,async tx=>{
+   const orderRef=doc(db,'users',order.uid,'orders',order.id);
+   const deliveryRef=doc(db,'users',order.uid,'orders',order.id,'delivery','roblox');
+   const [snap,delivery]=await Promise.all([tx.get(orderRef),tx.get(deliveryRef)]);
+   if(!snap.exists())throw new Error('El pedido ya no existe.');
+   const current=snap.data();
+   if(!isRoblox(current)||!['verified','processing'].includes(current.status)||current.status!==order.status)throw new Error('El pedido cambió o aún no tiene pago verificado.');
+   if(delivery.exists())throw new Error('Este pedido ya tiene un código entregado. No se puede entregar dos veces.');
+   tx.set(deliveryRef,{code,deliveredBy:auth.currentUser.uid,createdAt:serverTimestamp()});
+   tx.update(orderRef,{status:'completed'});
+  });
+  feedback('Código Roblox entregado. El cliente puede verlo en Mis compras.');
+ }catch(error){
+  feedback(error.code==='permission-denied'?'No se pudo entregar. Publica las nuevas reglas de Firestore y verifica que la cuenta MVP tenga el correo confirmado.':error.message||'No se pudo entregar el código. Revisa el pedido antes de intentarlo de nuevo.',true);
+ }finally{busy=false;render();}
+}
 async function changeStatus(order,next){
  if(busy||!isMvp(auth.currentUser))return;
+ if(next==='completed'&&isRoblox(order)){feedback('Para Roblox usa «Entregar código y completar pedido».',true);return;}
  const question=next==='completed'?'¿Confirmas que el pago está verificado y ya entregaste el producto?':next==='processing'?'¿Confirmas que el pago está verificado y vas a atender este pedido?':order.paymentMethod==='wallet'?'¿Cancelar este pedido y devolver el importe a su saldo?':'¿Cancelar este pedido? No se realizará un reembolso automático.';
  if(!window.confirm(order.customer+' · '+order.product+'\nPedido: '+order.id+'\n\n'+question))return;
  busy=true;render();feedback('Guardando cambio…');

@@ -291,6 +291,13 @@ try {
         code.className = "detail";
         code.textContent = "Pedido: " + order.id;
         item.append(title, detail, status, code);
+    if (order.status === "completed" && String(order.game || "").trim().toLowerCase() === "roblox") {
+      const link = document.createElement("a");
+      link.href = "compras.html";
+      link.textContent = "🎁 Ver código Roblox en Mis compras →";
+      link.style.cssText = "display:inline-block;margin-top:10px;color:#ffbe70;font-size:12px;font-weight:800;text-decoration:underline;text-underline-offset:3px";
+      item.append(link);
+    }
         document.getElementById("ordersList").append(item);
       }
     } catch {
