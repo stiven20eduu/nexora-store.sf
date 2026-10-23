@@ -53,7 +53,8 @@ button.secondary,.action.secondary{background:#1b2430;color:#fff;border:1px soli
       <p class="muted">Saldo disponible en tu cuenta</p><div class="balance" id="balance">S/ 0.00</div>
       <form id="topupForm">
         <label for="amount">¿Cuánto dinero yapeaste? (S/)</label>
-        <input id="amount" type="text" inputmode="decimal" placeholder="20.00" required maxlength="8" autocomplete="off">
+        <input id="amount" type="text" inputmode="decimal" placeholder="10.00" required maxlength="8" autocomplete="off" aria-describedby="amountHelp">
+        <p class="muted" id="amountHelp">Recarga mínima: S/ 10.00 · Máximo: S/ 1,000.00.</p>
         <label for="operation">Número de operación que aparece en Yape</label>
         <input id="operation" type="text" inputmode="numeric" pattern="[0-9]{6,16}" placeholder="Ej. 12345678" minlength="6" maxlength="16" required autocomplete="off">
         <label for="payer">Nombre del titular que realizó el Yape (opcional)</label>
@@ -89,7 +90,7 @@ button.secondary,.action.secondary{background:#1b2430;color:#fff;border:1px soli
 <script type="module">
 import { auth } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-import { requestYapeTopup, getMyWallet, getMyTopups, formatSoles } from "./wallet-data.js";
+import { requestYapeTopup, getMyWallet, getMyTopups, formatSoles, parseSoles } from "./wallet-data.js";
 // Solo mostrar el acceso de regreso cuando esta pestaña conserva un pedido.
 try{
   const saved=JSON.parse(sessionStorage.getItem("nexoraOrder")||"null");
@@ -216,6 +217,7 @@ async function refresh(){
 document.getElementById("topupForm").addEventListener("submit",async ev=>{
   ev.preventDefault();const button=document.getElementById("send");button.disabled=true;inform("Registrando solicitud…");
   try{
+    parseSoles(document.getElementById("amount").value); // Validar el mínimo antes de enviar la solicitud.
     if(!receiptData)throw new Error("Selecciona un comprobante válido y espera a que termine de prepararse.");
     const id=await requestYapeTopup({
       amount:document.getElementById("amount").value,
