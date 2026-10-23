@@ -121,6 +121,7 @@
 </main>
 <script type="module">
 import {auth} from "./firebase.js";
+import {renderRobloxDelivery} from "./roblox-delivery.js?v=20261023-1";
 import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 import {getFirestore,collection,query,orderBy,limit,onSnapshot} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
@@ -181,6 +182,8 @@ function render(){
     card.append(meta);
     const state=statuses[order.status]||{label:"En revisión",group:"pending"};
     card.append(add("span",state.label,"status "+(order.status==="processing"||order.status==="verified"?"processing":state.group)));
+    const delivery=renderRobloxDelivery(order);
+    if(delivery)card.append(delivery);
     card.append(add("div","Pedido #"+order.id,"purchase-id"));
     list.append(card);
   }
