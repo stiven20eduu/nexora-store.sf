@@ -475,7 +475,7 @@ async function loadWallet(order,user){
 }
 
 const originalOrder=readOrder();
-const robuxInMaintenance=validOrder(originalOrder)&&originalOrder.gameKey==="roblox";
+const robuxInMaintenance=false; // Robux reactivados; el pago mantiene la verificación de catálogo y saldo.
 if(!validOrder(originalOrder)){
  byId("missingOrder").hidden=false;
 }else{
