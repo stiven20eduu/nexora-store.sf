@@ -2898,98 +2898,34 @@ function updateSummary(){
    VERIFICAR ID
 ========================================================== */
 
-async function lookupFreeFirePlayer(id){
+let freeFireLookupController = null;
+let freeFireLookupVersion = 0;
 
-  const response =
-    await fetch(
-      `https://bmxyludhpoygyxsdtnem.supabase.co/functions/v1/ff-player?uid=${encodeURIComponent(id)}`,
-      {
-        method:"GET",
-        headers:{
-          "Accept":"application/json"
-        },
-        cache:"no-store"
-      }
-    );
-
-
-  let data = null;
-
-
-  try{
-
-    data =
-      await response.json();
-
-  }
-  catch(error){
-
-    data =
-      null;
-
-  }
-
-
-  if(
-    response.status === 404
-    ||
-    data?.error ===
-    "player_not_found"
-  ){
-
-    return {
-      notFound:true
-    };
-
-  }
-
-
-  if(
-    !response.ok
-  ){
-
-    throw new Error(
-      data?.error
-      ||
-      `HTTP ${response.status}`
-    );
-
-  }
-
-
-  if(
-    data?.ok
-    &&
-    data?.nickname
-  ){
-
-    return {
-      nickname:
-        String(data.nickname),
-
-      region:
-        String(
-          data.region
-          ||
-          ""
-        )
-    };
-
-  }
-
-
-  throw new Error(
-    "Respuesta inválida del verificador"
+async function lookupFreeFirePlayer(id, signal){
+  const response = await fetch(
+    `https://bmxyludhpoygyxsdtnem.supabase.co/functions/v1/ff-player?uid=${encodeURIComponent(id)}`,
+    { headers: { Accept: "application/json" }, cache: "no-store", signal }
   );
-
+  const data = await response.json().catch(() => null);
+  // A missing endpoint is not a missing player.
+  if (response.status === 404 && data?.error === "player_not_found") {
+    return { notFound: true };
+  }
+  if (!response.ok || data?.ok !== true ||
+      typeof data.nickname !== "string" || !data.nickname.trim() ||
+      String(data.uid) !== id) {
+    throw new Error("lookup_unavailable");
+  }
+  return { nickname: data.nickname, region: String(data.region || "") };
 }
 
 verifyBtn.addEventListener(
   "click",
   async function(){
 
-    const id =
-      playerId.value.trim();
+    const id = playerId.value.trim();
+    const lookupVersion = ++freeFireLookupVersion;
+    freeFireLookupController?.abort();
 
 
     verifiedPlayer = {
@@ -3003,8 +2939,7 @@ verifyBtn.addEventListener(
 
 
     if(
-      id.length < 4 ||
-      !/^\d+$/.test(id)
+      (gameKey === "free-fire" ? !/^\d{5,15}$/.test(id) : !/^\d{4,}$/.test(id))
     ){
 
       verifyMessage.textContent =
@@ -3061,12 +2996,12 @@ verifyBtn.addEventListener(
     );
 
 
+    const controller = new AbortController();
+    freeFireLookupController = controller;
+    const timeout = setTimeout(() => controller.abort(), 12000);
     try{
-
-      const result =
-        await lookupFreeFirePlayer(
-          id
-        );
+      const result = await lookupFreeFirePlayer(id, controller.signal);
+      if (lookupVersion !== freeFireLookupVersion || playerId.value.trim() !== id) return;
 
 
       if(
@@ -3110,24 +3045,26 @@ verifyBtn.addEventListener(
 
     }
     catch(error){
+      if (lookupVersion !== freeFireLookupVersion || playerId.value.trim() !== id) return;
 
       freeFireVerificationStatus =
         "unavailable";
 
       verifyMessage.textContent =
-        "⚠ No se pudo consultar el nombre ahora. Puedes continuar usando el ID.";
+        "⚠ El verificador no está disponible. Reintenta o continúa por ID bajo tu confirmación; el nombre no está verificado.";
 
       verifyMessage.style.color =
         "var(--orange)";
 
     }
     finally{
+      clearTimeout(timeout);
+      if (lookupVersion !== freeFireLookupVersion) return;
 
       verifyBtn.disabled =
         false;
 
-      verifyBtn.textContent =
-        "Verificar ID";
+      verifyBtn.textContent = freeFireVerificationStatus === "unavailable" ? "Reintentar búsqueda" : "Verificar ID";
 
       updateSummary();
 
@@ -3151,6 +3088,11 @@ playerId.addEventListener(
       gameKey ===
       "free-fire"
     ){
+
+      ++freeFireLookupVersion;
+      freeFireLookupController?.abort();
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = "Verificar ID";
 
       verifiedPlayer = {
         id:"",
@@ -3248,6 +3190,14 @@ continueBtn.addEventListener(
         gameKey ===
         "free-fire"
       ){
+
+        if (!/^\d{5,15}$/.test(orderPlayerId)) {
+          alert("Ingresa un ID de Free Fire válido: de 5 a 15 dígitos.");
+          return;
+        }
+        if (freeFireVerificationStatus === "unavailable" && !confirm(
+          `No pudimos verificar el nombre. ¿Confirmas que el ID ${orderPlayerId} es correcto? Revisa el ID dentro de Free Fire antes de continuar.`
+        )) return;
 
         if(
           freeFireVerificationStatus ===
