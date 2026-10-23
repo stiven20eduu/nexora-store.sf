@@ -288,7 +288,7 @@ footer{border-top:1px solid rgba(176,194,227,.09);font-size:11px}
 import { auth } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { getMyWallet, formatSoles, buyWithNexoraBalance } from "./wallet-data.js";
+import { getMyWallet, formatSoles, buyWithNexoraBalance } from "./wallet-data.js?v=20261023-roblox-pago-2";
 
 const byId=(id)=>document.getElementById(id);
 const button=byId("confirmPurchase");
@@ -527,12 +527,35 @@ byId("modalApprove").addEventListener("click",async()=>{
   const answer=await buyWithNexoraBalance(order);
   paySucceeded(answer.orderId,answer.balanceCents);
  }catch(error){
-  console.error(error);
-  button.disabled=true;button.textContent="Verificar nuevamente";
-  setStatus(error.message||"No pudimos confirmar el pago. Revisa primero tu historial.","error");
+  console.error("NEXORA: no se pudo completar el pago con saldo",error);
   busy=false;
-  // Volvemos a consultar Firebase para no repetir un débito posiblemente confirmado.
-  await loadWallet(originalOrder,auth.currentUser);
+  button.disabled=true;
+  button.textContent="Pago no confirmado";
+  // Comprobar primero el pedido antes de mostrar un error: un fallo de red
+  // puede ocurrir después de que Firebase haya registrado el pago.
+  try{
+   const uid=auth.currentUser?.uid;
+   if(uid && order.historyId){
+    const previous=await getDoc(doc(db,"users",uid,"orders",order.historyId));
+    if(previous.exists() && previous.data().paymentMethod==="wallet" && previous.data().status!=="cancelled"){
+     paySucceeded(order.historyId,await getMyWallet());
+     return;
+    }
+   }
+  }catch(checkError){
+   console.error("NEXORA: no se pudo comprobar el estado del pedido",checkError);
+   setStatus("No pudimos confirmar el estado de esta compra. Antes de volver a pagar, revisa «Mis compras» para evitar cargos repetidos.","error");
+   return;
+  }
+  // Mantener el error visible, sin volver a llamar a loadWallet(): esa llamada
+  // ocultaba el motivo del fallo y mostraba otra vez «Confirmar y pagar».
+  if(error?.code==="permission-denied"){
+   setStatus("Firebase rechazó el pago por permisos. No se registró esta compra. Deben revisarse las reglas publicadas de Firestore. No vuelvas a confirmar hasta resolverlo.","error");
+  }else if(error?.code==="unavailable" || error?.code==="deadline-exceeded"){
+   setStatus("No se pudo completar la consulta a Firebase. Comprueba tu historial de compras antes de volver a intentarlo.","error");
+  }else{
+   setStatus(error?.message||"No pudimos completar el pago. Revisa «Mis compras» antes de intentarlo nuevamente.","error");
+  }
  }
 });
 </script>
