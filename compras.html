@@ -59,6 +59,13 @@
     .action{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:43px;padding:12px 17px;background:linear-gradient(110deg,#ffaf4c,#ffcd75);color:#211307;font-weight:900;border-radius:11px;font-size:13px}
     .help{font-size:13px;color:#b2c0d0;line-height:1.75;text-align:center;margin:23px 0}
     .help a{color:#ffc176;text-decoration:underline;text-underline-offset:3px}
+    .roblox-delivery{margin-top:14px;padding:16px;border:1px solid rgba(133,230,183,.30);border-radius:13px;background:rgba(29,66,54,.21);display:grid;gap:10px}
+    .roblox-delivery strong{font-size:13px;color:#a9f8d1}
+    .roblox-delivery p{margin:0;color:#c7d6df;font-size:12px;line-height:1.65}
+    .roblox-delivery button{min-height:40px;justify-self:start;border-radius:9px;padding:9px 14px;border:1px solid #aeecc8;color:#102118;background:#a8efcf;font-weight:800}
+    .roblox-delivery button:disabled{opacity:.6;cursor:wait}
+    .roblox-delivery code{display:block;max-width:100%;overflow-wrap:anywhere;background:#0b1520;border:1px solid #436259;padding:12px;border-radius:8px;font-size:16px;letter-spacing:.05em;color:#fff}
+    .roblox-delivery a{color:#f8c67d;text-decoration:underline;text-underline-offset:3px;font-size:12px}
     @media(max-width:650px){
       main{width:calc(100% - 24px);padding:22px 0 40px}
       header{padding:14px 13px}
@@ -122,7 +129,7 @@
 <script type="module">
 import {auth} from "./firebase.js";
 import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-import {getFirestore,collection,query,orderBy,limit,onSnapshot} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import {getFirestore,collection,doc,getDoc,query,orderBy,limit,onSnapshot} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 const db=getFirestore(auth.app);
 const $=id=>document.getElementById(id);
@@ -135,6 +142,55 @@ const statuses={
   cancelled:{label:"Cancelado",group:"cancelled"}
 };
 let orders=[],activeFilter="all",unsubscribe=null,generation=0;
+const isRoblox=order=>String(order.game||"").trim().toLowerCase()==="roblox";
+function attachRobloxDelivery(card,order){
+  const box=add("div",null,"roblox-delivery");
+  box.append(add("strong","🎁 Entrega privada de Roblox"));
+  box.append(add("p","Solo tu cuenta puede consultar el código asociado a este pedido completado."));
+  const button=add("button","Ver mi código Roblox");
+  button.type="button";
+  const message=add("p","");
+  message.setAttribute("role","status");
+  box.append(button,message);
+  button.addEventListener("click",async()=>{
+    const uid=auth.currentUser?.uid;
+    if(!uid)return;
+    button.disabled=true;
+    message.textContent="Consultando tu entrega privada…";
+    try{
+      const snap=await getDoc(doc(db,"users",uid,"orders",order.id,"delivery","roblox"));
+      if(auth.currentUser?.uid!==uid||!card.isConnected)return;
+      if(!snap.exists()){
+        message.textContent="Este pedido no tiene un código registrado en el nuevo sistema. Contacta con soporte y menciona el número de pedido.";
+        button.disabled=false;
+        return;
+      }
+      const code=String(snap.data().code||"");
+      if(!/^[A-Za-z0-9-]{6,80}$/.test(code))throw new Error("El código entregado necesita revisión del soporte.");
+      button.hidden=true;
+      message.replaceChildren(
+        add("span","Tu código de canje:"),
+        add("code",code)
+      );
+      const copy=add("button","Copiar código");copy.type="button";
+      copy.addEventListener("click",async()=>{
+        try{await navigator.clipboard.writeText(code);copy.textContent="¡Copiado!";}
+        catch{copy.textContent="No se pudo copiar. Selecciona el código manualmente.";}
+      });
+      message.append(copy);
+      const redeem=add("a","Canjear en la página oficial de Roblox ↗");
+      redeem.href="https://www.roblox.com/redeem";
+      redeem.target="_blank";redeem.rel="noopener noreferrer";
+      message.append(redeem);
+    }catch(error){
+      if(auth.currentUser?.uid===uid&&card.isConnected){
+        message.textContent=error.code==="permission-denied"?"No pudimos abrir la entrega. Contacta con soporte NEXORA.":"No se pudo cargar el código. Inténtalo otra vez o contacta con soporte.";
+        button.disabled=false;
+      }
+    }
+  });
+  card.append(box);
+}
 const add=(tag,content,classname)=>{
   const el=document.createElement(tag);
   if(content!==undefined&&content!==null)el.textContent=String(content);
@@ -182,6 +238,7 @@ function render(){
     const state=statuses[order.status]||{label:"En revisión",group:"pending"};
     card.append(add("span",state.label,"status "+(order.status==="processing"||order.status==="verified"?"processing":state.group)));
     card.append(add("div","Pedido #"+order.id,"purchase-id"));
+    if(order.status==="completed"&&isRoblox(order))attachRobloxDelivery(card,order);
     list.append(card);
   }
 }
