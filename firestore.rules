@@ -313,7 +313,7 @@ service cloud.firestore {
         ])
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.amountCents is int
-        && request.resource.data.amountCents >= 100
+        && request.resource.data.amountCents >= 1000
         && request.resource.data.amountCents <= 100000
         && request.resource.data.yapeOperation is string
         && request.resource.data.yapeOperation.matches('^[0-9]{6,16}$')
