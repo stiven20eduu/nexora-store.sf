@@ -291,7 +291,6 @@ service cloud.firestore {
           'cancelled'
         ]
         // Roblox: completar y entregar el codigo es una sola transaccion.
-        // No se puede completar sin registrar primero un codigo privado nuevo.
         && (
           !(resource.data.game in ['Roblox', 'roblox', 'ROBLOX'])
           || request.resource.data.status != 'completed'
@@ -307,9 +306,7 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // Cada codigo pertenece a un solo pedido de Roblox.
-    // Solo el cliente propietario puede leerlo una vez completado.
-    // Nunca permitir listados, cambios ni borrado de codigos.
+    // Un codigo solo se escribe al completar el pedido correspondiente.
     match /users/{uid}/orders/{orderId}/delivery/{deliveryId} {
       allow get: if deliveryId == 'roblox' &&
         (isMvp() || (
@@ -326,161 +323,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['code','deliveredBy','createdAt'])
         && request.resource.data.keys().hasAll(['code','deliveredBy','createdAt'])
         && request.resource.data.code is string
-        && request.resource.data.code.matches('^[A-Za-z0-9-]{6,80}
-
-    // Las recargas de dinero solo pueden aprobarse con una cuenta administradora verificada.
-    function isWalletAdmin() {
-      return isMvp() && request.auth.token.email_verified == true;
-    }
-
-    match /yapeTopups/{topupId} {
-      allow get, list: if isWalletAdmin()
-        || (signedIn() && resource.data.uid == request.auth.uid);
-
-      allow create: if signedIn()
-        && request.resource.data.keys().hasOnly([
-          'uid', 'amountCents', 'yapeOperation', 'payerName', 'status', 'createdAt',
-          'proofImage', 'proofUploadedAt'
-        ])
-        && request.resource.data.keys().hasAll([
-          'uid', 'amountCents', 'yapeOperation', 'payerName', 'status', 'createdAt'
-        ])
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.amountCents is int
-        && request.resource.data.amountCents >= 100
-        && request.resource.data.amountCents <= 100000
-        && request.resource.data.yapeOperation is string
-        && request.resource.data.yapeOperation.matches('^[0-9]{6,16}$')
-        && request.resource.data.payerName is string
-        && request.resource.data.payerName.size() <= 80
-        && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time
-        // La imagen es opcional para no interrumpir versiones anteriores de la web.
-        // Debe ser un JPEG reducido (PNG se convertirá antes de enviarlo).
-        && (
-          !request.resource.data.keys().hasAny(['proofImage', 'proofUploadedAt'])
-          || (
-            request.resource.data.keys().hasAll(['proofImage', 'proofUploadedAt'])
-            && request.resource.data.proofImage is string
-            && request.resource.data.proofImage.size() <= 180000
-            && request.resource.data.proofImage.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')
-            && request.resource.data.proofUploadedAt == request.time
-          )
-        );
-
-      allow update: if isWalletAdmin()
-        && resource.data.status == 'pending'
-        && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['status', 'processedAt', 'processedBy'])
-        && request.resource.data.status in ['approved', 'rejected']
-        && request.resource.data.processedBy == request.auth.uid
-        && request.resource.data.processedAt == request.time;
-
-      allow delete: if false;
-    }
-
-    // Descuento solo si existe un pedido nuevo, pagado en el mismo commit.
-    function validWalletDebit(uid) {
-      let purchaseId = request.resource.data.lastPurchaseId;
-      let orderPath = /databases/$(database)/documents/users/$(uid)/orders/$(purchaseId);
-      let order = getAfter(orderPath).data;
-      return owner(uid)
-        && resource.data.balanceCents is int
-        && resource.data.balanceCents >= 0
-        && request.resource.data.keys().hasOnly(['balanceCents', 'updatedAt', 'lastPurchaseId'])
-        && request.resource.data.keys().hasAll(['balanceCents', 'updatedAt', 'lastPurchaseId'])
-        && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['balanceCents', 'updatedAt', 'lastPurchaseId'])
-        && request.resource.data.balanceCents is int
-        && request.resource.data.balanceCents >= 0
-        && request.resource.data.balanceCents < resource.data.balanceCents
-        && request.resource.data.updatedAt == request.time
-        && purchaseId is string
-        && purchaseId.size() > 0
-        && purchaseId.size() <= 80
-        && purchaseId != resource.data.get('lastPurchaseId', '')
-        && !exists(orderPath)
-        && order.paymentMethod == 'wallet'
-        && order.status == 'verified'
-        && order.createdAt == request.time
-        && order.priceCents == resource.data.balanceCents - request.resource.data.balanceCents;
-    }
-
-    match /users/{uid}/wallet/{walletId} {
-      allow get: if walletId == 'main' && (owner(uid) || isWalletAdmin());
-      allow list: if false;
-
-      allow create: if walletId == 'main'
-        && isWalletAdmin()
-        && request.resource.data.keys().hasOnly(['balanceCents', 'updatedAt'])
-        && request.resource.data.keys().hasAll(['balanceCents', 'updatedAt'])
-        && request.resource.data.balanceCents is int
-        && request.resource.data.balanceCents >= 0
-        && request.resource.data.balanceCents <= 100000000
-        && request.resource.data.updatedAt == request.time;
-
-      allow update: if walletId == 'main' && (
-        (isWalletAdmin()
-          && request.resource.data.keys().hasOnly(['balanceCents', 'updatedAt', 'lastPurchaseId'])
-          && request.resource.data.keys().hasAll(['balanceCents', 'updatedAt'])
-          && request.resource.data.balanceCents is int
-          && request.resource.data.balanceCents >= 0
-          && request.resource.data.balanceCents <= 100000000
-          && request.resource.data.updatedAt == request.time)
-        || validWalletDebit(uid)
-      );
-      allow delete: if false;
-    }
-
-    // Precios oficiales utilizados para futuros pagos con saldo.
-    // Solo administradores con correo verificado pueden modificarlos.
-    match /catalogPrices/{productId} {
-      allow get, list: if true;
-
-      allow create, update: if isWalletAdmin()
-        && request.resource.data.keys().hasOnly([
-          'gameKey', 'game', 'product', 'priceCents', 'enabled', 'updatedAt'
-        ])
-        && request.resource.data.keys().hasAll([
-          'gameKey', 'game', 'product', 'priceCents', 'enabled', 'updatedAt'
-        ])
-        && request.resource.data.gameKey is string
-        && request.resource.data.gameKey.size() > 0
-        && request.resource.data.gameKey.size() <= 80
-        && request.resource.data.game is string
-        && request.resource.data.game.size() > 0
-        && request.resource.data.game.size() <= 100
-        && request.resource.data.product is string
-        && request.resource.data.product.size() > 0
-        && request.resource.data.product.size() <= 200
-        && request.resource.data.priceCents is int
-        && request.resource.data.priceCents >= 100
-        && request.resource.data.priceCents <= 100000
-        && request.resource.data.enabled is bool
-        && request.resource.data.updatedAt == request.time;
-
-      allow delete: if false;
-    }
-
-    // Bloquea reutilizar un número de operación al aprobar otra solicitud.
-    match /yapeOperations/{operation} {
-      allow get: if isWalletAdmin();
-      allow list: if false;
-      allow create: if isWalletAdmin()
-        && operation.matches('^[0-9]{6,16}$')
-        && request.resource.data.keys().hasOnly(['topupId', 'uid', 'amountCents', 'usedAt'])
-        && request.resource.data.keys().hasAll(['topupId', 'uid', 'amountCents', 'usedAt'])
-        && request.resource.data.topupId is string
-        && request.resource.data.uid is string
-        && request.resource.data.amountCents is int
-        && request.resource.data.amountCents >= 100
-        && request.resource.data.usedAt == request.time;
-      allow update, delete: if false;
-    }
-  }
-}
-
-)
+        && request.resource.data.code.matches('^[A-Za-z0-9-]{6,80}$')
         && request.resource.data.deliveredBy == request.auth.uid
         && request.resource.data.createdAt == request.time;
       allow update, delete: if false;
