@@ -177,6 +177,7 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
 <noscript><p>Activa JavaScript para acceder a tu perfil.</p></noscript>
 </main>
 <script type="module">
+import {renderRobloxDelivery} from "./roblox-delivery.js?v=20261023-1";
 const panel = document.getElementById("profile");
 const loading = document.getElementById("loading");
 const message = document.getElementById("message");
@@ -291,6 +292,8 @@ try {
         code.className = "detail";
         code.textContent = "Pedido: " + order.id;
         item.append(title, detail, status, code);
+        const delivery=renderRobloxDelivery(order);
+        if(delivery)item.append(delivery);
         document.getElementById("ordersList").append(item);
       }
     } catch {
