@@ -46,11 +46,12 @@ function render(){
   head.append(left,element('div',money(o.price),'price'));card.append(head);
   const date=o.createdAt?.toDate?.();card.append(element('p','Pedido: '+o.id+(date?' · '+date.toLocaleString('es-PE'):''),'muted'));
   const details=element('div','','details');details.append(detail('ID del jugador / cuenta',o.playerId),detail('Nombre del jugador',o.playerName),detail('Servidor / región',[o.serverId,o.playerRegion].filter(Boolean).join(' · ')),detail('Pago',o.paymentMethod==='wallet'?'Pagado con saldo NEXORA':o.status==='pending'?'Pendiente de verificación':'Verificar comprobante del cliente'));card.append(details);
-  if(o.status==='pending')card.append(element('p','Verifica el pago real antes de entregar el producto.','notice'));
+  if(o.status==='pending')card.append(element('p',isRobloxOrder(o)?'Antes de entregar el código Roblox, verifica el pago y pulsa «Poner en proceso».':'Verifica el pago real antes de entregar el producto.','notice'));
   const actions=element('div','','actions');
   if(active(o.status)){
    for(const [status,title,cls] of [['processing','Poner en proceso','process'],['completed','Marcar completado','complete'],['cancelled','Cancelar pedido','cancel']]){
     if(status==='processing'&&o.status==='processing')continue;
+     if(status==='completed'&&isRobloxOrder(o)&&o.status==='pending')continue;
     const btn=element('button',title,'btn '+cls);btn.type='button';btn.disabled=busy;btn.addEventListener('click',()=>changeStatus(o,status));actions.append(btn);
    }
   }
