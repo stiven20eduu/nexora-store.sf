@@ -133,9 +133,6 @@ export async function rejectYapeTopup(id) {
 export async function buyWithNexoraBalance(order) {
   const user = await session();
   const gameKey = String(order?.gameKey || "");
-  if (gameKey === "roblox") {
-    throw new Error("Por ahora no hay Robux (mantenimiento). Las compras de Roblox están suspendidas.");
-  }
   const game = String(order?.game || "");
   const product = String(order?.product || "");
   const historyId = String(order?.historyId || "");
