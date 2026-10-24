@@ -121,7 +121,7 @@
 </main>
 <script type="module">
 import {auth} from "./firebase.js";
-import {isRobloxOrder,renderRobloxDelivery} from "./roblox-delivery.js?v=20261023-privacy";
+import {isRobloxOrder,renderRobloxDelivery} from "./roblox-delivery.js?v=20261023-multicode";
 import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 import {getFirestore,collection,doc,getDoc,query,orderBy,limit,onSnapshot} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
@@ -143,17 +143,18 @@ function loadPrivateCodes(user){
   for(const order of orders){
     if(!isRobloxOrder(order)||order.status!=="completed"||order.redemptionCode)continue;
     if(privateCodes.has(order.id))continue;
-    privateCodes.set(order.id,{loading:true,code:""});
+    privateCodes.set(order.id,{loading:true,codes:[]});
     getDoc(doc(db,"users",user.uid,"orders",order.id,"privateDelivery","roblox"))
       .then(snap=>{
         if(epoch!==generation||auth.currentUser?.uid!==user.uid)return;
-        const code=snap.exists()?snap.data().code:"";
-        privateCodes.set(order.id,{loading:false,code:typeof code==="string"?code:""});
+        const data=snap.exists()?snap.data():{};
+        const codes=Array.isArray(data.codes)?data.codes:(typeof data.code==="string"?[data.code]:[]);
+        privateCodes.set(order.id,{loading:false,codes});
         render();
       })
       .catch(()=>{
         if(epoch!==generation||auth.currentUser?.uid!==user.uid)return;
-        privateCodes.set(order.id,{loading:false,error:true,code:""});
+        privateCodes.set(order.id,{loading:false,error:true,codes:[]});
         render();
       });
   }
@@ -207,7 +208,7 @@ function render(){
     const privateCode=privateCodes.get(order.id);
     const delivery=renderRobloxDelivery({
       ...order,
-      redemptionCode:order.redemptionCode||privateCode?.code||"",
+      redemptionCodes:order.redemptionCode?[order.redemptionCode]:(privateCode?.codes||[]),
       redemptionLoading:!order.redemptionCode&&!!privateCode?.loading,
       redemptionError:!order.redemptionCode&&!!privateCode?.error
     });
