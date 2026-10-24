@@ -66,6 +66,36 @@ service cloud.firestore {
     function codeClaimPath(fingerprint) {
       return /databases/$(database)/documents/robloxCodeClaims/$(fingerprint);
     }
+    // Cada código se reserva de forma atómica en la misma operación de entrega.
+    function validMultiClaim(uid, orderId, hash) {
+      return hash is string && hash.matches('^[a-f0-9]{64}$')
+        && !exists(codeClaimPath(hash))
+        && existsAfter(codeClaimPath(hash))
+        && getAfter(codeClaimPath(hash)).data.uid == uid
+        && getAfter(codeClaimPath(hash)).data.orderId == orderId
+        && getAfter(codeClaimPath(hash)).data.addedBy == request.auth.uid;
+    }
+    function validMultiSlot(uid, orderId, d, i) {
+      return d.codes[i] is string
+        && d.codes[i].matches('^[A-Za-z0-9][A-Za-z0-9-]{7,79}$')
+        && validMultiClaim(uid, orderId, d.codeHashes[i]);
+    }
+    function validMultiDelivery(uid, orderId) {
+      let d = getAfter(deliveryPath(uid, orderId)).data;
+      return d.keys().hasOnly(['codes','codeHashes','addedAt','addedBy'])
+        && d.keys().hasAll(['codes','codeHashes','addedAt','addedBy'])
+        && d.codes is list && d.codeHashes is list
+        && d.codes.size() >= 1 && d.codes.size() <= 5
+        && d.codeHashes.size() == d.codes.size()
+        && d.codeHashes.toSet().size() == d.codeHashes.size()
+        && d.codes.toSet().size() == d.codes.size()
+        && d.addedAt == request.time && d.addedBy == request.auth.uid
+        && validMultiSlot(uid, orderId, d, 0)
+        && (d.codes.size() < 2 || validMultiSlot(uid, orderId, d, 1))
+        && (d.codes.size() < 3 || validMultiSlot(uid, orderId, d, 2))
+        && (d.codes.size() < 4 || validMultiSlot(uid, orderId, d, 3))
+        && (d.codes.size() < 5 || validMultiSlot(uid, orderId, d, 4));
+    }
 
     // Soporte NEXORA: cada cliente ve solo sus casos y capturas.
     // Solo cuentas MVP verificadas pueden abrir la bandeja y responder.
@@ -320,13 +350,15 @@ service cloud.firestore {
             && existsAfter(deliveryPath(uid, orderId))
             && getAfter(deliveryPath(uid, orderId)).data.addedAt == request.time
             && getAfter(deliveryPath(uid, orderId)).data.addedBy == request.auth.uid
-            // La huella reservada debe corresponder al código privado.
-            && getAfter(deliveryPath(uid, orderId)).data.codeHash is string
-            && getAfter(deliveryPath(uid, orderId)).data.codeHash.matches('^[a-f0-9]{64}$')
-            && !exists(codeClaimPath(getAfter(deliveryPath(uid, orderId)).data.codeHash))
-            && existsAfter(codeClaimPath(getAfter(deliveryPath(uid, orderId)).data.codeHash))
-            && getAfter(codeClaimPath(getAfter(deliveryPath(uid, orderId)).data.codeHash)).data.uid == uid
-            && getAfter(codeClaimPath(getAfter(deliveryPath(uid, orderId)).data.codeHash)).data.orderId == orderId
+            // Una entrega con código único o varios códigos privados.
+            && (
+              (
+                getAfter(deliveryPath(uid, orderId)).data.keys().hasAny(['codeHash'])
+                && getAfter(deliveryPath(uid, orderId)).data.codeHash is string
+                && validMultiClaim(uid, orderId, getAfter(deliveryPath(uid, orderId)).data.codeHash)
+              )
+              || validMultiDelivery(uid, orderId)
+            )
           )
         );
 
@@ -357,6 +389,14 @@ service cloud.firestore {
           && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.status == 'completed'
           && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.redemptionAddedAt == request.time
           && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.redemptionAddedBy == request.auth.uid;
+        allow create: if deliveryId == 'roblox'
+          && isVerifiedMvp()
+          && validMultiDelivery(uid, orderId)
+          && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.game == 'Roblox'
+          && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.status in ['verified','processing']
+          && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.status == 'completed'
+          && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.redemptionAddedAt == request.time
+          && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.redemptionAddedBy == request.auth.uid;
         allow update, delete: if false;
       }
     }
@@ -381,7 +421,17 @@ service cloud.firestore {
         && getAfter(/databases/$(database)/documents/users/$(request.resource.data.uid)/orders/$(request.resource.data.orderId)).data.status == 'completed'
         && !exists(deliveryPath(request.resource.data.uid, request.resource.data.orderId))
         && existsAfter(deliveryPath(request.resource.data.uid, request.resource.data.orderId))
-        && getAfter(deliveryPath(request.resource.data.uid, request.resource.data.orderId)).data.codeHash == codeHash
+        && (
+          (
+            getAfter(deliveryPath(request.resource.data.uid, request.resource.data.orderId)).data.keys().hasAny(['codeHash'])
+            && getAfter(deliveryPath(request.resource.data.uid, request.resource.data.orderId)).data.codeHash == codeHash
+          )
+          || (
+            getAfter(deliveryPath(request.resource.data.uid, request.resource.data.orderId)).data.keys().hasAny(['codeHashes'])
+            && getAfter(deliveryPath(request.resource.data.uid, request.resource.data.orderId)).data.codeHashes is list
+            && codeHash in getAfter(deliveryPath(request.resource.data.uid, request.resource.data.orderId)).data.codeHashes
+          )
+        )
         && getAfter(deliveryPath(request.resource.data.uid, request.resource.data.orderId)).data.addedBy == request.auth.uid;
       allow update, delete: if false;
     }
