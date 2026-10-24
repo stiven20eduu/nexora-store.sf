@@ -192,6 +192,16 @@ async function tryRegionApis(uid, signal) {
   for (const region of regions) {
     const urls = [
       {
+        // Ruta de perfil vigente en la documentación del proveedor.
+        name: "freefireapis-getplayer",
+        url: `https://freefireapis.lat/GetPlayer?uid=${encodeURIComponent(uid)}&region=${region}`,
+      },
+      {
+        // Ruta ligera independiente: Nickname + UID sin necesidad de imágenes.
+        name: "freefireapis-history",
+        url: `https://freefireapis.lat/history-passe?uid=${encodeURIComponent(uid)}&region=${region}`,
+      },
+      {
         name: "freefireapis",
         url: `https://freefireapis.lat/info-player?uid=${encodeURIComponent(uid)}&region=${region}`,
       },
@@ -217,6 +227,15 @@ async function tryRegionApis(uid, signal) {
         console.log(
           `ff-player source=${source.name} region=${region} status=${result.status}`
         );
+        // Registrar solo claves de estructura y estados, nunca nombres o datos del jugador.
+        if (result.ok && !normalizePlayer(result.data, region, uid).nickname) {
+          const keys = result.data && typeof result.data === "object" ?
+            Object.keys(result.data).slice(0, 7).join(",") : "not_json";
+          const resultKeys = result.data?.result && typeof result.data.result === "object" ?
+            Object.keys(result.data.result).slice(0, 7).join(",") : "";
+          console.log(`ff-player empty_profile source=${source.name} top_keys=${keys} result_keys=${resultKeys}`);
+        }
+
 
         if (
           result.status === 404 ||
