@@ -17,7 +17,7 @@
 </section></main>
 <script type="module">
 import {auth} from './firebase.js';
-import {isRobloxOrder,validRobloxCode,fingerprintRobloxCode} from './roblox-delivery.js?v=20261023-unique';
+import {isRobloxOrder,MAX_ROBLOX_CODES,normalizeRobloxCodes,fingerprintRobloxCode} from './roblox-delivery.js?v=20261023-multicode';
 
 import {onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 import {getFirestore,collection,doc,onSnapshot,runTransaction,serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
@@ -50,26 +50,43 @@ function render(){
   if(o.status==='pending')card.append(element('p',isRobloxOrder(o)?'Antes de entregar el código Roblox, verifica el pago y pulsa «Poner en proceso».':'Verifica el pago real antes de entregar el producto.','notice'));
   if(isRobloxOrder(o)&&['verified','processing'].includes(o.status)){
    const wrap=element('section','','redeem-entry');
-   const label=element('label','🎁 Código de canje Roblox · obligatorio','redeem-label');
-   const input=document.createElement('input');
-   input.type='password';input.id='rbx-'+o.uid+'-'+o.id;input.className='redeem-input';
-   input.placeholder='Escribe o pega el código de Roblox';input.autocomplete='new-password';
-   input.setAttribute('autocapitalize','off');input.spellcheck=false;input.maxLength=80;
-   input.value=codeDrafts.get(orderKey(o))||'';input.disabled=busy;
-   input.addEventListener('input',()=>codeDrafts.set(orderKey(o),input.value));
-   label.htmlFor=input.id;
-   const reveal=element('button','Mostrar código','btn');
-   reveal.type='button';reveal.disabled=busy;
-   reveal.style.cssText='margin-top:10px;padding:9px 13px;font-size:12px;min-height:38px;';
-   reveal.setAttribute('aria-pressed','false');
-   reveal.addEventListener('click',()=>{
-    const visible=input.type==='password';
-    input.type=visible?'text':'password';
-    reveal.textContent=visible?'Ocultar código':'Mostrar código';
-    reveal.setAttribute('aria-pressed',String(visible));
-   });
-   wrap.append(label,input,reveal,element('p','El código está oculto por defecto. Comprueba que no haya sido utilizado antes de entregarlo; solo el comprador lo verá en Mis compras.','redeem-hint'));
-   card.append(wrap);
+   wrap.append(element('h3','🎁 Códigos de canje Roblox · obligatorios','redeem-label'));
+   const key=orderKey(o),drafts=codeDrafts.get(key)||[''];
+   const saveDraft=()=>codeDrafts.set(key,[...drafts]);
+   function paintEntries(){
+    wrap.querySelectorAll('.nx-code-row,.nx-add-code,.redeem-hint').forEach(node=>node.remove());
+    drafts.forEach((value,index)=>{
+     const row=element('div','','nx-code-row');
+     row.style.cssText='margin:11px 0;padding:12px;border:1px solid #36586a;border-radius:12px;background:#081820';
+     const label=element('label','Código '+(index+1),'redeem-label');
+     const input=document.createElement('input');
+     input.type='password';input.className='redeem-input';input.id='rbx-'+o.uid+'-'+o.id+'-'+index;
+     input.placeholder='Código '+(index+1);input.autocomplete='off';
+     input.setAttribute('autocapitalize','off');input.spellcheck=false;input.maxLength=80;
+     input.value=value;input.disabled=busy;
+     input.addEventListener('input',()=>{drafts[index]=input.value;saveDraft();});
+     label.htmlFor=input.id;
+     const show=element('button','Mostrar','btn');
+     show.type='button';show.disabled=busy;
+     show.style.cssText='margin:9px 8px 0 0;padding:9px 13px;min-height:38px;font-size:12px';
+     show.addEventListener('click',()=>{const v=input.type==='password';input.type=v?'text':'password';show.textContent=v?'Ocultar':'Mostrar';});
+     row.append(label,input,show);
+     if(drafts.length>1){
+      const remove=element('button','Quitar','btn');
+      remove.type='button';remove.disabled=busy;remove.style.cssText=show.style.cssText;
+      remove.addEventListener('click',()=>{drafts.splice(index,1);saveDraft();paintEntries();});
+      row.append(remove);
+     }
+     wrap.append(row);
+    });
+    const add=element('button',drafts.length>=MAX_ROBLOX_CODES?'Máximo '+MAX_ROBLOX_CODES+' códigos':'+ Agregar otro código','btn nx-add-code');
+    add.type='button';add.disabled=busy||drafts.length>=MAX_ROBLOX_CODES;
+    add.addEventListener('click',()=>{
+     if(drafts.length<MAX_ROBLOX_CODES){drafts.push('');saveDraft();paintEntries();const inputs=wrap.querySelectorAll('.redeem-input');inputs[inputs.length-1]?.focus();}
+    });
+    wrap.append(add,element('p','Agrega de 1 a '+MAX_ROBLOX_CODES+' códigos sin usar. Se entregarán juntos al comprador al completar el pedido.','redeem-hint'));
+   }
+   paintEntries();card.append(wrap);
   }
   if(isRobloxOrder(o)&&o.status==='completed')card.append(element('p',(o.redemptionAddedAt||o.redemptionCode)?'✓ Código Roblox entregado de forma privada. Disponible en Mis compras del cliente.':'Atención: pedido completado sin código. Revisa el caso con soporte.','redeem-done'));
   const actions=element('div','','actions');
@@ -84,10 +101,12 @@ function render(){
  }
  if(!list.length&&!pending.size&&!failed.size)$('orders').append(element('p',q?'No hay pedidos que coincidan con tu búsqueda.':filter==='active'?'Todo al día. No hay pedidos pendientes.':'No hay pedidos en esta pestaña.','empty'));
 }
-async function saveStatus(uid,id,next,expectedStatus,redemptionCode=null){
+async function saveStatus(uid,id,next,expectedStatus,redemptionCodes=null){
  if(!isMvp(auth.currentUser))throw new Error('Acceso exclusivo para MVP.');
  if(!['processing','completed','cancelled'].includes(next))throw new Error('Estado inválido.');
- const codeHash=next==='completed'&&redemptionCode?await fingerprintRobloxCode(redemptionCode):null;
+ const codes=next==='completed'&&redemptionCodes?normalizeRobloxCodes(redemptionCodes):null;
+ const hashes=codes?await Promise.all(codes.map(fingerprintRobloxCode)):[];
+ if(new Set(hashes).size!==hashes.length)throw new Error('Hay códigos duplicados.');
  return runTransaction(db,async tx=>{
   const ref=doc(db,'users',uid,'orders',id),snap=await tx.get(ref);
   if(!snap.exists())throw new Error('El pedido ya no existe.');
@@ -95,13 +114,14 @@ async function saveStatus(uid,id,next,expectedStatus,redemptionCode=null){
   if(!active(current.status)||current.status!==expectedStatus)throw new Error('Otro administrador actualizó este pedido. Revisa su estado antes de continuar.');
   const roblox=isRobloxOrder(current);
   if(next==='completed'&&roblox){
-   if(!auth.currentUser.emailVerified)throw new Error('Verifica tu correo de MVP para entregar códigos.');
-   if(!validRobloxCode(redemptionCode))throw new Error('Debes ingresar un código de Roblox válido.');
-   if(current.redemptionCode)throw new Error('Este pedido ya tiene un código. Actualiza la bandeja antes de continuar.');
-   if(!codeHash)throw new Error('No se pudo validar la huella del código.');
-   const claimRef=doc(db,'robloxCodeClaims',codeHash);
-   const claimSnap=await tx.get(claimRef);
-   if(claimSnap.exists())throw new Error('Este código Roblox ya fue entregado en otro pedido. Usa otro código.');
+   if(!auth.currentUser.emailVerified)throw new Error('Verifica tu correo de MVP.');
+   if(!codes?.length)throw new Error('Introduce al menos un código de Roblox.');
+   if(current.redemptionCode||current.redemptionAddedAt)throw new Error('Este pedido ya tiene una entrega.');
+   // Comprobar todas las reservas antes de crear documentos.
+   for(const hash of hashes){
+    const snap=await tx.get(doc(db,'robloxCodeClaims',hash));
+    if(snap.exists())throw new Error('Uno de estos códigos ya fue asignado a otro pedido.');
+   }
   }
   if(next==='cancelled'&&current.paymentMethod==='wallet'){
    if(!auth.currentUser.emailVerified)throw new Error('Verifica tu correo de administrador para reembolsar.');
@@ -110,11 +130,9 @@ async function saveStatus(uid,id,next,expectedStatus,redemptionCode=null){
    tx.update(walletRef,{balanceCents:balance+cost,updatedAt:serverTimestamp()});
   }
   if(next==='completed'&&roblox){
-   // Código en documento privado, fuera del listado general de pedidos.
    const deliveryRef=doc(db,'users',uid,'orders',id,'privateDelivery','roblox');
-   const claimRef=doc(db,'robloxCodeClaims',codeHash);
-   tx.set(claimRef,{uid,orderId:id,addedAt:serverTimestamp(),addedBy:auth.currentUser.uid});
-   tx.set(deliveryRef,{code:redemptionCode,codeHash,addedAt:serverTimestamp(),addedBy:auth.currentUser.uid});
+   hashes.forEach(hash=>tx.set(doc(db,'robloxCodeClaims',hash),{uid,orderId:id,addedAt:serverTimestamp(),addedBy:auth.currentUser.uid}));
+   tx.set(deliveryRef,{codes,codeHashes:hashes,addedAt:serverTimestamp(),addedBy:auth.currentUser.uid});
    tx.update(ref,{status:'completed',redemptionAddedAt:serverTimestamp(),redemptionAddedBy:auth.currentUser.uid});
   }else{
    tx.update(ref,{status:next});
@@ -123,25 +141,19 @@ async function saveStatus(uid,id,next,expectedStatus,redemptionCode=null){
 }
 async function changeStatus(order,next){
  if(busy||!isMvp(auth.currentUser))return;
- let redemptionCode=null;
+ let redemptionCodes=null;
  if(next==='completed'&&isRobloxOrder(order)){
-  redemptionCode=String(codeDrafts.get(orderKey(order))||'').trim();
-  if(!validRobloxCode(redemptionCode)){
-   feedback('Ingresa primero un código Roblox válido (8 a 80 caracteres, letras, números y guiones).',true);
-   document.getElementById('rbx-'+order.uid+'-'+order.id)?.focus();
-   return;
+  try{redemptionCodes=normalizeRobloxCodes(codeDrafts.get(orderKey(order))||['']);}
+  catch(error){
+   feedback(error.message,true);document.getElementById('rbx-'+order.uid+'-'+order.id+'-0')?.focus();return;
   }
-  if(allOrders().some(o=>(o.uid!==order.uid||o.id!==order.id)&&o.status==='completed'&&o.redemptionCode===redemptionCode)){
-   feedback('Este código ya fue entregado en otro pedido. Usa un código nuevo.',true);
-   return;
-  }
-  if(!window.confirm('¿Confirmas que el código está sin usar y quieres entregarlo al comprador?\n\nPedido: '+order.id+'\nProducto: '+order.product))return;
+  if(!window.confirm('¿Confirmas que los '+redemptionCodes.length+' códigos están sin usar y se entregarán juntos al comprador?\\n\\nPedido: '+order.id))return;
  }else{
   const question=next==='completed'?'¿Confirmas que el pago está verificado y ya entregaste el producto?':next==='processing'?'¿Confirmas que el pago está verificado y vas a atender este pedido?':order.paymentMethod==='wallet'?'¿Cancelar este pedido y devolver el importe a su saldo?':'¿Cancelar este pedido? No se realizará un reembolso automático.';
   if(!window.confirm(order.customer+' · '+order.product+'\nPedido: '+order.id+'\n\n'+question))return;
  }
  busy=true;render();feedback('Guardando cambio…');
- try{await saveStatus(order.uid,order.id,next,order.status,redemptionCode);codeDrafts.delete(orderKey(order));feedback(next==='completed'&&isRobloxOrder(order)?'Pedido Roblox completado. El código privado ya aparece en Mis compras del cliente.':next==='cancelled'&&order.paymentMethod==='wallet'?'Pedido cancelado y saldo reembolsado.':'Pedido actualizado: '+labels[next]+'.');}
+ try{await saveStatus(order.uid,order.id,next,order.status,redemptionCodes);codeDrafts.delete(orderKey(order));feedback(next==='completed'&&isRobloxOrder(order)?'Pedido Roblox completado. Los códigos privados ya están disponibles en Mis compras del cliente.':next==='cancelled'&&order.paymentMethod==='wallet'?'Pedido cancelado y saldo reembolsado.':'Pedido actualizado: '+labels[next]+'.');}
  catch(error){feedback(error.code==='permission-denied'?'Firebase bloqueó el cambio. Publica las reglas nuevas de seguridad de códigos Roblox.':error.message||'No se pudo confirmar el cambio. Revisa el estado antes de reintentar.',true);}
  finally{busy=false;render();}
 }
