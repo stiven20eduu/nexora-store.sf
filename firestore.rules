@@ -63,6 +63,9 @@ service cloud.firestore {
     function deliveryPath(uid, orderId) {
       return /databases/$(database)/documents/users/$(uid)/orders/$(orderId)/privateDelivery/roblox;
     }
+    function codeClaimPath(fingerprint) {
+      return /databases/$(database)/documents/robloxCodeClaims/$(fingerprint);
+    }
 
     // Soporte NEXORA: cada cliente ve solo sus casos y capturas.
     // Solo cuentas MVP verificadas pueden abrir la bandeja y responder.
@@ -317,6 +320,13 @@ service cloud.firestore {
             && existsAfter(deliveryPath(uid, orderId))
             && getAfter(deliveryPath(uid, orderId)).data.addedAt == request.time
             && getAfter(deliveryPath(uid, orderId)).data.addedBy == request.auth.uid
+            // La huella reservada debe corresponder al código privado.
+            && getAfter(deliveryPath(uid, orderId)).data.codeHash is string
+            && getAfter(deliveryPath(uid, orderId)).data.codeHash.matches('^[a-f0-9]{64}$')
+            && !exists(codeClaimPath(getAfter(deliveryPath(uid, orderId)).data.codeHash))
+            && existsAfter(codeClaimPath(getAfter(deliveryPath(uid, orderId)).data.codeHash))
+            && getAfter(codeClaimPath(getAfter(deliveryPath(uid, orderId)).data.codeHash)).data.uid == uid
+            && getAfter(codeClaimPath(getAfter(deliveryPath(uid, orderId)).data.codeHash)).data.orderId == orderId
           )
         );
 
@@ -329,10 +339,17 @@ service cloud.firestore {
         allow list: if false;
         allow create: if deliveryId == 'roblox'
           && isVerifiedMvp()
-          && request.resource.data.keys().hasOnly(['code', 'addedAt', 'addedBy'])
-          && request.resource.data.keys().hasAll(['code', 'addedAt', 'addedBy'])
+          && request.resource.data.keys().hasOnly(['code', 'codeHash', 'addedAt', 'addedBy'])
+          && request.resource.data.keys().hasAll(['code', 'codeHash', 'addedAt', 'addedBy'])
           && request.resource.data.code is string
           && request.resource.data.code.matches('^[A-Za-z0-9][A-Za-z0-9-]{7,79}$')
+          && request.resource.data.codeHash is string
+          && request.resource.data.codeHash.matches('^[a-f0-9]{64}$')
+          && !exists(codeClaimPath(request.resource.data.codeHash))
+          && existsAfter(codeClaimPath(request.resource.data.codeHash))
+          && getAfter(codeClaimPath(request.resource.data.codeHash)).data.uid == uid
+          && getAfter(codeClaimPath(request.resource.data.codeHash)).data.orderId == orderId
+          && getAfter(codeClaimPath(request.resource.data.codeHash)).data.addedBy == request.auth.uid
           && request.resource.data.addedAt == request.time
           && request.resource.data.addedBy == request.auth.uid
           && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.game == 'Roblox'
@@ -342,6 +359,31 @@ service cloud.firestore {
           && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.redemptionAddedBy == request.auth.uid;
         allow update, delete: if false;
       }
+    }
+
+    // Registro global de uso. Contiene solo la huella SHA-256 del código;
+    // sin códigos en claro, ni lectura/listado público, ni reescritura.
+    match /robloxCodeClaims/{codeHash} {
+      allow get: if isVerifiedMvp();
+      allow list: if false;
+      allow create: if isVerifiedMvp()
+        && codeHash.matches('^[a-f0-9]{64}$')
+        && request.resource.data.keys().hasOnly(['uid', 'orderId', 'addedAt', 'addedBy'])
+        && request.resource.data.keys().hasAll(['uid', 'orderId', 'addedAt', 'addedBy'])
+        && request.resource.data.uid is string
+        && request.resource.data.uid.size() > 0
+        && request.resource.data.orderId is string
+        && request.resource.data.orderId.size() > 0
+        && request.resource.data.addedAt == request.time
+        && request.resource.data.addedBy == request.auth.uid
+        && get(/databases/$(database)/documents/users/$(request.resource.data.uid)/orders/$(request.resource.data.orderId)).data.game == 'Roblox'
+        && get(/databases/$(database)/documents/users/$(request.resource.data.uid)/orders/$(request.resource.data.orderId)).data.status in ['verified', 'processing']
+        && getAfter(/databases/$(database)/documents/users/$(request.resource.data.uid)/orders/$(request.resource.data.orderId)).data.status == 'completed'
+        && !exists(deliveryPath(request.resource.data.uid, request.resource.data.orderId))
+        && existsAfter(deliveryPath(request.resource.data.uid, request.resource.data.orderId))
+        && getAfter(deliveryPath(request.resource.data.uid, request.resource.data.orderId)).data.codeHash == codeHash
+        && getAfter(deliveryPath(request.resource.data.uid, request.resource.data.orderId)).data.addedBy == request.auth.uid;
+      allow update, delete: if false;
     }
 
     // Las recargas de dinero solo pueden aprobarse con una cuenta administradora verificada.
