@@ -56,6 +56,14 @@ service cloud.firestore {
     }
 
 
+    // Las acciones de entrega requieren una cuenta MVP verificada.
+    function isVerifiedMvp() {
+      return isMvp() && request.auth.token.email_verified == true;
+    }
+    function deliveryPath(uid, orderId) {
+      return /databases/$(database)/documents/users/$(uid)/orders/$(orderId)/privateDelivery/roblox;
+    }
+
     // Soporte NEXORA: cada cliente ve solo sus casos y capturas.
     // Solo cuentas MVP verificadas pueden abrir la bandeja y responder.
     function isSupportAdmin() {
@@ -259,7 +267,7 @@ service cloud.firestore {
     }
 
     match /users/{uid}/orders/{orderId} {
-      allow read: if owner(uid) || isMvp();
+      allow read: if owner(uid) || isVerifiedMvp();
 
       allow create: if (owner(uid)
         && request.resource.data.keys().hasOnly([
@@ -283,7 +291,7 @@ service cloud.firestore {
 
       // Cambios habituales: nunca permitir completar Roblox sin código.
       // Se exige que el pedido esté activo para evitar reabrir entregas pasadas.
-      allow update: if isMvp()
+      allow update: if isVerifiedMvp()
         && resource.data.status in ['pending', 'verified', 'processing']
         && (
           (
@@ -296,28 +304,44 @@ service cloud.firestore {
           )
           ||
           (
-            // Entrega de Roblox: completar y registrar el código en el mismo commit.
-            request.auth.token.email_verified == true
-            && resource.data.game == 'Roblox'
+            // Sin secretos en los listados de pedidos; solo metadatos.
+            resource.data.game == 'Roblox'
             && resource.data.status in ['verified', 'processing']
             && request.resource.data.status == 'completed'
-            && !resource.data.keys().hasAny([
-              'redemptionCode', 'redemptionAddedAt', 'redemptionAddedBy'
-            ])
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-              'status', 'redemptionCode', 'redemptionAddedAt', 'redemptionAddedBy'
-            ])
-            && request.resource.data.diff(resource.data).affectedKeys().hasAll([
-              'status', 'redemptionCode', 'redemptionAddedAt', 'redemptionAddedBy'
-            ])
-            && request.resource.data.redemptionCode is string
-            && request.resource.data.redemptionCode.matches('^[A-Za-z0-9][A-Za-z0-9-]{7,79}$')
+            && !resource.data.keys().hasAny(['redemptionCode', 'redemptionAddedAt', 'redemptionAddedBy'])
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'redemptionAddedAt', 'redemptionAddedBy'])
+            && request.resource.data.diff(resource.data).affectedKeys().hasAll(['status', 'redemptionAddedAt', 'redemptionAddedBy'])
             && request.resource.data.redemptionAddedAt == request.time
             && request.resource.data.redemptionAddedBy == request.auth.uid
+            && !exists(deliveryPath(uid, orderId))
+            && existsAfter(deliveryPath(uid, orderId))
+            && getAfter(deliveryPath(uid, orderId)).data.addedAt == request.time
+            && getAfter(deliveryPath(uid, orderId)).data.addedBy == request.auth.uid
           )
         );
 
       allow delete: if false;
+
+      // Código privado: visible al comprador y a administradores verificados.
+      // Bloquea listados, escrituras de clientes y cambios tras la entrega.
+      match /privateDelivery/{deliveryId} {
+        allow get: if deliveryId == 'roblox' && (owner(uid) || isVerifiedMvp());
+        allow list: if false;
+        allow create: if deliveryId == 'roblox'
+          && isVerifiedMvp()
+          && request.resource.data.keys().hasOnly(['code', 'addedAt', 'addedBy'])
+          && request.resource.data.keys().hasAll(['code', 'addedAt', 'addedBy'])
+          && request.resource.data.code is string
+          && request.resource.data.code.matches('^[A-Za-z0-9][A-Za-z0-9-]{7,79}$')
+          && request.resource.data.addedAt == request.time
+          && request.resource.data.addedBy == request.auth.uid
+          && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.game == 'Roblox'
+          && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.status in ['verified', 'processing']
+          && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.status == 'completed'
+          && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.redemptionAddedAt == request.time
+          && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.redemptionAddedBy == request.auth.uid;
+        allow update, delete: if false;
+      }
     }
 
     // Las recargas de dinero solo pueden aprobarse con una cuenta administradora verificada.
