@@ -66,7 +66,8 @@ function normalizePlayer(data, fallbackRegion = "", expectedUid = "") {
     seen.add(source);
 
     const reportedId = source.accountId ?? source.AccountId ??
-      source.account_id ?? source.uid ?? source.UID ?? source.player_id;
+      source.accountid ?? source.account_id ?? source.uid ?? source.UID ??
+      source.player_id ?? source.playerId ?? source.PlayerId;
     const mismatch = expectedUid && reportedId != null &&
       /^\d{5,15}$/.test(String(reportedId)) &&
       String(reportedId) !== expectedUid;
@@ -74,7 +75,8 @@ function normalizePlayer(data, fallbackRegion = "", expectedUid = "") {
     if (!mismatch) {
       const name = source.nickname ?? source.Nickname ??
         source.player_nickname ?? source.AccountName ?? source.accountName ??
-        source.name;
+        source.accountname ?? source.playerName ?? source.PlayerName ??
+        (reportedId != null ? source.name : undefined);
       if (typeof name === "string" && name.trim() &&
           name.trim().length <= 80 &&
           !/^(playername|unknown|not found|error|undefined|null)$/i.test(name.trim())) {
@@ -88,9 +90,13 @@ function normalizePlayer(data, fallbackRegion = "", expectedUid = "") {
       }
     }
 
-    for (const key of nestedKeys) {
-      const child = source[key];
-      if (child && typeof child === "object" && !seen.has(child)) queue.push(child);
+    // Un proveedor que devuelve otro UID no debe permitir verificar
+    // accidentalmente el nombre de un subperfil (por ejemplo, un capitán).
+    if (!mismatch) {
+      for (const key of nestedKeys) {
+        const child = source[key];
+        if (child && typeof child === "object" && !seen.has(child)) queue.push(child);
+      }
     }
   }
   return { nickname: "", region: "" };
@@ -103,6 +109,11 @@ async function tryAutoApis(uid, signal) {
     {
       name: "nftoken",
       url: `https://api2.nftoken.info/player-info?uid=${encodeURIComponent(uid)}`,
+    },
+    {
+      // Consulta pública documentada como alternativa al perfil completo.
+      name: "nftoken-check",
+      url: `https://api2.nftoken.info/checkbanned?id=${encodeURIComponent(uid)}`,
     },
     {
       name: "squareweb-nick",
@@ -191,6 +202,10 @@ async function tryRegionApis(uid, signal) {
       {
         name: "ffdvinh",
         url: `https://ffdvinh09-info.vercel.app/player-info?region=${region}&uid=${encodeURIComponent(uid)}`,
+      },
+      {
+        name: "freefireinfo",
+        url: `https://freefireinfo-zy9l.onrender.com/api/v1/player-profile?uid=${encodeURIComponent(uid)}&server=${region}`,
       },
     ];
 
@@ -309,7 +324,8 @@ Deno.serve(async (req) => {
       const timer = setTimeout(() => controller.abort(), 9000);
       try {
         const player = await Promise.any(
-          [tryAutoApis, tryPagoStore, tryRegionApis, tryGlobalApi].map(async source => {
+          // Evitamos depender del acceso restringido de Garena (403).
+          [tryAutoApis, tryRegionApis, tryGlobalApi].map(async source => {
             const result = await source(uid, controller.signal);
             if (!result?.nickname) throw new Error("source_unavailable");
             return result;
