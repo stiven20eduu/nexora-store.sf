@@ -1719,6 +1719,17 @@ a{
           >
             ✓ Datos ingresados correctamente.
           </div>
+          <div id="ffManualConfirmBox" hidden
+            style="margin-top:14px;padding:14px;border-radius:12px;border:1px solid rgba(242,173,82,.35);background:rgba(242,173,82,.07);color:#f7dfb8;">
+            <label for="ffManualConfirm" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:13px;line-height:1.5;">
+              <input id="ffManualConfirm" type="checkbox"
+                style="margin-top:2px;width:18px;height:18px;flex-shrink:0;accent-color:#f6b65b;">
+              <span><strong>Confirmo mi ID de Free Fire.</strong>
+                Lo copié desde el perfil del juego y comprobé que pertenece a la cuenta que recibirá la recarga.
+                Si el lector automático falla, NEXORA recibirá el pedido con el nombre <strong>sin verificar</strong>.
+              </span>
+            </label>
+          </div>
 
 
         </div>
@@ -2548,6 +2559,10 @@ let verifiedPlayer = {
 let freeFireVerificationStatus =
   "idle";
 
+const ffManualConfirmBox = document.getElementById("ffManualConfirmBox");
+const ffManualConfirm = document.getElementById("ffManualConfirm");
+if (gameKey === "free-fire") ffManualConfirmBox.hidden = false;
+
 
 
 function getProductImage(categoryName, productName){
@@ -3051,7 +3066,7 @@ verifyBtn.addEventListener(
         "unavailable";
 
       verifyMessage.textContent =
-        "⚠ El verificador no está disponible. Reintenta o continúa por ID bajo tu confirmación; el nombre no está verificado.";
+        "⚠ No pudimos consultar el nombre del jugador. Puedes confirmar el ID desde tu perfil de Free Fire y continuar; NEXORA lo recibirá como NO verificado.";
 
       verifyMessage.style.color =
         "var(--orange)";
@@ -3100,6 +3115,8 @@ playerId.addEventListener(
         region:""
       };
 
+      // Cambiar el UID invalida cualquier aceptación manual anterior.
+      ffManualConfirm.checked = false;
       freeFireVerificationStatus =
         "idle";
 
@@ -3195,21 +3212,13 @@ continueBtn.addEventListener(
           alert("Ingresa un ID de Free Fire válido: de 5 a 15 dígitos.");
           return;
         }
-        if (freeFireVerificationStatus === "unavailable" && !confirm(
-          `No pudimos verificar el nombre. ¿Confirmas que el ID ${orderPlayerId} es correcto? Revisa el ID dentro de Free Fire antes de continuar.`
-        )) return;
-
-        if(
-          freeFireVerificationStatus ===
-          "idle"
-        ){
-
-          alert(
-            "Primero pulsa Verificar ID para comprobar tu cuenta de Free Fire."
-          );
-
-          return;
-
+        if (freeFireVerificationStatus === "unavailable" || freeFireVerificationStatus === "idle") {
+          if (!ffManualConfirm.checked) {
+            alert("No pudimos verificar automáticamente el nombre. Revisa el ID dentro de Free Fire y marca «Confirmo mi ID de Free Fire» para continuar.");
+            ffManualConfirm.focus();
+            return;
+          }
+          if (!confirm(`Este ID aún NO está verificado: ${orderPlayerId}.\nComprueba que pertenece a la cuenta correcta en Free Fire antes de continuar.`)) return;
         }
 
 
