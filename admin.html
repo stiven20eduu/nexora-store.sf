@@ -133,7 +133,7 @@ button,input{font:inherit}.btn{border:0;border-radius:10px;padding:11px 14px;fon
 
 <script type="module">
 import { auth } from "./firebase.js";
-import {askRobloxCode,isRobloxOrder,validRobloxCode} from "./roblox-delivery.js?v=20261023-1";
+import {askRobloxCode,isRobloxOrder,validRobloxCode} from "./roblox-delivery.js?v=20261023-privacy";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, getDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
@@ -250,7 +250,7 @@ function message(text,error=false){
  element.textContent=text;element.className=error?"error":"ok";
 }
 
-function isMvp(user){return !!user?.email&&MVP_EMAILS.has(user.email.toLowerCase())}
+function isMvp(user){return !!user?.emailVerified&&!!user?.email&&MVP_EMAILS.has(user.email.toLowerCase())}
 function initials(name){return String(name||"N").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()||"N"}
 function money(v){return "S/ "+Number(v||0).toFixed(2)}
 function dateText(v){if(!v)return "Sin fecha";const d=new Date(v);return Number.isNaN(d.getTime())?"Sin fecha":d.toLocaleDateString("es-PE")}
@@ -395,17 +395,21 @@ async function changeOrderStatus(uid,orderId,nextStatus){
          throw new Error("No es posible calcular el saldo a devolver.");
        tx.update(walletRef,{balanceCents:balance+cost,updatedAt:serverTimestamp()});
      }
-     tx.update(ref,nextStatus==="completed"&&roblox
-      ? {status:"completed",redemptionCode,redemptionAddedAt:serverTimestamp(),redemptionAddedBy:auth.currentUser.uid}
-      : {status:nextStatus});
+     if(nextStatus==="completed"&&roblox){
+      const privateRef=doc(db,"users",uid,"orders",orderId,"privateDelivery","roblox");
+      tx.set(privateRef,{code:redemptionCode,addedAt:serverTimestamp(),addedBy:auth.currentUser.uid});
+      tx.update(ref,{status:"completed",redemptionAddedAt:serverTimestamp(),redemptionAddedBy:auth.currentUser.uid});
+     }else{
+      tx.update(ref,{status:nextStatus});
+     }
    });
    order.status=nextStatus;
-   if(isComplete&&isRobloxOrder(order))order.redemptionCode=redemptionCode;
+   if(isComplete&&isRobloxOrder(order))order.redemptionAddedAt=new Date();
    renderStats();
    message(isComplete&&isRobloxOrder(order)?"Pedido Roblox completado: el código está disponible en Mis compras.":isComplete?"Pedido marcado como COMPLETADO. El cliente verá el cambio en su historial.":order.paymentMethod==="wallet"?"Pedido CANCELADO y saldo reembolsado.":"Pedido CANCELADO. El cliente verá el cambio en su historial.");
  }catch(error){
    console.error(error);
-   message(error.code==="permission-denied"?"Firebase denegó el cambio. Para códigos Roblox hay que publicar las reglas nuevas de Firestore.":error.message||"No pudimos actualizar el pedido.",true);
+   message(error.code==="permission-denied"?"Firebase denegó el cambio. Publica las reglas nuevas de privacidad Roblox en Firestore.":error.message||"No pudimos actualizar el pedido.",true);
  }finally{
    savingOrder=false;
    showMember(uid);
