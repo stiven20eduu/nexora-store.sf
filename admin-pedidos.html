@@ -52,13 +52,23 @@ function render(){
    const wrap=element('section','','redeem-entry');
    const label=element('label','🎁 Código de canje Roblox · obligatorio','redeem-label');
    const input=document.createElement('input');
-   input.type='text';input.id='rbx-'+o.uid+'-'+o.id;input.className='redeem-input';
-   input.placeholder='Escribe o pega el código de Roblox';input.autocomplete='off';
+   input.type='password';input.id='rbx-'+o.uid+'-'+o.id;input.className='redeem-input';
+   input.placeholder='Escribe o pega el código de Roblox';input.autocomplete='new-password';
    input.setAttribute('autocapitalize','off');input.spellcheck=false;input.maxLength=80;
    input.value=codeDrafts.get(orderKey(o))||'';input.disabled=busy;
    input.addEventListener('input',()=>codeDrafts.set(orderKey(o),input.value));
    label.htmlFor=input.id;
-   wrap.append(label,input,element('p','Comprueba que el código no se haya utilizado. Al completar el pedido, solo el comprador lo verá en Mis compras, junto con el enlace oficial de canje.','redeem-hint'));
+   const reveal=element('button','Mostrar código','btn');
+   reveal.type='button';reveal.disabled=busy;
+   reveal.style.cssText='margin-top:10px;padding:9px 13px;font-size:12px;min-height:38px;';
+   reveal.setAttribute('aria-pressed','false');
+   reveal.addEventListener('click',()=>{
+    const visible=input.type==='password';
+    input.type=visible?'text':'password';
+    reveal.textContent=visible?'Ocultar código':'Mostrar código';
+    reveal.setAttribute('aria-pressed',String(visible));
+   });
+   wrap.append(label,input,reveal,element('p','El código está oculto por defecto. Comprueba que no haya sido utilizado antes de entregarlo; solo el comprador lo verá en Mis compras.','redeem-hint'));
    card.append(wrap);
   }
   if(isRobloxOrder(o)&&o.status==='completed')card.append(element('p',(o.redemptionAddedAt||o.redemptionCode)?'✓ Código Roblox entregado de forma privada. Disponible en Mis compras del cliente.':'Atención: pedido completado sin código. Revisa el caso con soporte.','redeem-done'));
