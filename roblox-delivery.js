@@ -3,6 +3,17 @@
 export const isRobloxOrder = order => order?.game === "Roblox" || order?.gameKey === "roblox";
 export const validRobloxCode = value => /^[A-Za-z0-9][A-Za-z0-9-]{7,79}$/.test(String(value || "").trim());
 
+// Deterministic fingerprint: no redemption code is exposed by the unique index.
+// Case-insensitive to stop the same code being reused with different capitalization.
+export async function fingerprintRobloxCode(value) {
+  const code=String(value||"").trim();
+  if(!validRobloxCode(code))throw new Error("Código Roblox inválido.");
+  if(!globalThis.crypto?.subtle)throw new Error("No se puede comprobar la seguridad del código en este navegador.");
+  const input=new TextEncoder().encode(code.toUpperCase());
+  const digest=await globalThis.crypto.subtle.digest("SHA-256",input);
+  return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,"0")).join("");
+}
+
 export function askRobloxCode(order) {
   return new Promise(resolve => {
     let done = false;
