@@ -121,9 +121,9 @@
 </main>
 <script type="module">
 import {auth} from "./firebase.js";
-import {renderRobloxDelivery} from "./roblox-delivery.js?v=20261023-1";
+import {isRobloxOrder,renderRobloxDelivery} from "./roblox-delivery.js?v=20261023-privacy";
 import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-import {getFirestore,collection,query,orderBy,limit,onSnapshot} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import {getFirestore,collection,doc,getDoc,query,orderBy,limit,onSnapshot} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 const db=getFirestore(auth.app);
 const $=id=>document.getElementById(id);
@@ -136,6 +136,28 @@ const statuses={
   cancelled:{label:"Cancelado",group:"cancelled"}
 };
 let orders=[],activeFilter="all",unsubscribe=null,generation=0;
+const privateCodes=new Map();
+// Los documentos privados son inmutables: una lectura por código basta.
+function loadPrivateCodes(user){
+  const epoch=generation;
+  for(const order of orders){
+    if(!isRobloxOrder(order)||order.status!=="completed"||order.redemptionCode)continue;
+    if(privateCodes.has(order.id))continue;
+    privateCodes.set(order.id,{loading:true,code:""});
+    getDoc(doc(db,"users",user.uid,"orders",order.id,"privateDelivery","roblox"))
+      .then(snap=>{
+        if(epoch!==generation||auth.currentUser?.uid!==user.uid)return;
+        const code=snap.exists()?snap.data().code:"";
+        privateCodes.set(order.id,{loading:false,code:typeof code==="string"?code:""});
+        render();
+      })
+      .catch(()=>{
+        if(epoch!==generation||auth.currentUser?.uid!==user.uid)return;
+        privateCodes.set(order.id,{loading:false,error:true,code:""});
+        render();
+      });
+  }
+}
 const add=(tag,content,classname)=>{
   const el=document.createElement(tag);
   if(content!==undefined&&content!==null)el.textContent=String(content);
@@ -182,7 +204,13 @@ function render(){
     card.append(meta);
     const state=statuses[order.status]||{label:"En revisión",group:"pending"};
     card.append(add("span",state.label,"status "+(order.status==="processing"||order.status==="verified"?"processing":state.group)));
-    const delivery=renderRobloxDelivery(order);
+    const privateCode=privateCodes.get(order.id);
+    const delivery=renderRobloxDelivery({
+      ...order,
+      redemptionCode:order.redemptionCode||privateCode?.code||"",
+      redemptionLoading:!order.redemptionCode&&!!privateCode?.loading,
+      redemptionError:!order.redemptionCode&&!!privateCode?.error
+    });
     if(delivery)card.append(delivery);
     card.append(add("div","Pedido #"+order.id,"purchase-id"));
     list.append(card);
@@ -196,7 +224,7 @@ document.querySelectorAll("[data-filter]").forEach(button=>button.addEventListen
 onAuthStateChanged(auth,user=>{
   const current=++generation;
   if(unsubscribe){unsubscribe();unsubscribe=null;}
-  orders=[];activeFilter="all";
+  orders=[];privateCodes.clear();activeFilter="all";
   document.querySelectorAll("[data-filter]").forEach(item=>item.setAttribute("aria-pressed",String(item.dataset.filter==="all")));
   $("ordersList").replaceChildren();
   $("initialStatus").hidden=true;
@@ -211,6 +239,7 @@ onAuthStateChanged(auth,user=>{
     if(current!==generation||auth.currentUser?.uid!==user.uid)return;
     orders=snapshot.docs.map(d=>({...d.data(),id:d.id}));
     $("historyArea").dataset.loaded="true";
+    loadPrivateCodes(user);
     render();
   },error=>{
     if(current!==generation)return;
