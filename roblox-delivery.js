@@ -98,6 +98,16 @@ export function renderRobloxDelivery(order) {
   heading.textContent = "🎁 Tu código de Roblox";
   heading.style.cssText = "font-size:17px;margin:0 0 11px;color:#aeffda;";
   section.append(heading);
+  // El código nuevo se consulta en un documento privado tras autenticar al comprador.
+  if (order?.redemptionLoading || order?.redemptionError) {
+    const message = document.createElement("p");
+    message.textContent = order.redemptionError
+      ? "No se pudo cargar el código privado. Recarga la página o contacta con soporte si continúa."
+      : "Cargando tu código privado de Roblox…";
+    message.style.cssText = "line-height:1.65;color:#cbdacf;";
+    section.append(message);
+    return section;
+  }
   const code = String(order?.redemptionCode || "");
   if (!validRobloxCode(code)) {
     const missing = document.createElement("p");
