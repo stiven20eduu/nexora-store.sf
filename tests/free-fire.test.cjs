@@ -51,3 +51,24 @@ test('mismatched returned UID is never accepted',async()=>{
 test('matching account is shown',async()=>{
  const c=ui(async()=>new Response('{"ok":true,"uid":"12345678","nickname":"Test"}'));await c.verifyBtn.click();assert.equal(c.freeFireVerificationStatus,'valid');assert.equal(c.verifiedPlayer.id,'12345678');
 });
+
+test('new alternate provider accepts only a matching Free Fire UID',async()=>{
+ const ok=server(async url=>new Response(JSON.stringify(String(url).includes('/checkbanned')
+   ?{player_id:'12345678',nickname:'JugadorPrueba',region:'SAC'}
+   :{error:'provider_down'}),{status:String(url).includes('/checkbanned')?200:403}));
+ const response=await ok('12345678');
+ assert.equal(response.status,200);
+ const player=await response.json();
+ assert.equal(player.uid,'12345678');
+ assert.equal(player.nickname,'JugadorPrueba');
+});
+
+test('wrong account ID from an upstream provider is not treated as verified',async()=>{
+ const bad=server(async()=>new Response(JSON.stringify({
+   result:{basicInfo:{accountId:'99999999',nickname:'OtroJugador'}}
+ }),{status:200}));
+ const response=await bad('12345678');
+ assert.equal(response.status,503);
+ const data=await response.json();
+ assert.equal(data.error,'lookup_unavailable');
+});
