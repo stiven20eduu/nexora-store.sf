@@ -16,8 +16,8 @@ test('Solo MVP verificado puede solicitar atención; otros usuarios no pueden le
 test('Anuncios restringidos y configuración sin acceso a tokens',async()=>{
  const data={kind:'news',title:'Nueva función',body:'Tenemos una nueva función para ti.',authorUid:'mvp',createdAt:serverTimestamp()};
  await assertFails(setDoc(doc(db('alice'),'announcements/test'),data));
- await assertSucceeds(setDoc(doc(db('mvp','nexora.store.sf@gmail.com'),'announcements/test'),data));
- await assertSucceeds(getDoc(doc(db('bob'),'announcements/test')));
+ await assertFails(setDoc(doc(db('mvp','nexora.store.sf@gmail.com'),'announcements/test'),data));
+ await assertFails(getDoc(doc(db('bob'),'announcements/test')));
  await assertFails(updateDoc(doc(db('mvp','nexora.store.sf@gmail.com'),'announcements/test'),{title:'Cambio'}));
  await assertFails(setDoc(doc(db('alice'),'notificationConfig/public'),{vapidKey:'B'.repeat(87),updatedAt:serverTimestamp()}));
  await assertSucceeds(setDoc(doc(db('mvp','nexora.store.sf@gmail.com'),'notificationConfig/public'),{vapidKey:'B'.repeat(87),updatedAt:serverTimestamp()}));
