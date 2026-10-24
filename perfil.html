@@ -177,7 +177,7 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
 <noscript><p>Activa JavaScript para acceder a tu perfil.</p></noscript>
 </main>
 <script type="module">
-import {renderRobloxDelivery} from "./roblox-delivery.js?v=20261023-1";
+import {isRobloxOrder,renderRobloxDelivery} from "./roblox-delivery.js?v=20261023-profile-private";
 const panel = document.getElementById("profile");
 const loading = document.getElementById("loading");
 const message = document.getElementById("message");
@@ -216,10 +216,13 @@ function render(user) {
   showPhoto();
 }
 try {
-  const [{ auth }, { onAuthStateChanged, updateProfile, signOut }] = await Promise.all([
+  const [{ auth }, { onAuthStateChanged, updateProfile, signOut }, { getFirestore, doc, getDoc }] = await Promise.all([
     import("./firebase.js"),
-    import("https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js")
+    import("https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js"),
+    import("https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js")
   ]);
+  const db = getFirestore(auth.app);
+  let historyVersion = 0;
 
   const photoInput = document.getElementById("photoFile");
   const photoStatus = document.getElementById("photoStatus");
@@ -256,13 +259,14 @@ try {
     finally { this.disabled = false; }
   });
   async function refreshAccount(user) {
+    const version = ++historyVersion;
     ordersStatus.textContent = "Cargando historial…";
     document.getElementById("ordersList").replaceChildren();
     try {
       const result = await (await dataModule()).loadAccount();
-      if (auth.currentUser?.uid !== user.uid || result.uid !== user.uid) return;
+      if (version !== historyVersion || auth.currentUser?.uid !== user.uid || result.uid !== user.uid) return;
       savedPhoto = result.photo;
-    render(user);
+      render(user);
       const completedCount = result.orders.filter(order => order.status === "completed").length;
       const pendingCount = result.orders.filter(order => !["completed","cancelled"].includes(order.status)).length;
       document.getElementById("statOrders").textContent = String(result.orders.length);
@@ -292,12 +296,30 @@ try {
         code.className = "detail";
         code.textContent = "Pedido: " + order.id;
         item.append(title, detail, status, code);
-        const delivery=renderRobloxDelivery(order);
-        if(delivery)item.append(delivery);
+        // Los pedidos actuales guardan el código en un documento privado, no en el pedido.
+        const needsPrivateCode = isRobloxOrder(order) && order.status === "completed" && !order.redemptionCode;
+        const delivery = renderRobloxDelivery(needsPrivateCode
+          ? {...order, redemptionLoading:true}
+          : order);
+        if (delivery) item.append(delivery);
         document.getElementById("ordersList").append(item);
+        if (needsPrivateCode && delivery) {
+          getDoc(doc(db, "users", user.uid, "orders", order.id, "privateDelivery", "roblox"))
+            .then(snap => {
+              if (version !== historyVersion || auth.currentUser?.uid !== user.uid || !delivery.isConnected) return;
+              const privateCode = snap.exists() && typeof snap.data().code === "string" ? snap.data().code : "";
+              const updated = renderRobloxDelivery({...order, redemptionCode:privateCode});
+              if (updated) delivery.replaceWith(updated);
+            })
+            .catch(() => {
+              if (version !== historyVersion || auth.currentUser?.uid !== user.uid || !delivery.isConnected) return;
+              const failed = renderRobloxDelivery({...order, redemptionLoading:false, redemptionError:true});
+              if (failed) delivery.replaceWith(failed);
+            });
+        }
       }
     } catch {
-      if (auth.currentUser?.uid === user.uid) ordersStatus.textContent = "El historial no está disponible en este momento. Inténtalo más tarde.";
+      if (version === historyVersion && auth.currentUser?.uid === user.uid) ordersStatus.textContent = "El historial no está disponible en este momento. Inténtalo más tarde.";
     }
   }
   document.getElementById("reloadOrders").addEventListener("click", async function() {
@@ -354,6 +376,7 @@ try {
   });
 
   onAuthStateChanged(auth, (user) => {
+    historyVersion++;
     if (!user) {
       savedPhoto = "";
       mvpPanel.hidden = true;
