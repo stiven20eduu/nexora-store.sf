@@ -27,6 +27,14 @@ before(async()=>{
       game:'Roblox',product:'300 Robux',price:15,status:'processing',
       createdAt:serverTimestamp()
     });
+    await setDoc(doc(ctx.firestore(),'users/carl/orders/roblox-multi-test'),{
+      game:'Roblox',product:'Robux con dos códigos',price:24,status:'processing',
+      createdAt:serverTimestamp()
+    });
+    await setDoc(doc(ctx.firestore(),'users/dave/orders/roblox-multi-duplicate'),{
+      game:'Roblox',product:'Robux',price:12,status:'processing',
+      createdAt:serverTimestamp()
+    });
     await setDoc(doc(ctx.firestore(),'users/alice/orders/roblox-old-test'),{
       game:'Roblox',product:'100 Robux',price:5,status:'completed',
       redemptionCode:'LEGACY-CODE-1234',createdAt:serverTimestamp()
@@ -92,4 +100,46 @@ test('No se puede crear un código en un pedido de otra persona como comprador',
   await assertFails(setDoc(doc(buyer,'users/alice/orders/new-order/privateDelivery/roblox'),{
     code:'RBX-FOO12345',addedAt:serverTimestamp(),addedBy:'alice'
   }));
+});
+
+test('Un pedido puede entregar dos códigos de Roblox en una sola operación privada',async()=>{
+  const admin=authDb('mvp','nexora.store.sf@gmail.com');
+  const pathMulti='users/carl/orders/roblox-multi-test';
+  const codes=['RBX-MULTI111','RBX-MULTI222'];
+  const hashes=codes.map(fingerprint);
+  const batch=writeBatch(admin);
+  for(const hash of hashes){
+    batch.set(doc(admin,'robloxCodeClaims/'+hash),{
+      uid:'carl',orderId:'roblox-multi-test',addedAt:serverTimestamp(),addedBy:'mvp'
+    });
+  }
+  batch.set(doc(admin,pathMulti+'/privateDelivery/roblox'),{
+    codes,codeHashes:hashes,addedAt:serverTimestamp(),addedBy:'mvp'
+  });
+  batch.update(doc(admin,pathMulti),{
+    status:'completed',redemptionAddedAt:serverTimestamp(),redemptionAddedBy:'mvp'
+  });
+  await assertSucceeds(batch.commit());
+  const privateOrder=await assertSucceeds(getDoc(doc(authDb('carl'),pathMulti+'/privateDelivery/roblox')));
+  if(privateOrder.data().codes.join('|')!==codes.join('|'))throw Error('Faltan códigos del pedido');
+  await assertFails(getDoc(doc(authDb('dave'),pathMulti+'/privateDelivery/roblox')));
+});
+
+test('No se pueden repetir códigos privados ni reservar una huella ya usada',async()=>{
+  const admin=authDb('mvp','nexora.store.sf@gmail.com');
+  const pathOther='users/dave/orders/roblox-multi-duplicate';
+  const code='RBX-MULTI111',hash=fingerprint(code);
+  const batch=writeBatch(admin);
+  batch.set(doc(admin,'robloxCodeClaims/'+hash),{
+    uid:'dave',orderId:'roblox-multi-duplicate',addedAt:serverTimestamp(),addedBy:'mvp'
+  });
+  batch.set(doc(admin,pathOther+'/privateDelivery/roblox'),{
+    codes:[code],codeHashes:[hash],addedAt:serverTimestamp(),addedBy:'mvp'
+  });
+  batch.update(doc(admin,pathOther),{
+    status:'completed',redemptionAddedAt:serverTimestamp(),redemptionAddedBy:'mvp'
+  });
+  await assertFails(batch.commit());
+  const unchanged=await assertSucceeds(getDoc(doc(authDb('dave'),pathOther)));
+  if(unchanged.data().status!=='processing')throw Error('El pedido se completó pese al rechazo');
 });
