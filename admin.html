@@ -133,7 +133,7 @@ button,input{font:inherit}.btn{border:0;border-radius:10px;padding:11px 14px;fon
 
 <script type="module">
 import { auth } from "./firebase.js";
-import {askRobloxCode,isRobloxOrder,validRobloxCode} from "./roblox-delivery.js?v=20261023-privacy";
+import {askRobloxCode,isRobloxOrder,validRobloxCode,fingerprintRobloxCode} from "./roblox-delivery.js?v=20261023-unique";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, getDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
@@ -366,6 +366,11 @@ async function changeOrderStatus(uid,orderId,nextStatus){
     :"¿Seguro que quieres CANCELAR el pedido "+(order.product||orderId)+"?\n\n"+(order.paymentMethod==="wallet"?"Se reembolsará el importe a la billetera del cliente.":"No se modificará su saldo NEXORA.")+"";
   if(!window.confirm(question))return;
  }
+ let codeHash=null;
+ if(isComplete&&isRobloxOrder(order)){
+  try{codeHash=await fingerprintRobloxCode(redemptionCode);}
+  catch(error){message(error.message||"No se pudo comprobar el código.",true);return;}
+ }
  savingOrder=true;
  document.querySelectorAll(".order-actions button").forEach(button=>button.disabled=true);
  message("Guardando estado del pedido…");
@@ -382,6 +387,9 @@ async function changeOrderStatus(uid,orderId,nextStatus){
       if(!auth.currentUser?.emailVerified)throw new Error("Verifica tu correo para entregar un código de Roblox.");
       if(!validRobloxCode(redemptionCode))throw new Error("Debes registrar un código de canje válido para Roblox.");
       if(current.redemptionCode)throw new Error("Este pedido ya tiene un código asignado.");
+      if(!codeHash)throw new Error("No se pudo verificar el código.");
+      const claimSnap=await tx.get(doc(db,"robloxCodeClaims",codeHash));
+      if(claimSnap.exists())throw new Error("Este código Roblox ya fue entregado. Usa uno diferente.");
      }
      if(nextStatus==="cancelled" && current.paymentMethod==="wallet"){
        if(!auth.currentUser?.emailVerified)throw new Error("Verifica tu correo de administrador antes de reembolsar.");
@@ -397,7 +405,9 @@ async function changeOrderStatus(uid,orderId,nextStatus){
      }
      if(nextStatus==="completed"&&roblox){
       const privateRef=doc(db,"users",uid,"orders",orderId,"privateDelivery","roblox");
-      tx.set(privateRef,{code:redemptionCode,addedAt:serverTimestamp(),addedBy:auth.currentUser.uid});
+      const claimRef=doc(db,"robloxCodeClaims",codeHash);
+      tx.set(claimRef,{uid,orderId,addedAt:serverTimestamp(),addedBy:auth.currentUser.uid});
+      tx.set(privateRef,{code:redemptionCode,codeHash,addedAt:serverTimestamp(),addedBy:auth.currentUser.uid});
       tx.update(ref,{status:"completed",redemptionAddedAt:serverTimestamp(),redemptionAddedBy:auth.currentUser.uid});
      }else{
       tx.update(ref,{status:nextStatus});
@@ -409,7 +419,7 @@ async function changeOrderStatus(uid,orderId,nextStatus){
    message(isComplete&&isRobloxOrder(order)?"Pedido Roblox completado: el código está disponible en Mis compras.":isComplete?"Pedido marcado como COMPLETADO. El cliente verá el cambio en su historial.":order.paymentMethod==="wallet"?"Pedido CANCELADO y saldo reembolsado.":"Pedido CANCELADO. El cliente verá el cambio en su historial.");
  }catch(error){
    console.error(error);
-   message(error.code==="permission-denied"?"Firebase denegó el cambio. Publica las reglas nuevas de privacidad Roblox en Firestore.":error.message||"No pudimos actualizar el pedido.",true);
+   message(error.code==="permission-denied"?"Firebase denegó el cambio. Publica las reglas nuevas contra códigos Roblox duplicados.":error.message||"No pudimos actualizar el pedido.",true);
  }finally{
    savingOrder=false;
    showMember(uid);
