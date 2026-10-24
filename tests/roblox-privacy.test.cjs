@@ -65,7 +65,8 @@ test('Dos pedidos no pueden reservar la misma huella de Roblox',async()=>{
  await assertFails(batch.commit());
  const original=await assertSucceeds(getDoc(doc(admin,second)));
  if(original.data().status!=='processing')throw Error('La transacción duplicada alteró otro pedido');
- await assertFails(getDoc(doc(authDb('bob'),second+'/privateDelivery/roblox')));
+ const deliveryAfter=await assertSucceeds(getDoc(doc(authDb('bob'),second+'/privateDelivery/roblox')));
+ if(deliveryAfter.exists())throw Error('La transacción duplicada guardó un código privado');
 });
 
 test('Los clientes no pueden consultar ni alterar el registro de huellas',async()=>{
