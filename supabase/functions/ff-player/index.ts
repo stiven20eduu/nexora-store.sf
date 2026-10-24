@@ -47,48 +47,86 @@ async function fetchJson(url, init = {}, timeoutMs = 4000) {
   }
 }
 
-function normalizePlayer(data, fallbackRegion = "") {
-  const sources = [
-    data,
-    data?.result,
-    data?.data,
-    data?.basicInfo,
-    data?.basicinfo,
-    data?.accountBasicInfo,
-    data?.result?.basicInfo,
-    data?.result?.basicinfo,
-    data?.result?.accountBasicInfo,
-    data?.data?.basicInfo,
-    data?.data?.basicinfo,
-    data?.data?.accountBasicInfo,
-    data?.player,
-  ].filter(Boolean);
+function normalizePlayer(data, fallbackRegion = "", expectedUid = "") {
+  if (!data || typeof data !== "object" || data.success === false ||
+      data.error || data.status === "error") return { nickname: "", region: "" };
 
-  let nickname = "";
-  let region = fallbackRegion;
+  // Third-party providers use different structures. Never take the
+  // nickname from captain/clan profiles, and check the account ID if present.
+  const queue = [data];
+  const seen = new Set();
+  const nestedKeys = [
+    "result", "data", "basicInfo", "basicinfo", "accountBasicInfo",
+    "accountInfo", "AccountInfo", "player", "playerInfo", "PlayerInfo",
+  ];
 
-  for (const source of sources) {
-    nickname =
-      nickname ||
-      source?.nickname ||
-      source?.Nickname ||
-      source?.player_nickname ||
-      source?.name ||
-      "";
+  while (queue.length && seen.size < 25) {
+    const source = queue.shift();
+    if (!source || typeof source !== "object" || seen.has(source)) continue;
+    seen.add(source);
 
-    region =
-      region ||
-      source?.region ||
-      source?.Region ||
-      source?.player_region ||
-      source?.server ||
-      "";
+    const reportedId = source.accountId ?? source.AccountId ??
+      source.account_id ?? source.uid ?? source.UID ?? source.player_id;
+    const mismatch = expectedUid && reportedId != null &&
+      /^\d{5,15}$/.test(String(reportedId)) &&
+      String(reportedId) !== expectedUid;
+
+    if (!mismatch) {
+      const name = source.nickname ?? source.Nickname ??
+        source.player_nickname ?? source.AccountName ?? source.accountName ??
+        source.name;
+      if (typeof name === "string" && name.trim() &&
+          name.trim().length <= 80 &&
+          !/^(playername|unknown|not found|error|undefined|null)$/i.test(name.trim())) {
+        const region = source.region ?? source.Region ??
+          source.player_region ?? source.AccountRegion ?? source.accountRegion ??
+          source.server ?? fallbackRegion;
+        return {
+          nickname: name.trim(),
+          region: String(region || fallbackRegion).toUpperCase(),
+        };
+      }
+    }
+
+    for (const key of nestedKeys) {
+      const child = source[key];
+      if (child && typeof child === "object" && !seen.has(child)) queue.push(child);
+    }
   }
+  return { nickname: "", region: "" };
+}
 
-  return {
-    nickname: nickname ? String(nickname) : "",
-    region: region ? String(region).toUpperCase() : "",
-  };
+// Auto-region lookup is preferred: users should not have to guess the
+// regional server. These sources supply public profile information only.
+async function tryAutoApis(uid, signal) {
+  const sources = [
+    {
+      name: "nftoken",
+      url: `https://api2.nftoken.info/player-info?uid=${encodeURIComponent(uid)}`,
+    },
+    {
+      name: "squareweb-nick",
+      url: `https://freefirefwx-beta.squareweb.app/api/nick?id=${encodeURIComponent(uid)}`,
+    },
+    {
+      name: "star-info",
+      url: `https://star-info-api.lovable.app/functions/v1/info-api/accinfo?uid=${encodeURIComponent(uid)}`,
+    },
+  ];
+
+  // Race the endpoints; failed/unavailable providers do not block the others.
+  try {
+    return await Promise.any(sources.map(async (source) => {
+      const response = await fetchJson(source.url, { signal }, 4200);
+      console.log(`ff-player source=${source.name} status=${response.status}`);
+      if (!response.ok) throw new Error("provider_http_error");
+      const player = normalizePlayer(response.data, "", uid);
+      if (!player.nickname) throw new Error("provider_has_no_player");
+      return { ...player, source: source.name };
+    }));
+  } catch {
+    return null;
+  }
 }
 
 async function tryPagoStore(uid, signal) {
@@ -124,7 +162,7 @@ async function tryPagoStore(uid, signal) {
         continue;
       }
 
-      const player = normalizePlayer(result.data);
+      const player = normalizePlayer(result.data, "", uid);
 
       if (player.nickname) {
         return { ...player, source: "garena" };
@@ -177,7 +215,7 @@ async function tryRegionApis(uid, signal) {
           continue;
         }
 
-        const player = normalizePlayer(result.data, region);
+        const player = normalizePlayer(result.data, region, uid);
 
         if (player.nickname) {
           return {
@@ -217,7 +255,7 @@ async function tryGlobalApi(uid, signal) {
         continue;
       }
 
-      const player = normalizePlayer(result.data);
+      const player = normalizePlayer(result.data, "", uid);
 
       if (player.nickname) {
         return {
@@ -271,7 +309,7 @@ Deno.serve(async (req) => {
       const timer = setTimeout(() => controller.abort(), 9000);
       try {
         const player = await Promise.any(
-          [tryPagoStore, tryRegionApis, tryGlobalApi].map(async source => {
+          [tryAutoApis, tryPagoStore, tryRegionApis, tryGlobalApi].map(async source => {
             const result = await source(uid, controller.signal);
             if (!result?.nickname) throw new Error("source_unavailable");
             return result;
