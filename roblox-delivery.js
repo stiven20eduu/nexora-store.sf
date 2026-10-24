@@ -30,14 +30,25 @@ export function askRobloxCode(order) {
     label.style.cssText = "display:block;margin-bottom:8px;font-weight:bold;";
     const input = document.createElement("input");
     input.id = "nxRedeemCode";
-    input.type = "text";
+    input.type = "password";
     input.placeholder = "Ingresa el código completo";
-    input.autocomplete = "off";
+    input.autocomplete = "new-password";
     input.setAttribute("autocapitalize", "off");
     input.spellcheck = false;
     input.maxLength = 80;
     input.required = true;
     input.style.cssText = "display:block;width:100%;padding:14px;border:1px solid #546783;border-radius:10px;background:#070e19;color:#fff;font:inherit;box-sizing:border-box;letter-spacing:.05em;";
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.textContent = "Mostrar código";
+    toggle.setAttribute("aria-pressed", "false");
+    toggle.style.cssText = "margin-top:10px;padding:9px 12px;border:1px solid #546783;border-radius:10px;background:#172437;color:#fff;cursor:pointer;";
+    toggle.addEventListener("click", () => {
+      const visible = input.type === "password";
+      input.type = visible ? "text" : "password";
+      toggle.textContent = visible ? "Ocultar código" : "Mostrar código";
+      toggle.setAttribute("aria-pressed", String(visible));
+    });
     const error = document.createElement("p");
     error.setAttribute("role", "alert");
     error.style.cssText = "min-height:18px;margin:8px 0;color:#ffadad;font-size:12px";
@@ -63,7 +74,7 @@ export function askRobloxCode(order) {
     const onKeydown = event => {
       if (event.key === "Escape") {event.preventDefault();close(null);}
       if (event.key === "Tab") {
-        const focusable = [input,cancel,submit];
+        const focusable = [input,toggle,cancel,submit];
         const first = focusable[0],last = focusable[focusable.length-1];
         if (event.shiftKey && document.activeElement === first) {event.preventDefault();last.focus();}
         else if (!event.shiftKey && document.activeElement === last) {event.preventDefault();first.focus();}
@@ -81,7 +92,7 @@ export function askRobloxCode(order) {
       close(code);
     });
     buttons.append(cancel, submit);
-    form.append(label, input, error, buttons);
+    form.append(label, input, toggle, error, buttons);
     dialog.append(title, info, note, form);
     overlay.append(dialog);
     document.body.append(overlay);
@@ -121,13 +132,24 @@ export function renderRobloxDelivery(order) {
     return section;
   }
   const small = document.createElement("p");
-  small.textContent = "Código entregado · úsalo en la cuenta de Roblox correcta y no lo compartas.";
+  small.textContent = "Código privado · oculto por defecto. No lo compartas y úsalo en tu cuenta Roblox correcta.";
   small.style.cssText = "color:#cbdacb;line-height:1.6;font-size:13px;";
   const box = document.createElement("div");
   box.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0;";
   const value = document.createElement("code");
-  value.textContent = code;
+  value.textContent = "••••••••";
   value.style.cssText = "display:block;background:#07131e;border:1px solid #577c79;border-radius:10px;padding:13px;letter-spacing:.09em;font-size:clamp(13px,3vw,19px);color:#fff;overflow-wrap:anywhere;flex:1;min-width:130px;user-select:all;";
+  const show = document.createElement("button");
+  show.type = "button";
+  show.textContent = "Mostrar";
+  show.setAttribute("aria-pressed", "false");
+  show.style.cssText = "padding:12px;border-radius:10px;border:1px solid #547883;background:#182c36;color:#e7f9f2;font-weight:800;cursor:pointer;";
+  show.addEventListener("click", () => {
+    const revealed = show.getAttribute("aria-pressed") !== "true";
+    value.textContent = revealed ? code : "••••••••";
+    show.textContent = revealed ? "Ocultar" : "Mostrar";
+    show.setAttribute("aria-pressed", String(revealed));
+  });
   const copy = document.createElement("button");
   copy.type = "button";
   copy.textContent = "Copiar código";
@@ -136,7 +158,7 @@ export function renderRobloxDelivery(order) {
     try {await navigator.clipboard.writeText(code);copy.textContent="Copiado ✓";}
     catch {copy.textContent="Selecciona y copia el código";}
   });
-  box.append(value,copy);
+  box.append(value,show,copy);
   const list = document.createElement("ol");
   list.style.cssText = "margin:12px 0 4px;padding-left:23px;color:#dbe9e7;line-height:1.75;font-size:13px;";
   for (const text of [
