@@ -144,19 +144,25 @@ function configuredProviders(uid, signal) {
 
 function publicProviders(uid, signal) {
   const id = encodeURIComponent(uid);
-  // Independent, documented no-key endpoints; errors are not treated as an
-  // invalid player. A provider might simply be offline or rate-limited.
+  // Several previous providers now return 404 or time out on valid-looking
+  // requests. Use a separately operated, documented public nick route first.
+  // An unavailable upstream is NEVER proof that an account is invalid.
   return [
-    querySource("nftoken-sac",
-      "https://api2.nftoken.info/get?uid=" + id + "&region=SAC", uid, signal),
-    querySource("nftoken-auto",
-      "https://api2.nftoken.info/get?uid=" + id, uid, signal),
-    querySource("nftoken-ban",
-      "https://api2.nftoken.info/checkbanned?id=" + id, uid, signal),
-    querySource("squareweb-nick",
-      "https://freefirefwx-beta.squareweb.app/api/nick?id=" + id + "&region=sac", uid, signal),
-    querySource("star-auto",
-      "https://star-info-api.lovable.app/functions/v1/info-api/accinfo?uid=" + id, uid, signal),
+    querySource("bt-nick-sac",
+      "https://hostfreefire-api.squareweb.app/api/nick?id=" + id + "&region=sac",
+      uid, signal),
+    querySource("bt-nick-us",
+      "https://hostfreefire-api.squareweb.app/api/nick?id=" + id + "&region=us",
+      uid, signal),
+    querySource("bt-nick-auto",
+      "https://hostfreefire-api.squareweb.app/api/nick?id=" + id,
+      uid, signal),
+    querySource("fwx-nick-auto",
+      "https://freefirefwx-beta.squareweb.app/api/nick?id=" + id,
+      uid, signal),
+    querySource("nftoken-region",
+      "https://api2.nftoken.info/get?uid=" + id + "&region=SAC",
+      uid, signal),
   ];
 }
 
