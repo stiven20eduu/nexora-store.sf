@@ -177,7 +177,7 @@ button,.shop{display:inline-block;border:0;border-radius:10px;padding:14px 18px;
 <noscript><p>Activa JavaScript para acceder a tu perfil.</p></noscript>
 </main>
 <script type="module">
-import {isRobloxOrder,renderRobloxDelivery} from "./roblox-delivery.js?v=20261023-profile-private";
+import {isRobloxOrder,renderRobloxDelivery} from "./roblox-delivery.js?v=20261023-multicode";
 const panel = document.getElementById("profile");
 const loading = document.getElementById("loading");
 const message = document.getElementById("message");
@@ -307,8 +307,9 @@ try {
           getDoc(doc(db, "users", user.uid, "orders", order.id, "privateDelivery", "roblox"))
             .then(snap => {
               if (version !== historyVersion || auth.currentUser?.uid !== user.uid || !delivery.isConnected) return;
-              const privateCode = snap.exists() && typeof snap.data().code === "string" ? snap.data().code : "";
-              const updated = renderRobloxDelivery({...order, redemptionCode:privateCode});
+              const data = snap.exists() ? snap.data() : {};
+              const codes = Array.isArray(data.codes) ? data.codes : (typeof data.code === "string" ? [data.code] : []);
+              const updated = renderRobloxDelivery({...order, redemptionCodes:codes});
               if (updated) delivery.replaceWith(updated);
             })
             .catch(() => {
