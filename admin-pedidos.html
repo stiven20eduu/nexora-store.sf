@@ -17,7 +17,7 @@
 </section></main>
 <script type="module">
 import {auth} from './firebase.js';
-import {isRobloxOrder,validRobloxCode} from './roblox-delivery.js?v=20261023-2';
+import {isRobloxOrder,validRobloxCode,fingerprintRobloxCode} from './roblox-delivery.js?v=20261023-unique';
 
 import {onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 import {getFirestore,collection,doc,onSnapshot,runTransaction,serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
@@ -87,6 +87,7 @@ function render(){
 async function saveStatus(uid,id,next,expectedStatus,redemptionCode=null){
  if(!isMvp(auth.currentUser))throw new Error('Acceso exclusivo para MVP.');
  if(!['processing','completed','cancelled'].includes(next))throw new Error('Estado inválido.');
+ const codeHash=next==='completed'&&redemptionCode?await fingerprintRobloxCode(redemptionCode):null;
  return runTransaction(db,async tx=>{
   const ref=doc(db,'users',uid,'orders',id),snap=await tx.get(ref);
   if(!snap.exists())throw new Error('El pedido ya no existe.');
@@ -97,6 +98,10 @@ async function saveStatus(uid,id,next,expectedStatus,redemptionCode=null){
    if(!auth.currentUser.emailVerified)throw new Error('Verifica tu correo de MVP para entregar códigos.');
    if(!validRobloxCode(redemptionCode))throw new Error('Debes ingresar un código de Roblox válido.');
    if(current.redemptionCode)throw new Error('Este pedido ya tiene un código. Actualiza la bandeja antes de continuar.');
+   if(!codeHash)throw new Error('No se pudo validar la huella del código.');
+   const claimRef=doc(db,'robloxCodeClaims',codeHash);
+   const claimSnap=await tx.get(claimRef);
+   if(claimSnap.exists())throw new Error('Este código Roblox ya fue entregado en otro pedido. Usa otro código.');
   }
   if(next==='cancelled'&&current.paymentMethod==='wallet'){
    if(!auth.currentUser.emailVerified)throw new Error('Verifica tu correo de administrador para reembolsar.');
@@ -107,7 +112,9 @@ async function saveStatus(uid,id,next,expectedStatus,redemptionCode=null){
   if(next==='completed'&&roblox){
    // Código en documento privado, fuera del listado general de pedidos.
    const deliveryRef=doc(db,'users',uid,'orders',id,'privateDelivery','roblox');
-   tx.set(deliveryRef,{code:redemptionCode,addedAt:serverTimestamp(),addedBy:auth.currentUser.uid});
+   const claimRef=doc(db,'robloxCodeClaims',codeHash);
+   tx.set(claimRef,{uid,orderId:id,addedAt:serverTimestamp(),addedBy:auth.currentUser.uid});
+   tx.set(deliveryRef,{code:redemptionCode,codeHash,addedAt:serverTimestamp(),addedBy:auth.currentUser.uid});
    tx.update(ref,{status:'completed',redemptionAddedAt:serverTimestamp(),redemptionAddedBy:auth.currentUser.uid});
   }else{
    tx.update(ref,{status:next});
@@ -135,7 +142,7 @@ async function changeStatus(order,next){
  }
  busy=true;render();feedback('Guardando cambio…');
  try{await saveStatus(order.uid,order.id,next,order.status,redemptionCode);codeDrafts.delete(orderKey(order));feedback(next==='completed'&&isRobloxOrder(order)?'Pedido Roblox completado. El código privado ya aparece en Mis compras del cliente.':next==='cancelled'&&order.paymentMethod==='wallet'?'Pedido cancelado y saldo reembolsado.':'Pedido actualizado: '+labels[next]+'.');}
- catch(error){feedback(error.code==='permission-denied'?'Firebase denegó el cambio. Es necesario publicar las reglas nuevas de Firestore para entregar códigos de Roblox.':error.message||'No se pudo confirmar el cambio. Revisa el estado antes de reintentar.',true);}
+ catch(error){feedback(error.code==='permission-denied'?'Firebase bloqueó el cambio. Publica las reglas nuevas de seguridad de códigos Roblox.':error.message||'No se pudo confirmar el cambio. Revisa el estado antes de reintentar.',true);}
  finally{busy=false;render();}
 }
 function cleanup(){generation++;codeDrafts.clear();stopUsers?.();stopUsers=null;for(const stop of listeners.values())stop();listeners.clear();clients.clear();pending.clear();failed.clear();$('orders').replaceChildren();}
