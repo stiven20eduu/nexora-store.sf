@@ -15,7 +15,7 @@ test('validates input before calling providers',async()=>{
 });
 test('successful fallback survives a failed Garena source and is cached',async()=>{
  let calls=0;
- const run=server(async url=>{calls++;const found=String(url).includes('region=br');return new Response(JSON.stringify(found?{player_nickname:'Test player',player_region:'SAC'}:{error:'provider_down'}),{status:found?200:503})});
+ const run=server(async url=>{calls++;const found=String(url).includes('region=br');return new Response(JSON.stringify(found?{player_nickname:'Test player',player_region:'SAC'}:{error:'provider_down'}),{status:found?200:503,headers:{'content-type':'application/json'}})});
  const r=await run('12345678');assert.equal(r.status,200);assert.equal((await r.json()).nickname,'Test player');
  await new Promise(r=>setTimeout(r,20));const before=calls;
  assert.equal((await run('12345678')).status,200);assert.equal(calls,before);
@@ -59,7 +59,7 @@ test('Americas provider uses documented br region and returns the player nicknam
    const isAmericas=String(url).includes('/api/nick?id=12345678&region=br');
    return new Response(JSON.stringify(isAmericas
      ?{player_nickname:'JugadorPrueba',player_region:'SAC'}
-     :{error:'provider_down'}),{status:isAmericas?200:503});
+     :{error:'provider_down'}),{status:isAmericas?200:503,headers:{'content-type':'application/json'}});
  });
  const response=await ok('12345678');
  assert.equal(response.status,200);
@@ -74,7 +74,7 @@ test('Americas provider uses documented br region and returns the player nicknam
 test('wrong account ID from an upstream provider is not treated as verified',async()=>{
  const bad=server(async()=>new Response(JSON.stringify({
    result:{basicInfo:{accountId:'99999999',nickname:'OtroJugador'}}
- }),{status:200}));
+ }),{status:200,headers:{'content-type':'application/json'}}));
  const response=await bad('12345678');
  assert.equal(response.status,503);
  const data=await response.json();
