@@ -2,7 +2,7 @@
   "name": "nexora-notifications-tests",
   "private": true,
   "scripts": {
-    "test": "node --test notifications.test.cjs",
+    "test": "node --test notifications.test.cjs free-fire.test.cjs",
     "test:rules": "firebase emulators:exec --project demo-nexora --only firestore --config ../firebase.json \"node --test rules.test.cjs roblox-privacy.test.cjs\""
   },
   "devDependencies": {
