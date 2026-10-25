@@ -5,7 +5,7 @@ const fs=require('node:fs');
 const edge=fs.readFileSync('supabase/functions/ff-player/index.ts','utf8');
 function server(fetch){
  let handler;
- const context=vm.createContext({fetch,Request,Response,URL,AbortController,AbortSignal,console:{log(){}},setTimeout:(fn,ms)=>setTimeout(fn,ms/100),clearTimeout,Deno:{serve(fn){handler=fn}}});
+ const context=vm.createContext({fetch,Request,Response,URL,AbortController,AbortSignal,console:{log(){}},setTimeout:(fn,ms)=>setTimeout(fn,ms/100),clearTimeout,Deno:{env:{get(){return undefined}},serve(fn){handler=fn}}});
  vm.runInContext(edge,context);
  return uid=>handler(new Request('https://example.test/?uid='+uid));
 }
@@ -15,7 +15,7 @@ test('validates input before calling providers',async()=>{
 });
 test('successful fallback survives a failed Garena source and is cached',async()=>{
  let calls=0;
- const run=server(async url=>{calls++;return new Response(JSON.stringify(url.includes('glob-info2')?{nickname:'Test player',region:'SAC'}:{error:'invalid_id'}),{status:url.includes('glob-info2')?200:403})});
+ const run=server(async url=>{calls++;const found=String(url).includes('region=br');return new Response(JSON.stringify(found?{player_nickname:'Test player',player_region:'SAC'}:{error:'provider_down'}),{status:found?200:503})});
  const r=await run('12345678');assert.equal(r.status,200);assert.equal((await r.json()).nickname,'Test player');
  await new Promise(r=>setTimeout(r,20));const before=calls;
  assert.equal((await run('12345678')).status,200);assert.equal(calls,before);
@@ -52,15 +52,23 @@ test('matching account is shown',async()=>{
  const c=ui(async()=>new Response('{"ok":true,"uid":"12345678","nickname":"Test"}'));await c.verifyBtn.click();assert.equal(c.freeFireVerificationStatus,'valid');assert.equal(c.verifiedPlayer.id,'12345678');
 });
 
-test('new alternate provider accepts only a matching Free Fire UID',async()=>{
- const ok=server(async url=>new Response(JSON.stringify(String(url).includes('/checkbanned')
-   ?{player_id:'12345678',nickname:'JugadorPrueba',region:'SAC'}
-   :{error:'provider_down'}),{status:String(url).includes('/checkbanned')?200:403}));
+test('Americas provider uses documented br region and returns the player nickname',async()=>{
+ const requested=[];
+ const ok=server(async url=>{
+   requested.push(String(url));
+   const isAmericas=String(url).includes('/api/nick?id=12345678&region=br');
+   return new Response(JSON.stringify(isAmericas
+     ?{player_nickname:'JugadorPrueba',player_region:'SAC'}
+     :{error:'provider_down'}),{status:isAmericas?200:503});
+ });
  const response=await ok('12345678');
  assert.equal(response.status,200);
  const player=await response.json();
  assert.equal(player.uid,'12345678');
  assert.equal(player.nickname,'JugadorPrueba');
+ assert.equal(player.region,'SAC');
+ assert.ok(requested.some(url=>url.includes('region=br')));
+ assert.ok(requested.every(url=>!url.includes('region=sac')&&!url.includes('region=us')));
 });
 
 test('wrong account ID from an upstream provider is not treated as verified',async()=>{
@@ -71,4 +79,11 @@ test('wrong account ID from an upstream provider is not treated as verified',asy
  assert.equal(response.status,503);
  const data=await response.json();
  assert.equal(data.error,'lookup_unavailable');
+});
+
+test('provider 402 outage is not interpreted as a nonexistent player',async()=>{
+ const run=server(async()=>new Response('{"error":"Invalid UID or server error"}',{status:402}));
+ const response=await run('12345678');
+ assert.equal(response.status,503);
+ assert.equal((await response.json()).error,'lookup_unavailable');
 });
