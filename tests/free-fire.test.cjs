@@ -69,7 +69,7 @@ test('Americas provider uses documented br region and returns the player nicknam
  assert.equal(player.nickname,'JugadorPrueba');
  assert.equal(player.region,'SAC');
  assert.ok(requested.some(url=>url.includes('region=br')));
- assert.ok(requested.every(url=>!url.includes('region=sac')&&!url.includes('region=us')));
+ assert.ok(requested.filter(url=>url.includes('hostfreefire-api.squareweb.app')).every(url=>!url.includes('region=sac')&&!url.includes('region=us')));
 });
 
 test('wrong account ID from an upstream provider is not treated as verified',async()=>{
@@ -87,4 +87,30 @@ test('provider 402 outage is not interpreted as a nonexistent player',async()=>{
  const response=await run('12345678');
  assert.equal(response.status,503);
  assert.equal((await response.json()).error,'lookup_unavailable');
+});
+
+test('SAC player profile provider accepts a matching UID in result.basicInfo',async()=>{
+ const calls=[];
+ const run=server(async url=>{
+   const u=String(url);calls.push(u);
+   const found=u.includes('freefireapis.lat/GetPlayer?uid=12345678&region=SAC');
+   return new Response(JSON.stringify(found
+     ?{success:true,result:{basicInfo:{accountId:'12345678',nickname:'Nexora Jugador',region:'SAC'}}}
+     :{error:'provider_unavailable'}),{status:found?200:503,headers:{'content-type':'application/json'}});
+ });
+ const response=await run('12345678');
+ assert.equal(response.status,200);
+ const data=await response.json();
+ assert.equal(data.uid,'12345678');
+ assert.equal(data.nickname,'Nexora Jugador');
+ assert.equal(data.region,'SAC');
+ assert.ok(calls.some(url=>url.includes('freefireapis.lat')));
+});
+
+test('New providers reject mismatching UIDs',async()=>{
+ const run=server(async()=>new Response(JSON.stringify({success:true,result:{basicInfo:{
+  accountId:'99999999',nickname:'Not the requested player',region:'SAC'
+ }}}),{status:200,headers:{'content-type':'application/json'}}));
+ const response=await run('12345678');
+ assert.equal(response.status,503);
 });
