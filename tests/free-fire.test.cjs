@@ -2,7 +2,8 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const fs=require('node:fs');
-const edge=fs.readFileSync('supabase/functions/ff-player/index.ts','utf8');
+const path=require('node:path');
+const edge=fs.readFileSync(path.join(__dirname,'../supabase/functions/ff-player/index.ts'),'utf8');
 function server(fetch){
  let handler;
  const context=vm.createContext({fetch,Request,Response,URL,AbortController,AbortSignal,console:{log(){}},setTimeout:(fn,ms)=>setTimeout(fn,ms/100),clearTimeout,Deno:{env:{get(){return undefined}},serve(fn){handler=fn}}});
@@ -28,7 +29,7 @@ test('hung upstreams are aborted within the total deadline',async()=>{
  const run=server((url,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(Error('aborted')),{once:true})));
  const start=Date.now();assert.equal((await run('12345678')).status,503);assert.ok(Date.now()-start<500);
 });
-const html=fs.readFileSync('juego.html','utf8');
+const html=fs.readFileSync(path.join(__dirname,'../juego.html'),'utf8');
 const script=html.slice(html.indexOf('let freeFireLookupController'),html.indexOf('mlPlayerId.addEventListener(',html.indexOf('let freeFireLookupController')));
 function ui(fetch){
  const node=()=>({value:'12345678',textContent:'',disabled:false,style:{},classList:{add(){},remove(){}},addEventListener(t,fn){this[t]=fn}});
