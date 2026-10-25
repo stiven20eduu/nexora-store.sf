@@ -33,7 +33,7 @@ const html=fs.readFileSync(path.join(__dirname,'../juego.html'),'utf8');
 const script=html.slice(html.indexOf('let freeFireLookupController'),html.indexOf('mlPlayerId.addEventListener(',html.indexOf('let freeFireLookupController')));
 function ui(fetch){
  const node=()=>({value:'12345678',textContent:'',disabled:false,style:{},classList:{add(){},remove(){}},addEventListener(t,fn){this[t]=fn}});
- const c={fetch,AbortController,setTimeout,clearTimeout,gameKey:'free-fire',playerId:node(),verifyBtn:node(),verifyMessage:node(),verifiedPlayer:{},freeFireVerificationStatus:'idle',updateSummary(){}};
+ const c={fetch,AbortController,setTimeout,clearTimeout,gameKey:'free-fire',playerId:node(),verifyBtn:node(),verifyMessage:node(),ffManualConfirm:{checked:false,focus(){}},verifiedPlayer:{},freeFireVerificationStatus:'idle',updateSummary(){}};
  vm.createContext(c);vm.runInContext(script,c);return c;
 }
 test('changing ID discards a late successful response',async()=>{
