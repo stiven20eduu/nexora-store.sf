@@ -148,11 +148,10 @@ function publicProviders(uid, signal) {
   // requests. Use a separately operated, documented public nick route first.
   // An unavailable upstream is NEVER proof that an account is invalid.
   return [
-    querySource("bt-nick-sac",
-      "https://hostfreefire-api.squareweb.app/api/nick?id=" + id + "&region=sac",
-      uid, signal),
-    querySource("bt-nick-us",
-      "https://hostfreefire-api.squareweb.app/api/nick?id=" + id + "&region=us",
+    // BT System uses "br" for BR, SAC, US, NA and LATAM.
+    // Using "sac" or "us" here can return 404 even for existing players.
+    querySource("bt-nick-americas",
+      "https://hostfreefire-api.squareweb.app/api/nick?id=" + id + "&region=br",
       uid, signal),
     querySource("bt-nick-auto",
       "https://hostfreefire-api.squareweb.app/api/nick?id=" + id,
