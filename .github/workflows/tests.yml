@@ -1,0 +1,18 @@
+name: Verificar NEXORA
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar dependencias de pruebas
+        run: npm install --prefix tests --ignore-scripts --no-audit --no-fund
+      - name: Probar Free Fire y notificaciones
+        run: npm test --prefix tests
