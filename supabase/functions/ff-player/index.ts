@@ -144,23 +144,24 @@ function configuredProviders(uid, signal) {
 
 function publicProviders(uid, signal) {
   const id = encodeURIComponent(uid);
-  // Several previous providers now return 404 or time out on valid-looking
-  // requests. Use a separately operated, documented public nick route first.
-  // An unavailable upstream is NEVER proof that an account is invalid.
+  // Public third-party integrations are best-effort; an upstream 404 or 408
+  // is NOT proof that the customer's Free Fire account does not exist.
   return [
-    // BT System uses "br" for BR, SAC, US, NA and LATAM.
-    // Using "sac" or "us" here can return 404 even for existing players.
+    // HubsGGx/GetPlayer documents SAC (South America) and nested result.basicInfo.
+    querySource("freefireapis-sac",
+      "https://freefireapis.lat/GetPlayer?uid=" + id + "&region=SAC",
+      uid, signal),
+    // Automatically determines the player's region, per provider docs.
+    querySource("star-info-auto",
+      "https://star-info-api.lovable.app/functions/v1/info-api/accinfo?uid=" + id,
+      uid, signal),
+    // Public FreeFireFWX route documented specifically for profiles by UID.
+    querySource("fwx-info-sac",
+      "https://freefirefwx-beta.squareweb.app/api/info_player?uid=" + id + "&region=sac",
+      uid, signal),
+    // BT System documents "br" for the Americas, including SAC/LATAM.
     querySource("bt-nick-americas",
       "https://hostfreefire-api.squareweb.app/api/nick?id=" + id + "&region=br",
-      uid, signal),
-    querySource("bt-nick-auto",
-      "https://hostfreefire-api.squareweb.app/api/nick?id=" + id,
-      uid, signal),
-    querySource("fwx-nick-auto",
-      "https://freefirefwx-beta.squareweb.app/api/nick?id=" + id,
-      uid, signal),
-    querySource("nftoken-region",
-      "https://api2.nftoken.info/get?uid=" + id + "&region=SAC",
       uid, signal),
   ];
 }
