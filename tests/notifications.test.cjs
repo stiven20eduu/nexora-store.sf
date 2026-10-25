@@ -23,8 +23,8 @@ test('Las recargas pendientes avisan al MVP y las aprobadas/rechazadas al titula
 
 test('El service worker no registra notificaciones push y protege las peticiones privadas',()=>{
  const code=fs.readFileSync(require.resolve('../service-worker.js'),'utf8');
- assert.doesNotMatch(code,/addEventListener\\(\\s*["']push["']/);
- assert.doesNotMatch(code,/addEventListener\\(\\s*["']notificationclick["']/);
- assert.match(code,/request\\.method\\s*!==\\s*"GET"/);
- assert.match(code,/request\\.headers\\.has\\("Authorization"\\)/);
+ assert.doesNotMatch(code,/addEventListener\(\s*["']push["']/);
+ assert.doesNotMatch(code,/addEventListener\(\s*["']notificationclick["']/);
+ assert.match(code,/request\.method\s*!==\s*"GET"/);
+ assert.match(code,/request\.headers\.has\("Authorization"\)/);
 });
