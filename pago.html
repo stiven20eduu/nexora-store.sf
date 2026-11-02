@@ -363,6 +363,7 @@ function readOrder(){
 function validOrder(value){
  return value && typeof value==="object"
   && /^[a-z0-9-]{2,80}$/.test(String(value.gameKey||""))
+  && !["mobile-legends","fc-mobile"].includes(value.gameKey)
   && typeof value.game==="string" && value.game.length>0
   && typeof value.product==="string" && value.product.length>0
   && (["roblox","minecraft"].includes(value.gameKey) || value.idConfirmed===true)
