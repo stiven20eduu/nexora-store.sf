@@ -634,6 +634,75 @@ a{
 }
 
 
+/* Menús desplegables de Free Fire: membresías, cajas y fragmentos */
+.nx-category-collapse{
+  margin:6px 0 13px;
+  border:1px solid #354052;
+  border-radius:13px;
+  background:linear-gradient(135deg,#1c2736,#111821);
+  overflow:hidden;
+}
+.nx-category-collapse .nx-category-toggle{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:58px;
+  margin:0;
+  padding:13px 15px;
+  list-style:none;
+  cursor:pointer;
+  font-size:12px;
+  letter-spacing:.65px;
+  user-select:none;
+}
+.nx-category-collapse .nx-category-toggle::-webkit-details-marker{display:none}
+.nx-category-collapse .nx-category-toggle::after{display:none}
+.nx-category-toggle .nx-category-name{
+  flex:1;
+  min-width:0;
+  color:#f0f3fa;
+}
+.nx-category-hint{
+  color:#f7b659;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:0;
+  white-space:nowrap;
+}
+.nx-category-chevron{
+  flex:0 0 28px;
+  width:28px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(247,182,89,.38);
+  border-radius:50%;
+  color:#f7b659;
+  font-size:21px;
+  line-height:1;
+  transition:transform .2s ease,background .2s ease;
+}
+.nx-category-collapse[open] .nx-category-chevron{
+  transform:rotate(180deg);
+  background:rgba(247,182,89,.11);
+}
+.nx-category-collapse[open] .nx-category-toggle{
+  border-bottom:1px solid rgba(255,255,255,.09);
+}
+.nx-category-collapse .nx-category-toggle:focus-visible{
+  outline:2px solid #f7b659;
+  outline-offset:-3px;
+}
+.nx-category-collapse > .products-grid{
+  padding:13px;
+}
+@media(max-width:420px){
+  .nx-category-collapse .nx-category-toggle{padding:12px 11px;font-size:11px}
+  .nx-category-hint{font-size:10px}
+  .nx-category-collapse > .products-grid{padding:10px}
+}
+
 /* ==========================================================
    PRODUCTOS
 ========================================================== */
@@ -2628,23 +2697,46 @@ function renderProducts(){
     category => {
 
 
-      const categoryTitle =
-        document.createElement(
-          "div"
-        );
+      // Free Fire: diamantes siempre visibles; el resto con desplegables.
+      const isCollapsible =
+        gameKey === "free-fire" &&
+        !category.category.toUpperCase().includes("DIAMANTES");
 
+      const categoryGroup = isCollapsible
+        ? document.createElement("details")
+        : null;
 
-      categoryTitle.className =
-        "category-title";
-
-
-      categoryTitle.textContent =
-        category.category;
-
-
-      productsArea.appendChild(
-        categoryTitle
+      const categoryTitle = document.createElement(
+        isCollapsible ? "summary" : "div"
       );
+
+      categoryTitle.className = isCollapsible
+        ? "category-title nx-category-toggle"
+        : "category-title";
+
+      if (isCollapsible) {
+        categoryGroup.className = "nx-category-collapse";
+
+        const titleText = document.createElement("span");
+        titleText.className = "nx-category-name";
+        titleText.textContent = category.category;
+
+        const hint = document.createElement("span");
+        hint.className = "nx-category-hint";
+        hint.textContent = category.items.length + " opciones";
+
+        const arrow = document.createElement("span");
+        arrow.className = "nx-category-chevron";
+        arrow.textContent = "⌄";
+        arrow.setAttribute("aria-hidden", "true");
+
+        categoryTitle.append(titleText, hint, arrow);
+        categoryGroup.appendChild(categoryTitle);
+        productsArea.appendChild(categoryGroup);
+      } else {
+        categoryTitle.textContent = category.category;
+        productsArea.appendChild(categoryTitle);
+      }
 
 
       const grid =
@@ -2754,9 +2846,7 @@ function renderProducts(){
       );
 
 
-      productsArea.appendChild(
-        grid
-      );
+      (categoryGroup || productsArea).appendChild(grid);
 
     }
   );
