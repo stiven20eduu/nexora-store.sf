@@ -89,7 +89,8 @@ service cloud.firestore {
       return d.keys().hasOnly(['codes','codeHashes','addedAt','addedBy'])
         && d.keys().hasAll(['codes','codeHashes','addedAt','addedBy'])
         && d.codes is list && d.codeHashes is list
-        && d.codes.size() >= 1 && d.codes.size() <= 5
+        && d.codes.size() >= 1
+        && d.codes.size() <= (get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.game == 'Minecraft' ? 1 : 5)
         && d.codeHashes.size() == d.codes.size()
         && d.codeHashes.toSet().size() == d.codeHashes.size()
         && d.codes.toSet().size() == d.codes.size()
