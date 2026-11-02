@@ -381,6 +381,37 @@ export const PRODUCTOS_NEXORA = Object.freeze([
     "priceCents": 36200
   },
   {
+    "id": "minecraft%3A%3A320%20Minecoins",
+    "gameKey": "minecraft",
+    "game": "Minecraft",
+    "product": "320 Minecoins",
+    "priceCents": 2100
+  },
+
+  {
+    "id": "minecraft%3A%3A1720%20Minecoins",
+    "gameKey": "minecraft",
+    "game": "Minecraft",
+    "product": "1720 Minecoins",
+    "priceCents": 4800
+  },
+
+  {
+    "id": "minecraft%3A%3A3500%20Minecoins",
+    "gameKey": "minecraft",
+    "game": "Minecraft",
+    "product": "3500 Minecoins",
+    "priceCents": 8100
+  },
+
+  {
+    "id": "minecraft%3A%3A8800%20Minecoins",
+    "gameKey": "minecraft",
+    "game": "Minecraft",
+    "product": "8800 Minecoins",
+    "priceCents": 23700
+  },
+  {
     "id": "fc-mobile%3A%3A40%20FC%20Points",
     "gameKey": "fc-mobile",
     "game": "FC Mobile",
