@@ -2268,7 +2268,7 @@ const games = {
     badge: "NUEVO · MINECOINS",
     subtitle: "Minecoins · Código digital",
     description: "Minecoins para el Marketplace de Minecraft Bedrock. Comprueba la región y plataforma del código antes de comprar. El MVP entregará tu código privado en Mis compras tras validar el pago.",
-    hero: "hero-minecraft.svg",
+    hero: "https://www.minecraft.net/content/dam/minecraftnet/games/minecraft/key-art/NewKeyArt_Header.jpg",
     giftCode: true,
     products: [
       {
@@ -2531,6 +2531,14 @@ const idResponsibilityCheck = document.getElementById("idResponsibilityCheck");
 /* ==========================================================
    CONFIGURAR JUEGO
 ========================================================== */
+
+if(gameKey === "minecraft"){
+  // Use the official Minecraft art. Keep our vector as an offline fallback.
+  gameHeroImage.addEventListener("error", function fallbackMinecraftHero(){
+    gameHeroImage.removeEventListener("error", fallbackMinecraftHero);
+    gameHeroImage.src = "hero-minecraft.svg";
+  });
+}
 
 gameHeroImage.src =
   game.hero;
