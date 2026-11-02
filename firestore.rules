@@ -61,7 +61,11 @@ service cloud.firestore {
       return isMvp() && request.auth.token.email_verified == true;
     }
     function deliveryPath(uid, orderId) {
-      return /databases/$(database)/documents/users/$(uid)/orders/$(orderId)/privateDelivery/roblox;
+      // Roblox conserva su ruta existente. Minecraft utiliza otro documento privado.
+      let game = get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.game;
+      return game == 'Minecraft'
+        ? /databases/$(database)/documents/users/$(uid)/orders/$(orderId)/privateDelivery/minecraft
+        : /databases/$(database)/documents/users/$(uid)/orders/$(orderId)/privateDelivery/roblox;
     }
     function codeClaimPath(fingerprint) {
       return /databases/$(database)/documents/robloxCodeClaims/$(fingerprint);
@@ -322,7 +326,7 @@ service cloud.firestore {
         && request.resource.data.createdAt == request.time)
         || validWalletOrder(uid, orderId);
 
-      // Cambios habituales: nunca permitir completar Roblox sin código.
+      // Roblox y Minecraft no pueden completarse sin registrar su código privado.
       // Se exige que el pedido esté activo para evitar reabrir entregas pasadas.
       allow update: if isVerifiedMvp()
         && resource.data.status in ['pending', 'verified', 'processing']
@@ -332,13 +336,13 @@ service cloud.firestore {
             && request.resource.data.status in [
               'pending', 'processing', 'verified', 'completed', 'cancelled'
             ]
-            && !(resource.data.game == 'Roblox'
+            && !(resource.data.game in ['Roblox', 'Minecraft']
               && request.resource.data.status == 'completed')
           )
           ||
           (
             // Sin secretos en los listados de pedidos; solo metadatos.
-            resource.data.game == 'Roblox'
+            resource.data.game in ['Roblox', 'Minecraft']
             && resource.data.status in ['verified', 'processing']
             && request.resource.data.status == 'completed'
             && !resource.data.keys().hasAny(['redemptionCode', 'redemptionAddedAt', 'redemptionAddedBy'])
@@ -367,9 +371,9 @@ service cloud.firestore {
       // Código privado: visible al comprador y a administradores verificados.
       // Bloquea listados, escrituras de clientes y cambios tras la entrega.
       match /privateDelivery/{deliveryId} {
-        allow get: if deliveryId == 'roblox' && (owner(uid) || isVerifiedMvp());
+        allow get: if deliveryId in ['roblox', 'minecraft'] && (owner(uid) || isVerifiedMvp());
         allow list: if false;
-        allow create: if deliveryId == 'roblox'
+        allow create: if deliveryId == (get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.game == 'Minecraft' ? 'minecraft' : 'roblox')
           && isVerifiedMvp()
           && request.resource.data.keys().hasOnly(['code', 'codeHash', 'addedAt', 'addedBy'])
           && request.resource.data.keys().hasAll(['code', 'codeHash', 'addedAt', 'addedBy'])
@@ -384,15 +388,15 @@ service cloud.firestore {
           && getAfter(codeClaimPath(request.resource.data.codeHash)).data.addedBy == request.auth.uid
           && request.resource.data.addedAt == request.time
           && request.resource.data.addedBy == request.auth.uid
-          && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.game == 'Roblox'
+          && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.game in ['Roblox', 'Minecraft']
           && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.status in ['verified', 'processing']
           && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.status == 'completed'
           && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.redemptionAddedAt == request.time
           && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.redemptionAddedBy == request.auth.uid;
-        allow create: if deliveryId == 'roblox'
+        allow create: if deliveryId == (get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.game == 'Minecraft' ? 'minecraft' : 'roblox')
           && isVerifiedMvp()
           && validMultiDelivery(uid, orderId)
-          && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.game == 'Roblox'
+          && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.game in ['Roblox', 'Minecraft']
           && get(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.status in ['verified','processing']
           && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.status == 'completed'
           && getAfter(/databases/$(database)/documents/users/$(uid)/orders/$(orderId)).data.redemptionAddedAt == request.time
@@ -401,7 +405,7 @@ service cloud.firestore {
       }
     }
 
-    // Registro global de uso. Contiene solo la huella SHA-256 del código;
+    // Registro global compartido para Roblox y Minecraft. Solo huellas SHA-256;
     // sin códigos en claro, ni lectura/listado público, ni reescritura.
     match /robloxCodeClaims/{codeHash} {
       allow get: if isVerifiedMvp();
@@ -416,7 +420,7 @@ service cloud.firestore {
         && request.resource.data.orderId.size() > 0
         && request.resource.data.addedAt == request.time
         && request.resource.data.addedBy == request.auth.uid
-        && get(/databases/$(database)/documents/users/$(request.resource.data.uid)/orders/$(request.resource.data.orderId)).data.game == 'Roblox'
+        && get(/databases/$(database)/documents/users/$(request.resource.data.uid)/orders/$(request.resource.data.orderId)).data.game in ['Roblox', 'Minecraft']
         && get(/databases/$(database)/documents/users/$(request.resource.data.uid)/orders/$(request.resource.data.orderId)).data.status in ['verified', 'processing']
         && getAfter(/databases/$(database)/documents/users/$(request.resource.data.uid)/orders/$(request.resource.data.orderId)).data.status == 'completed'
         && !exists(deliveryPath(request.resource.data.uid, request.resource.data.orderId))
