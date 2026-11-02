@@ -1412,6 +1412,7 @@ a{
 <link rel="stylesheet" href="nexora-shop-ambience.css?v=1">
 <link rel="stylesheet" href="nexora-buy-flow.css?v=1">
 <link rel="stylesheet" href="nexora-mobile.css?v=2">
+<link rel="stylesheet" href="nexora-game-header.css?v=20261102-1">
 </head>
 
 
@@ -1458,25 +1459,27 @@ a{
     </a>
 
 
+    <a class="nx-install-nav" id="downloadAppNavBtn" href="install.html" aria-label="Descargar o instalar NEXORA STORE">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3v12m0 0 4-4m-4 4-4-4"/>
+        <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
+      </svg>
+      <span>Descargar App</span>
+    </a>
+
     <div class="nav-actions">
 
-      <button class="country">
+      <button class="country" type="button">
         🇵🇪 Perú
       </button>
 
-      <a
-        class="login"
-        href="login.html"
-      >
-        Ingresar
+      <a class="wallet-chip" id="walletChip" href="perfil.html#saldo" hidden aria-label="Ver mi saldo NEXORA">
+        <span class="wallet-chip-icon" aria-hidden="true">▣</span>
+        <span><span class="wallet-chip-label">Mi saldo</span><strong id="walletChipAmount" aria-live="polite">Cargando…</strong></span>
       </a>
 
-      <a
-        class="register"
-        href="register.html"
-      >
-        Crear cuenta
-      </a>
+      <a class="login" href="login.html" hidden>Ingresar</a>
+      <a class="register" href="register.html" hidden>Crear cuenta</a>
 
     </div>
 
@@ -3090,6 +3093,7 @@ document.title =
 </script>
 
 
+<script type="module" src="nexora-game-header.js?v=20261102-1"></script>
 <script type="module" src="notifications.js"></script>
 </body>
 </html>
