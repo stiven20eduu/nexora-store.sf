@@ -10,10 +10,8 @@ body[data-nexora-page="checkout"]{
 }
 body[data-game-theme="free-fire"]{--nx-shop-primary:255,164,65;--nx-shop-secondary:215,101,56}
 body[data-game-theme="blood-strike"]{--nx-shop-primary:244,81,105;--nx-shop-secondary:66,130,208}
-body[data-game-theme="mobile-legends"]{--nx-shop-primary:159,112,244;--nx-shop-secondary:58,156,238}
 body[data-game-theme="roblox"]{--nx-shop-primary:76,156,249;--nx-shop-secondary:63,202,212}
 body[data-game-theme="minecraft"]{--nx-shop-primary:113,204,102;--nx-shop-secondary:203,155,59}
-body[data-game-theme="fc-mobile"]{--nx-shop-primary:84,198,145;--nx-shop-secondary:237,181,81}
 
 /* Capa decorativa siempre detrás del contenido. */
 .nx-shop-ambience{
