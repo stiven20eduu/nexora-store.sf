@@ -1,13 +1,17 @@
 /* NEXORA · entrega de códigos Roblox.
    El código solo llega al pedido privado del comprador una vez completado. */
 export const isRobloxOrder = order => order?.game === "Roblox" || order?.gameKey === "roblox";
+export const isMinecraftOrder = order => order?.game === "Minecraft" || order?.gameKey === "minecraft";
+export const isCodeDeliveryOrder = order => isRobloxOrder(order) || isMinecraftOrder(order);
+export const codeDeliveryDocumentId = order => isMinecraftOrder(order) ? "minecraft" : "roblox";
+export const codeDeliveryName = order => isMinecraftOrder(order) ? "Minecraft" : "Roblox";
 export const validRobloxCode = value => /^[A-Za-z0-9][A-Za-z0-9-]{7,79}$/.test(String(value || "").trim());
 
 // Deterministic fingerprint: no redemption code is exposed by the unique index.
 // Case-insensitive to stop the same code being reused with different capitalization.
 export async function fingerprintRobloxCode(value) {
   const code=String(value||"").trim();
-  if(!validRobloxCode(code))throw new Error("Código Roblox inválido.");
+  if(!validRobloxCode(code))throw new Error("Código digital inválido.");
   if(!globalThis.crypto?.subtle)throw new Error("No se puede comprobar la seguridad del código en este navegador.");
   const input=new TextEncoder().encode(code.toUpperCase());
   const digest=await globalThis.crypto.subtle.digest("SHA-256",input);
@@ -17,9 +21,9 @@ export async function fingerprintRobloxCode(value) {
 export const MAX_ROBLOX_CODES = 5;
 
 // Evita duplicados dentro del pedido, incluso si cambian mayúsculas/minúsculas.
-export function normalizeRobloxCodes(values) {
+export function normalizeRobloxCodes(values,gameName="Roblox") {
   if (!Array.isArray(values) || values.length < 1 || values.length > MAX_ROBLOX_CODES)
-    throw new Error("Ingresa entre 1 y " + MAX_ROBLOX_CODES + " códigos de Roblox.");
+    throw new Error("Ingresa entre 1 y " + MAX_ROBLOX_CODES + " códigos de " + gameName + ".");
   const codes = values.map(value => String(value || "").trim());
   if (codes.some(code => !validRobloxCode(code)))
     throw new Error("Cada código debe tener entre 8 y 80 caracteres: letras, números o guiones.");
@@ -29,6 +33,7 @@ export function normalizeRobloxCodes(values) {
 }
 
 export function askRobloxCodes(order) {
+  const gameName=codeDeliveryName(order);
   return new Promise(resolve => {
     let finished = false;
     const values = [{code:"",visible:false}];
@@ -38,13 +43,13 @@ export function askRobloxCodes(order) {
     const dialog = document.createElement("section");
     dialog.setAttribute("role","dialog");
     dialog.setAttribute("aria-modal","true");
-    dialog.setAttribute("aria-label","Entregar códigos Roblox");
+    dialog.setAttribute("aria-label","Entregar códigos de "+gameName);
     dialog.style.cssText = "width:min(100%,520px);max-height:90vh;overflow:auto;border:1px solid #c08a4a;border-radius:20px;padding:25px;background:#121c2b;color:#f7f8fc;box-shadow:0 25px 85px #0009;font:14px Arial,sans-serif;";
     const title=document.createElement("h2");
-    title.textContent="Entregar códigos de Roblox";
+    title.textContent="Entregar códigos de "+gameName;
     title.style.cssText="margin:0 0 10px;font-size:24px;color:#ffc275";
     const info=document.createElement("p");
-    info.textContent=(order?.product||"Pedido Roblox")+" · Cliente: "+(order?.customer||order?.id||"NEXORA");
+    info.textContent=(order?.product||"Pedido "+gameName)+" · Cliente: "+(order?.customer||order?.id||"NEXORA");
     info.style.cssText="color:#c0cede;line-height:1.5";
     const note=document.createElement("p");
     note.textContent="Agrega los códigos necesarios para este pedido (máximo "+MAX_ROBLOX_CODES+"). Solo el comprador podrá verlos cuando marques el pedido como completado.";
@@ -120,7 +125,7 @@ export function askRobloxCodes(order) {
     cancel.addEventListener("click",()=>finish(null));
     form.addEventListener("submit",event=>{
       event.preventDefault();
-      try{finish(normalizeRobloxCodes(values.map(item=>item.code)));}
+      try{finish(normalizeRobloxCodes(values.map(item=>item.code),gameName));}
       catch(e){error.textContent=e.message;entries.querySelector("input")?.focus();}
     });
     buttons.append(cancel,submit);
@@ -133,18 +138,20 @@ export function askRobloxCodes(order) {
 }
 
 export function renderRobloxDelivery(order) {
-  if (!isRobloxOrder(order) || order?.status !== "completed") return null;
+  if (!isCodeDeliveryOrder(order) || order?.status !== "completed") return null;
+  const minecraft=isMinecraftOrder(order);
+  const gameName=codeDeliveryName(order);
   const section=document.createElement("section");
   section.style.cssText="margin:16px 0 8px;padding:18px;border:1px solid rgba(90,220,165,.4);border-radius:14px;background:linear-gradient(135deg,#122b29,#111e2b);";
   const heading=document.createElement("h4");
-  heading.textContent="🎁 Tus códigos de Roblox";
+  heading.textContent="🎁 Tus códigos de "+gameName;
   heading.style.cssText="font-size:17px;margin:0 0 11px;color:#aeffda;";
   section.append(heading);
   if(order?.redemptionLoading || order?.redemptionError) {
     const message=document.createElement("p");
     message.textContent=order.redemptionError
       ?"No se pudieron cargar los códigos privados. Actualiza la página o contacta con soporte."
-      :"Cargando tus códigos privados de Roblox…";
+      :("Cargando tus códigos privados de "+gameName+"…");
     message.style.cssText="line-height:1.65;color:#cbdacf";
     section.append(message);return section;
   }
@@ -197,14 +204,18 @@ export function renderRobloxDelivery(order) {
   });
   const list=document.createElement("ol");
   list.style.cssText="margin:13px 0 4px;padding-left:23px;color:#dbe9e7;line-height:1.75;font-size:13px";
-  for(const instruction of [
+  for(const instruction of (minecraft ? [
+    "Abre minecraft.net/redeem e inicia sesión con la cuenta Microsoft que utilizarás.",
+    "Selecciona el canje de Minecoins e introduce el código privado.",
+    "Confirma el canje en una versión o plataforma compatible. Comprueba la región y condiciones del código."
+  ] : [
     "Abre la página oficial de Roblox para canjear e inicia sesión.",
     "Introduce cada código por separado en la página de canje.",
     "Pulsa Canjear y sigue las indicaciones. Los códigos de crédito se convierten en saldo para comprar Robux."
-  ]){const li=document.createElement("li");li.textContent=instruction;list.append(li);}
+  ])){const li=document.createElement("li");li.textContent=instruction;list.append(li);}
   const link=document.createElement("a");
-  link.href="https://www.roblox.com/redeem";link.target="_blank";link.rel="noopener noreferrer";
-  link.textContent="Abrir página oficial de canje Roblox ↗";
+  link.href=minecraft?"https://www.minecraft.net/redeem":"https://www.roblox.com/redeem";link.target="_blank";link.rel="noopener noreferrer";
+  link.textContent="Abrir página oficial de canje "+gameName+" ↗";
   link.style.cssText="display:inline-block;margin-top:13px;color:#ffd18e;text-decoration:underline;font-weight:800;font-size:13px";
   section.append(list,link);return section;
 }
