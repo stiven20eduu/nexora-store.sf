@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-label="Minecraft Minecoins">
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#0c251d"/><stop offset=".6" stop-color="#153c30"/><stop offset="1" stop-color="#081a25"/></linearGradient><linearGradient id="grass" x2=".4" y2="1"><stop stop-color="#72c76a"/><stop offset="1" stop-color="#37713b"/></linearGradient><linearGradient id="gold" x2=".8" y2="1"><stop stop-color="#ffe57d"/><stop offset=".45" stop-color="#e5ab2b"/><stop offset="1" stop-color="#aa6f18"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="25"/></filter></defs>
+<rect width="1200" height="720" fill="url(#bg)"/>
+<circle cx="945" cy="170" r="190" fill="#f4c44b" opacity=".13" filter="url(#glow)"/>
+<g opacity=".35" fill="#2c694a"><rect x="0" y="455" width="140" height="70"/><rect x="140" y="390" width="125" height="135"/><rect x="940" y="380" width="135" height="140"/><rect x="1080" y="320" width="120" height="200"/></g>
+<g><path d="M0 500h250v-75h130v75h160v-65h240v65h160v-75h260v295H0Z" fill="#493a2b"/><path d="M0 475h250v-75h130v75h160v-65h240v65h160v-75h260v70H0Z" fill="url(#grass)"/><path d="M0 565h120v80H0zm260 30h95v80h-95zm470-35h110v95H730zm380 15h90v90h-90Z" fill="#675039" opacity=".6"/></g>
+<g transform="translate(650 125)">
+ <g stroke="#a47722" stroke-width="8">
+  <ellipse cx="65" cy="305" rx="130" ry="40" fill="#ad7828"/><ellipse cx="65" cy="283" rx="130" ry="40" fill="url(#gold)"/>
+  <ellipse cx="300" cy="340" rx="125" ry="38" fill="#95601f"/><ellipse cx="300" cy="316" rx="125" ry="38" fill="url(#gold)"/>
+  <ellipse cx="240" cy="220" rx="132" ry="42" fill="#b5791e"/><ellipse cx="240" cy="197" rx="132" ry="42" fill="url(#gold)"/>
+ </g>
+ <g fill="#a76d20" stroke="#ffe6a1" stroke-width="9"><circle cx="65" cy="220" r="95" fill="url(#gold)"/><circle cx="280" cy="145" r="85" fill="url(#gold)"/><circle cx="390" cy="256" r="72" fill="url(#gold)"/></g>
+ <g fill="#62430f" font-family="sans-serif" font-weight="900" text-anchor="middle"><text x="65" y="246" font-size="95">M</text><text x="280" y="169" font-size="88">M</text><text x="390" y="278" font-size="72">M</text></g>
+</g>
+<path d="M38 37h425l-30 10H48v58H38Z" fill="#eec65c" opacity=".85"/>
+<text x="55" y="131" fill="#fff9e4" font-family="Arial,sans-serif" font-weight="900" font-size="78" letter-spacing="8">MINECOINS</text>
+<text x="58" y="187" fill="#bbdfbe" font-family="Arial,sans-serif" font-weight="700" font-size="31" letter-spacing="4">MINECRAFT · CÓDIGOS DIGITALES</text>
+</svg>
