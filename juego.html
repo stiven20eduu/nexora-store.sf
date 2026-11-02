@@ -547,6 +547,41 @@ a{
     var(--orange);
 }
 
+
+/* Confirmación de la cuenta de destino */
+.id-responsibility{
+  margin-top:14px;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid rgba(245,166,35,.42);
+  background:rgba(245,166,35,.065);
+}
+.id-responsibility[hidden]{display:none}
+.id-responsibility-label{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  color:#e8edf5;
+  font-size:13px;
+  line-height:1.58;
+  cursor:pointer;
+}
+.id-responsibility-label input{
+  flex:0 0 20px;
+  width:20px;
+  height:20px;
+  margin:2px 0 0;
+  accent-color:var(--orange);
+  cursor:pointer;
+}
+.id-responsibility-label strong{color:#fff}
+.id-responsibility-help{
+  margin:9px 0 0 32px;
+  font-size:12px;
+  color:#f6c271;
+  line-height:1.5;
+}
+
 /* ==========================================================
    SERVER ID
 ========================================================== */
@@ -1659,6 +1694,22 @@ a{
 
 
 
+
+          <!-- Confirmación personal obligatoria antes de pasar al pago -->
+          <div id="idResponsibilityBox" class="id-responsibility" hidden>
+            <label class="id-responsibility-label" for="idResponsibilityCheck">
+              <input type="checkbox" id="idResponsibilityCheck" autocomplete="off">
+              <span>
+                <strong>Confirmo que he revisado mi ID y, si corresponde, mi Server ID.</strong>
+                Acepto la responsabilidad de escribirlos correctamente. Si por mi error
+                la recarga se entrega a otra cuenta, entiendo que no podré exigir
+                una segunda recarga gratuita una vez procesada la operación.
+                Esto no afecta mis derechos ante errores de NEXORA STORE.
+              </span>
+            </label>
+            <p class="id-responsibility-help">Marca la casilla para poder continuar con tu compra.</p>
+          </div>
+
         </div>
 
       </section>
@@ -2377,6 +2428,9 @@ const mlServerId =
     "mlServerId"
   );
 
+const idResponsibilityBox = document.getElementById("idResponsibilityBox");
+const idResponsibilityCheck = document.getElementById("idResponsibilityCheck");
+
 
 
 /* ==========================================================
@@ -2468,6 +2522,8 @@ if(game.mobileLegends){
 
 let selectedProduct =
   null;
+
+let lastIdSignature = "";
 
 
 
@@ -2767,18 +2823,52 @@ function selectProduct(
     `S/ ${price.toFixed(2)}`;
 
 
-  continueBtn.disabled =
-    false;
-
-
-  continueBtn.textContent =
-    "Revisar pedido y pago →";
-
-
   updateSummary();
 
 }
 
+
+
+function currentIdSignature(){
+  return game.mobileLegends
+    ? mlPlayerId.value.trim() + "::" + mlServerId.value.trim()
+    : playerId.value.trim();
+}
+
+function idFieldsComplete(){
+  if(game.roblox) return true;
+  if(game.mobileLegends) return Boolean(mlPlayerId.value.trim() && mlServerId.value.trim());
+  return Boolean(playerId.value.trim());
+}
+
+function updatePurchaseGate(){
+  if(game.roblox){
+    idResponsibilityBox.hidden = true;
+    continueBtn.disabled = !selectedProduct;
+    continueBtn.textContent = selectedProduct ? "Revisar pedido y pago →" : "Selecciona un paquete";
+    return;
+  }
+
+  const signature = currentIdSignature();
+  if(signature !== lastIdSignature){
+    idResponsibilityCheck.checked = false;
+    lastIdSignature = signature;
+  }
+
+  const hasId = idFieldsComplete();
+  idResponsibilityBox.hidden = !hasId;
+  if(!hasId) idResponsibilityCheck.checked = false;
+
+  const confirmed = hasId && idResponsibilityCheck.checked;
+  continueBtn.disabled = !selectedProduct || !confirmed;
+  continueBtn.textContent = !selectedProduct
+    ? "Selecciona un paquete"
+    : !hasId
+      ? (game.mobileLegends ? "Ingresa ID y Server ID" : "Ingresa tu ID")
+      : !confirmed
+        ? "Marca la confirmación del ID"
+        : "Revisar pedido y pago →";
+}
 
 /* ==========================================================
    ACTUALIZAR RESUMEN
@@ -2813,6 +2903,7 @@ function updateSummary(){
 
   }
 
+  updatePurchaseGate();
 }
 
 
@@ -2831,6 +2922,8 @@ mlServerId.addEventListener(
   "input",
   updateSummary
 );
+
+idResponsibilityCheck.addEventListener("change", updatePurchaseGate);
 
 
 /* ==========================================================
@@ -2905,7 +2998,16 @@ continueBtn.addEventListener(
     }
 
 
+    // Prohibir continuar sin confirmar los datos del jugador.
+    if(!game.roblox && (!idFieldsComplete() || !idResponsibilityCheck.checked)){
+      alert("Revisa tu ID y marca la casilla de confirmación antes de continuar.");
+      idResponsibilityCheck.focus();
+      return;
+    }
+
     const order = {
+
+      idConfirmed: game.roblox || idResponsibilityCheck.checked,
 
       gameKey:
         gameKey,
