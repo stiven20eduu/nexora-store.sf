@@ -2261,6 +2261,29 @@ const games = {
   },
 
 
+
+  "minecraft": {
+
+    title: "Minecraft",
+    badge: "NUEVO · MINECOINS",
+    subtitle: "Minecoins · Código digital",
+    description: "Compra Minecoins mediante código de canje. El MVP entrega tu código privado en Mis compras después de confirmar el pago.",
+    hero: "hero-minecraft.svg",
+    giftCode: true,
+    products: [
+      {
+        category: "MINECOINS · CÓDIGOS DIGITALES",
+        items: [
+          ["320 Minecoins",21.00],
+          ["1720 Minecoins",48.00],
+          ["3500 Minecoins",81.00],
+          ["8800 Minecoins",237.00]
+        ]
+      }
+    ]
+
+  },
+
   "fc-mobile": {
 
     title:
@@ -2568,6 +2591,22 @@ if(game.roblox){
 
 
 /* ==========================================================
+   MINECRAFT: CÓDIGOS SIN ID DE JUGADOR
+========================================================== */
+
+if(game.giftCode){
+  playerBox.style.display = "none";
+  summaryIdRow.style.display = "none";
+  robloxGuide.classList.add("show");
+  robloxGuide.querySelector(".guide-title").textContent = "Cómo canjear tu código de Minecraft";
+  robloxGuide.querySelector(".guide-text").textContent = "Después de recibir tu código privado en Mis compras, sigue estos pasos:";
+  const steps=robloxGuide.querySelectorAll(".guide-step span");
+  ["Ingresa a minecraft.net/redeem", "Inicia sesión con tu cuenta Microsoft", "Pega tu código de Minecoins", "Confirma el canje en la plataforma compatible"].forEach((text,i)=>{
+    if(steps[i])steps[i].textContent=text;
+  });
+}
+
+/* ==========================================================
    MOBILE LEGENDS
 ========================================================== */
 
@@ -2667,6 +2706,10 @@ function getProductImage(categoryName, productName){
 
   if(gameKey === "roblox"){
     return "icon-robux.png";
+  }
+
+  if(gameKey === "minecraft"){
+    return "icon-minecoins.svg";
   }
 
 
@@ -2929,13 +2972,13 @@ function currentIdSignature(){
 }
 
 function idFieldsComplete(){
-  if(game.roblox) return true;
+  if(game.roblox || game.giftCode) return true;
   if(game.mobileLegends) return Boolean(mlPlayerId.value.trim() && mlServerId.value.trim());
   return Boolean(playerId.value.trim());
 }
 
 function updatePurchaseGate(){
-  if(game.roblox){
+  if(game.roblox || game.giftCode){
     idResponsibilityBox.hidden = true;
     continueBtn.disabled = !selectedProduct;
     continueBtn.textContent = selectedProduct ? "Revisar pedido y pago →" : "Selecciona un paquete";
@@ -2986,7 +3029,7 @@ function updateSummary(){
 
   else
   if(
-    !game.roblox
+    !game.roblox && !game.giftCode
   ){
 
     summaryId.textContent =
@@ -3066,7 +3109,7 @@ continueBtn.addEventListener(
 
     }
     else
-    if(!game.roblox){
+    if(!game.roblox && !game.giftCode){
 
       orderPlayerId =
         playerId.value.trim();
@@ -3092,7 +3135,7 @@ continueBtn.addEventListener(
 
 
     // Prohibir continuar sin confirmar los datos del jugador.
-    if(!game.roblox && (!idFieldsComplete() || !idResponsibilityCheck.checked)){
+    if(!game.roblox && !game.giftCode && (!idFieldsComplete() || !idResponsibilityCheck.checked)){
       alert("Revisa tu ID y marca la casilla de confirmación antes de continuar.");
       idResponsibilityCheck.focus();
       return;
@@ -3100,7 +3143,7 @@ continueBtn.addEventListener(
 
     const order = {
 
-      idConfirmed: game.roblox || idResponsibilityCheck.checked,
+      idConfirmed: game.roblox || game.giftCode || idResponsibilityCheck.checked,
 
       gameKey:
         gameKey,
