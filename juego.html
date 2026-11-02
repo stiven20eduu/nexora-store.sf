@@ -2599,6 +2599,10 @@ if(game.giftCode){
   summaryIdRow.style.display = "none";
   robloxGuide.classList.add("show");
   robloxGuide.querySelector(".guide-title").textContent = "Cómo canjear tu código de Minecraft";
+  const route=document.querySelectorAll(".nx-buy-steps li strong");
+  if(route[0])route[0].textContent="Elige tus Minecoins";
+  if(route[1])route[1].textContent="Comprueba el total";
+  if(route[2])route[2].textContent="Paga y recibe el código";
   robloxGuide.querySelector(".guide-text").textContent = "Después de recibir tu código privado en Mis compras, sigue estos pasos:";
   const steps=robloxGuide.querySelectorAll(".guide-step span");
   ["Ingresa a minecraft.net/redeem", "Inicia sesión con tu cuenta Microsoft", "Pega tu código de Minecoins", "Confirma el canje en la plataforma compatible"].forEach((text,i)=>{
