@@ -2387,6 +2387,68 @@ body[data-nexora-page="home"] .nx-gaming-light-trace--blue {
     will-change: auto;
   }
 }
+/* Acceso visible y funcional a la instalación PWA de NEXORA */
+.nx-install-nav{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  flex:0 0 auto;min-height:42px;padding:9px 14px;
+  border:1px solid rgba(48,212,234,.53);border-radius:999px;
+  background:linear-gradient(135deg,rgba(3,170,199,.13),rgba(8,14,23,.94));
+  color:#85efff;font-size:12px;font-weight:900;letter-spacing:.1px;
+  text-decoration:none;white-space:nowrap;
+  box-shadow:inset 0 0 0 1px rgba(48,212,234,.05),0 0 20px rgba(6,178,216,.07);
+  transition:background .2s ease,border-color .2s ease,transform .2s ease;
+}
+.nx-install-nav svg{width:18px;height:18px;flex:0 0 18px}
+.nx-install-nav:hover,.nx-install-nav:focus-visible{
+  background:rgba(20,201,228,.16);border-color:#59e8fa;color:#cbfaff;
+  transform:translateY(-1px);
+}
+.nx-install-nav:focus-visible{outline:2px solid #7cecff;outline-offset:3px}
+@media(max-width:760px){
+  body[data-nexora-page="home"] header.navbar{
+    height:auto;min-height:101px;
+  }
+  body[data-nexora-page="home"] header.navbar .nav-inner{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-areas:"brand download" "account account";
+    align-items:center;column-gap:8px;row-gap:5px;
+    height:auto;min-height:101px;padding:7px 0 8px;
+  }
+  body[data-nexora-page="home"] header.navbar .brand{
+    grid-area:brand;min-width:0;gap:8px;
+  }
+  body[data-nexora-page="home"] header.navbar .brand-text{display:block;min-width:0}
+  body[data-nexora-page="home"] header.navbar .brand-name{
+    font-size:12px;line-height:1.2;white-space:nowrap;
+  }
+  body[data-nexora-page="home"] header.navbar .brand-sub{
+    margin-top:2px;font-size:8px;letter-spacing:.4px;white-space:nowrap;
+  }
+  body[data-nexora-page="home"] header.navbar .nav-menu{display:none}
+  body[data-nexora-page="home"] header.navbar .nx-install-nav{
+    grid-area:download;justify-self:end;min-height:39px;
+    padding:8px 11px;font-size:12px;
+  }
+  body[data-nexora-page="home"] header.navbar .nav-actions{
+    grid-area:account;justify-self:end;justify-content:flex-end;
+    width:100%;min-width:0;gap:6px;
+  }
+  body[data-nexora-page="home"] header.navbar .nav-actions .service-status,
+  body[data-nexora-page="home"] header.navbar .nav-actions .country{
+    display:none;
+  }
+  body[data-nexora-page="home"] header.navbar .nav-actions :is(.login,.register){
+    min-height:34px;padding:6px 10px;
+  }
+}
+@media(max-width:350px){
+  body[data-nexora-page="home"] header.navbar .brand-name{font-size:11px}
+  body[data-nexora-page="home"] header.navbar .brand-sub{font-size:7px}
+  body[data-nexora-page="home"] header.navbar .nx-install-nav{
+    padding:8px 9px;font-size:11px;gap:5px;
+  }
+}
 </style>
 <link rel="stylesheet" href="nexora-mobile.css?v=2">
 </head>
@@ -2443,6 +2505,14 @@ body[data-nexora-page="home"] .nx-gaming-light-trace--blue {
       <a href="#como-comprar">Cómo comprar</a>
       <a href="soporte.html">Soporte</a>
     </nav>
+
+    <a class="nx-install-nav" id="downloadAppNavBtn" href="install.html" aria-label="Descargar o instalar la aplicación NEXORA STORE">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3v12m0 0 4-4m-4 4-4-4"/>
+        <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
+      </svg>
+      <span>Descargar App</span>
+    </a>
 
     <div class="nav-actions">
 
@@ -4101,6 +4171,7 @@ let deferredInstallPrompt = null;
 const installCard = document.getElementById("installCard");
 const installAppBtn = document.getElementById("installAppBtn");
 const installHelp = document.getElementById("installHelp");
+const downloadAppNavBtn = document.getElementById("downloadAppNavBtn");
 
 function isIosDevice(){
   return /iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -4148,23 +4219,32 @@ window.addEventListener("beforeinstallprompt", event => {
   updateInstallUi();
 });
 
+async function requestNexoraInstall(){
+  const prompt = deferredInstallPrompt;
+  if(!prompt){
+    window.location.assign("install.html");
+    return;
+  }
+  deferredInstallPrompt = null;
+  try{
+    await prompt.prompt();
+    await prompt.userChoice;
+  }catch(error){
+    console.info("La instalación no se completó o fue cancelada.");
+  }
+  updateInstallUi();
+}
+
 if(installAppBtn){
-  installAppBtn.addEventListener("click", async () => {
-    if(!deferredInstallPrompt){
-      updateInstallUi();
-      return;
-    }
+  installAppBtn.addEventListener("click", requestNexoraInstall);
+}
 
-    deferredInstallPrompt.prompt();
-
-    try{
-      await deferredInstallPrompt.userChoice;
-    }catch(error){
-      console.log("Instalación cancelada o no disponible.");
-    }
-
-    deferredInstallPrompt = null;
-    updateInstallUi();
+if(downloadAppNavBtn){
+  downloadAppNavBtn.addEventListener("click", event => {
+    // Sin prompt disponible, el enlace abre las instrucciones de instalación.
+    if(!deferredInstallPrompt) return;
+    event.preventDefault();
+    requestNexoraInstall();
   });
 }
 
