@@ -547,51 +547,6 @@ a{
     var(--orange);
 }
 
-.verify-btn{
-  padding:
-    0 18px;
-
-  border:
-    0;
-
-  border-radius:9px;
-
-  background:
-    var(--orange);
-
-  color:#111;
-
-  font-size:11px;
-
-  font-weight:900;
-}
-
-.verify-btn:hover{
-  background:
-    var(--orange2);
-}
-
-.verify-btn:disabled{
-  opacity:.62;
-  cursor:wait;
-}
-
-.verify-message{
-  display:none;
-
-  margin-top:8px;
-
-  color:
-    var(--green);
-
-  font-size:11px;
-}
-
-.verify-message.show{
-  display:block;
-}
-
-
 /* ==========================================================
    SERVER ID
 ========================================================== */
@@ -1297,10 +1252,6 @@ a{
       column;
   }
 
-  .verify-btn{
-    height:42px;
-  }
-
   .products-grid{
     grid-template-columns:
       1fr;
@@ -1667,13 +1618,6 @@ a{
             </div>
 
 
-            <button
-              class="verify-btn"
-              id="verifyBtn"
-            >
-              Verificar ID
-            </button>
-
           </div>
 
 
@@ -1713,23 +1657,6 @@ a{
           </div>
 
 
-          <div
-            class="verify-message"
-            id="verifyMessage"
-          >
-            ✓ Datos ingresados correctamente.
-          </div>
-          <div id="ffManualConfirmBox" hidden
-            style="margin-top:14px;padding:14px;border-radius:12px;border:1px solid rgba(242,173,82,.35);background:rgba(242,173,82,.07);color:#f7dfb8;">
-            <label for="ffManualConfirm" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:13px;line-height:1.5;">
-              <input id="ffManualConfirm" type="checkbox"
-                style="margin-top:2px;width:18px;height:18px;flex-shrink:0;accent-color:#f6b65b;">
-              <span><strong>Confirmo mi ID de Free Fire.</strong>
-                Lo copié desde el perfil del juego y comprobé que pertenece a la cuenta que recibirá la recarga.
-                Si el lector automático falla, NEXORA recibirá el pedido con el nombre <strong>sin verificar</strong>.
-              </span>
-            </label>
-          </div>
 
 
         </div>
@@ -2450,15 +2377,6 @@ const mlServerId =
     "mlServerId"
   );
 
-const verifyBtn =
-  document.getElementById(
-    "verifyBtn"
-  );
-
-const verifyMessage =
-  document.getElementById(
-    "verifyMessage"
-  );
 
 
 /* ==========================================================
@@ -2551,18 +2469,6 @@ if(game.mobileLegends){
 let selectedProduct =
   null;
 
-let verifiedPlayer = {
-  id:"",
-  nickname:"",
-  region:""
-};
-
-let freeFireVerificationStatus =
-  "idle";
-
-const ffManualConfirmBox = document.getElementById("ffManualConfirmBox");
-const ffManualConfirm = document.getElementById("ffManualConfirm");
-if (gameKey === "free-fire") ffManualConfirmBox.hidden = false;
 
 
 
@@ -2911,224 +2817,10 @@ function updateSummary(){
 
 
 /* ==========================================================
-   VERIFICAR ID
-========================================================== */
-
-let freeFireLookupController = null;
-let freeFireLookupVersion = 0;
-
-async function lookupFreeFirePlayer(id, signal){
-  const response = await fetch(
-    `https://bmxyludhpoygyxsdtnem.supabase.co/functions/v1/ff-player?uid=${encodeURIComponent(id)}`,
-    { headers: { Accept: "application/json" }, cache: "no-store", signal }
-  );
-  const data = await response.json().catch(() => null);
-  // A missing endpoint is not a missing player.
-  if (response.status === 404 && data?.error === "player_not_found") {
-    return { notFound: true };
-  }
-  if (!response.ok || data?.ok !== true ||
-      typeof data.nickname !== "string" || !data.nickname.trim() ||
-      String(data.uid) !== id) {
-    throw new Error("lookup_unavailable");
-  }
-  return { nickname: data.nickname, region: String(data.region || "") };
-}
-
-verifyBtn.addEventListener(
-  "click",
-  async function(){
-
-    const id = playerId.value.trim();
-    const lookupVersion = ++freeFireLookupVersion;
-    freeFireLookupController?.abort();
-
-
-    verifiedPlayer = {
-      id:"",
-      nickname:"",
-      region:""
-    };
-
-    freeFireVerificationStatus =
-      "idle";
-
-
-    if(
-      (gameKey === "free-fire" ? !/^\d{5,15}$/.test(id) : !/^\d{4,}$/.test(id))
-    ){
-
-      verifyMessage.textContent =
-        "✕ Ingresa un ID válido.";
-
-      verifyMessage.style.color =
-        "var(--red)";
-
-      verifyMessage.classList.add(
-        "show"
-      );
-
-      return;
-
-    }
-
-
-    if(
-      gameKey !==
-      "free-fire"
-    ){
-
-      verifyMessage.textContent =
-        "✓ ID ingresado correctamente.";
-
-      verifyMessage.style.color =
-        "var(--green)";
-
-      verifyMessage.classList.add(
-        "show"
-      );
-
-      updateSummary();
-
-      return;
-
-    }
-
-
-    verifyBtn.disabled =
-      true;
-
-    verifyBtn.textContent =
-      "Verificando...";
-
-    verifyMessage.textContent =
-      "Buscando jugador de Free Fire...";
-
-    verifyMessage.style.color =
-      "var(--muted)";
-
-    verifyMessage.classList.add(
-      "show"
-    );
-
-
-    const controller = new AbortController();
-    freeFireLookupController = controller;
-    const timeout = setTimeout(() => controller.abort(), 12000);
-    try{
-      const result = await lookupFreeFirePlayer(id, controller.signal);
-      if (lookupVersion !== freeFireLookupVersion || playerId.value.trim() !== id) return;
-
-
-      if(
-        result?.notFound
-      ){
-
-        freeFireVerificationStatus =
-          "invalid";
-
-        verifyMessage.textContent =
-          "✕ No encontramos una cuenta de Free Fire con ese ID.";
-
-        verifyMessage.style.color =
-          "var(--red)";
-
-        return;
-
-      }
-
-
-      verifiedPlayer = {
-        id:
-          id,
-
-        nickname:
-          result.nickname,
-
-        region:
-          result.region
-      };
-
-      freeFireVerificationStatus =
-        "valid";
-
-
-      verifyMessage.textContent =
-        `✓ Jugador encontrado: ${result.nickname}${result.region ? ` • Región: ${result.region}` : ""}`;
-
-      verifyMessage.style.color =
-        "var(--green)";
-
-    }
-    catch(error){
-      if (lookupVersion !== freeFireLookupVersion || playerId.value.trim() !== id) return;
-
-      freeFireVerificationStatus =
-        "unavailable";
-
-      verifyMessage.textContent =
-        "⚠ No pudimos consultar el nombre del jugador. Puedes confirmar el ID desde tu perfil de Free Fire y continuar; NEXORA lo recibirá como NO verificado.";
-
-      verifyMessage.style.color =
-        "var(--orange)";
-
-    }
-    finally{
-      clearTimeout(timeout);
-      if (lookupVersion !== freeFireLookupVersion) return;
-
-      verifyBtn.disabled =
-        false;
-
-      verifyBtn.textContent = freeFireVerificationStatus === "unavailable" ? "Reintentar búsqueda" : "Verificar ID";
-
-      updateSummary();
-
-    }
-
-  }
-);
-
-
-/* ==========================================================
    CAMPOS EN TIEMPO REAL
 ========================================================== */
 
-playerId.addEventListener(
-  "input",
-  function(){
-
-    updateSummary();
-
-    if(
-      gameKey ===
-      "free-fire"
-    ){
-
-      ++freeFireLookupVersion;
-      freeFireLookupController?.abort();
-      verifyBtn.disabled = false;
-      verifyBtn.textContent = "Verificar ID";
-
-      verifiedPlayer = {
-        id:"",
-        nickname:"",
-        region:""
-      };
-
-      // Cambiar el UID invalida cualquier aceptación manual anterior.
-      ffManualConfirm.checked = false;
-      freeFireVerificationStatus =
-        "idle";
-
-      verifyMessage.classList.remove(
-        "show"
-      );
-
-    }
-
-  }
-);
+playerId.addEventListener("input", updateSummary);
 
 mlPlayerId.addEventListener(
   "input",
@@ -3204,55 +2896,10 @@ continueBtn.addEventListener(
       }
 
 
-      if(
-        gameKey ===
-        "free-fire"
-      ){
-
-        if (!/^\d{5,15}$/.test(orderPlayerId)) {
-          alert("Ingresa un ID de Free Fire válido: de 5 a 15 dígitos.");
-          return;
-        }
-        if (freeFireVerificationStatus === "unavailable" || freeFireVerificationStatus === "idle") {
-          if (!ffManualConfirm.checked) {
-            alert("No pudimos verificar automáticamente el nombre. Revisa el ID dentro de Free Fire y marca «Confirmo mi ID de Free Fire» para continuar.");
-            ffManualConfirm.focus();
-            return;
-          }
-          if (!confirm(`Este ID aún NO está verificado: ${orderPlayerId}.\nComprueba que pertenece a la cuenta correcta en Free Fire antes de continuar.`)) return;
-        }
-
-
-        if(
-          freeFireVerificationStatus ===
-          "invalid"
-        ){
-
-          alert(
-            "Ese ID de Free Fire no fue encontrado. Revísalo antes de continuar."
-          );
-
-          return;
-
-        }
-
-
-        if(
-          freeFireVerificationStatus ===
-          "valid"
-          &&
-          verifiedPlayer.id ===
-          orderPlayerId
-        ){
-
-          orderPlayerName =
-            verifiedPlayer.nickname;
-
-          orderPlayerRegion =
-            verifiedPlayer.region;
-
-        }
-
+      // Solo validar el formato del ID, sin buscar ni verificar la cuenta.
+      if (gameKey === "free-fire" && !/^\d{5,15}$/.test(orderPlayerId)) {
+        alert("Ingresa un ID de Free Fire de 5 a 15 dígitos.");
+        return;
       }
 
     }
