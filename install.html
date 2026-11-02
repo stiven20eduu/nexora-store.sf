@@ -46,10 +46,10 @@ let promptEvent=null;
 const btn=document.getElementById("installBtn");
 const hint=document.getElementById("hint");
 const steps=document.getElementById("installSteps");
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
 if(ios){
   steps.innerHTML="<li>Abre esta página en <strong>Safari</strong> de tu iPhone.</li><li>Toca el botón <strong>Compartir</strong>.</li><li>Elige <strong>«Añadir a pantalla de inicio»</strong>.</li>";
 }
-const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
 const standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;
 
 function render(){
