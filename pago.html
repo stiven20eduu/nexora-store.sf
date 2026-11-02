@@ -360,6 +360,7 @@ function validOrder(value){
   && /^[a-z0-9-]{2,80}$/.test(String(value.gameKey||""))
   && typeof value.game==="string" && value.game.length>0
   && typeof value.product==="string" && value.product.length>0
+  && (value.gameKey==="roblox" || value.idConfirmed===true)
   && Number.isFinite(Number(value.price)) && Number(value.price)>0;
 }
 function setDisplayOrder(order){
