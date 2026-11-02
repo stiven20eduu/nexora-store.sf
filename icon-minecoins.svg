@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 160" role="img" aria-label="Monedas Minecoins">
+<defs><linearGradient id="gold" x2=".8" y2="1"><stop stop-color="#fff4ae"/><stop offset=".42" stop-color="#f6c84a"/><stop offset="1" stop-color="#b98121"/></linearGradient></defs>
+<g stroke="#9c6821" stroke-width="4">
+<ellipse cx="59" cy="121" rx="49" ry="20" fill="#ac7227"/><ellipse cx="59" cy="107" rx="49" ry="20" fill="url(#gold)"/>
+<ellipse cx="121" cy="125" rx="46" ry="18" fill="#ad7127"/><ellipse cx="121" cy="109" rx="46" ry="18" fill="url(#gold)"/>
+<ellipse cx="75" cy="86" rx="49" ry="20" fill="#b67d23"/><ellipse cx="75" cy="72" rx="49" ry="20" fill="url(#gold)"/>
+<circle cx="111" cy="62" r="43" fill="url(#gold)" stroke="#e5ac2f" stroke-width="7"/>
+</g>
+<circle cx="111" cy="62" r="31" fill="none" stroke="#ffeaa2" stroke-width="5"/>
+<text x="111" y="77" font-family="Arial,sans-serif" text-anchor="middle" font-size="39" font-weight="900" fill="#79511a">M</text>
+</svg>
