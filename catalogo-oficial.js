@@ -136,46 +136,53 @@ export const PRODUCTOS_NEXORA = Object.freeze([
     "priceCents": 18750
   },
   {
+    "id": "blood-strike%3A%3A51%20ORO",
+    "gameKey": "blood-strike",
+    "game": "Blood Strike",
+    "product": "51 ORO",
+    "priceCents": 300
+  },
+  {
     "id": "blood-strike%3A%3A105%20ORO",
     "gameKey": "blood-strike",
     "game": "Blood Strike",
     "product": "105 ORO",
-    "priceCents": 279
+    "priceCents": 500
   },
   {
     "id": "blood-strike%3A%3A320%20ORO",
     "gameKey": "blood-strike",
     "game": "Blood Strike",
     "product": "320 ORO",
-    "priceCents": 849
+    "priceCents": 1300
   },
   {
     "id": "blood-strike%3A%3A540%20ORO",
     "gameKey": "blood-strike",
     "game": "Blood Strike",
     "product": "540 ORO",
-    "priceCents": 1449
+    "priceCents": 2100
   },
   {
     "id": "blood-strike%3A%3A1100%20ORO",
     "gameKey": "blood-strike",
     "game": "Blood Strike",
     "product": "1100 ORO",
-    "priceCents": 2899
+    "priceCents": 4000
   },
   {
     "id": "blood-strike%3A%3A2260%20ORO",
     "gameKey": "blood-strike",
     "game": "Blood Strike",
     "product": "2260 ORO",
-    "priceCents": 5499
+    "priceCents": 7500
   },
   {
     "id": "blood-strike%3A%3A5800%20ORO",
     "gameKey": "blood-strike",
     "game": "Blood Strike",
     "product": "5800 ORO",
-    "priceCents": 13499
+    "priceCents": 18300
   },
   {
     "id": "mobile-legends%3A%3A78%20%2B%208%20Diamantes",
