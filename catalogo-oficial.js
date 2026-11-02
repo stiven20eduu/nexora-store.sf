@@ -66,38 +66,38 @@ export const PRODUCTOS_NEXORA = Object.freeze([
     "priceCents": 550
   },
   {
-    "id": "free-fire%3A%3A18%20Cajas%20Tokens",
+    "id": "free-fire%3A%3A18%20Cajas%20de%20Fragmentos",
     "gameKey": "free-fire",
     "game": "Free Fire",
-    "product": "18 Cajas Tokens",
+    "product": "18 Cajas de Fragmentos",
     "priceCents": 2450
   },
   {
-    "id": "free-fire%3A%3A30%20Cajas%20Tokens",
+    "id": "free-fire%3A%3A30%20Cajas%20de%20Fragmentos",
     "gameKey": "free-fire",
     "game": "Free Fire",
-    "product": "30 Cajas Tokens",
+    "product": "30 Cajas de Fragmentos",
     "priceCents": 4450
   },
   {
-    "id": "free-fire%3A%3A60%20Cajas%20Tokens",
+    "id": "free-fire%3A%3A60%20Cajas%20de%20Fragmentos",
     "gameKey": "free-fire",
     "game": "Free Fire",
-    "product": "60 Cajas Tokens",
+    "product": "60 Cajas de Fragmentos",
     "priceCents": 6350
   },
   {
-    "id": "free-fire%3A%3A120%20Cajas%20Tokens",
+    "id": "free-fire%3A%3A120%20Cajas%20de%20Fragmentos",
     "gameKey": "free-fire",
     "game": "Free Fire",
-    "product": "120 Cajas Tokens",
+    "product": "120 Cajas de Fragmentos",
     "priceCents": 9600
   },
   {
-    "id": "free-fire%3A%3A240%20Cajas%20Tokens",
+    "id": "free-fire%3A%3A240%20Cajas%20de%20Fragmentos",
     "gameKey": "free-fire",
     "game": "Free Fire",
-    "product": "240 Cajas Tokens",
+    "product": "240 Cajas de Fragmentos",
     "priceCents": 18750
   },
   {
