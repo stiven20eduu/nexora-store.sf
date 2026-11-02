@@ -17,7 +17,7 @@
 </section></main>
 <script type="module">
 import {auth} from './firebase.js';
-import {isCodeDeliveryOrder,codeDeliveryDocumentId,codeDeliveryName,MAX_ROBLOX_CODES,normalizeRobloxCodes,fingerprintRobloxCode} from './roblox-delivery.js?v=20261102-minecraft1';
+import {isCodeDeliveryOrder,isMinecraftOrder,codeDeliveryDocumentId,codeDeliveryName,MAX_ROBLOX_CODES,normalizeRobloxCodes,fingerprintRobloxCode} from './roblox-delivery.js?v=20261102-minecraft1';
 
 import {onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 import {getFirestore,collection,doc,onSnapshot,runTransaction,serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
@@ -51,7 +51,7 @@ function render(){
   if(isCodeDeliveryOrder(o)&&['verified','processing'].includes(o.status)){
    const wrap=element('section','','redeem-entry');
    wrap.append(element('h3','🎁 Códigos de canje '+codeDeliveryName(o)+' · obligatorios','redeem-label'));
-   const key=orderKey(o),drafts=codeDrafts.get(key)||[''];
+   const key=orderKey(o),maxCodes=isMinecraftOrder(o)?1:MAX_ROBLOX_CODES,drafts=codeDrafts.get(key)||[''];
    const saveDraft=()=>codeDrafts.set(key,[...drafts]);
    function paintEntries(){
     wrap.querySelectorAll('.nx-code-row,.nx-add-code,.redeem-hint').forEach(node=>node.remove());
@@ -79,16 +79,16 @@ function render(){
      }
      wrap.append(row);
     });
-    const add=element('button',drafts.length>=MAX_ROBLOX_CODES?'Máximo '+MAX_ROBLOX_CODES+' códigos':'+ Agregar otro código','btn nx-add-code');
-    add.type='button';add.disabled=busy||drafts.length>=MAX_ROBLOX_CODES;
+    const add=element('button',drafts.length>=maxCodes?'Máximo '+maxCodes+' códigos':'+ Agregar otro código','btn nx-add-code');
+    add.type='button';add.disabled=busy||drafts.length>=maxCodes;
     add.addEventListener('click',()=>{
-     if(drafts.length<MAX_ROBLOX_CODES){drafts.push('');saveDraft();paintEntries();const inputs=wrap.querySelectorAll('.redeem-input');inputs[inputs.length-1]?.focus();}
+     if(drafts.length<maxCodes){drafts.push('');saveDraft();paintEntries();const inputs=wrap.querySelectorAll('.redeem-input');inputs[inputs.length-1]?.focus();}
     });
-    wrap.append(add,element('p','Agrega de 1 a '+MAX_ROBLOX_CODES+' códigos sin usar. Se entregarán juntos al comprador al completar el pedido.','redeem-hint'));
+    wrap.append(add,element('p',isMinecraftOrder(o)?'Escribe el código Minecoins correspondiente a este paquete; se enviará de forma privada al comprador.':'Agrega de 1 a '+maxCodes+' códigos sin usar. Se entregarán juntos al comprador al completar el pedido.','redeem-hint'));
    }
    paintEntries();card.append(wrap);
   }
-  if(isCodeDeliveryOrder(o)&&o.status==='completed')card.append(element('p',(o.redemptionAddedAt||o.redemptionCode)?'✓ Código Roblox entregado de forma privada. Disponible en Mis compras del cliente.':'Atención: pedido completado sin código. Revisa el caso con soporte.','redeem-done'));
+  if(isCodeDeliveryOrder(o)&&o.status==='completed')card.append(element('p',(o.redemptionAddedAt||o.redemptionCode)?'✓ Código digital entregado de forma privada. Disponible en Mis compras del cliente.':'Atención: pedido completado sin código. Revisa el caso con soporte.','redeem-done'));
   const actions=element('div','','actions');
   if(active(o.status)){
    for(const [status,title,cls] of [['processing','Poner en proceso','process'],['completed','Marcar completado','complete'],['cancelled','Cancelar pedido','cancel']]){
