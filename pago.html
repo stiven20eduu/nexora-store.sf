@@ -338,6 +338,11 @@ function showInsufficient(){
 }
 function showConfirmation(order){
  byId("modalProduct").textContent=order.product;
+ const requiresId=!["roblox","minecraft"].includes(order.gameKey);
+ byId("modalPlayerId").parentElement.hidden=!requiresId;
+ byId("confirmHint").textContent=requiresId
+   ? "Revisa bien el ID y el paquete antes de usar tu saldo."
+   : "Revisa el paquete y el total. El código de canje aparecerá en Mis compras cuando el MVP complete la entrega.";
  byId("modalPlayerId").textContent=[order.playerId,order.serverId].filter(Boolean).join(" / ")||"No indicado";
  byId("modalPrice").textContent=formatSoles(approvedPriceCents);
  byId("modalRemaining").textContent=formatSoles(visibleBalance-approvedPriceCents);
