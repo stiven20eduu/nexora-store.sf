@@ -22,8 +22,9 @@ export const MAX_ROBLOX_CODES = 5;
 
 // Evita duplicados dentro del pedido, incluso si cambian mayúsculas/minúsculas.
 export function normalizeRobloxCodes(values,gameName="Roblox") {
-  if (!Array.isArray(values) || values.length < 1 || values.length > MAX_ROBLOX_CODES)
-    throw new Error("Ingresa entre 1 y " + MAX_ROBLOX_CODES + " códigos de " + gameName + ".");
+  const maxCodes=gameName==="Minecraft"?1:MAX_ROBLOX_CODES;
+  if (!Array.isArray(values) || values.length < 1 || values.length > maxCodes)
+    throw new Error("Ingresa entre 1 y " + maxCodes + " códigos de " + gameName + ".");
   const codes = values.map(value => String(value || "").trim());
   if (codes.some(code => !validRobloxCode(code)))
     throw new Error("Cada código debe tener entre 8 y 80 caracteres: letras, números o guiones.");
@@ -34,6 +35,7 @@ export function normalizeRobloxCodes(values,gameName="Roblox") {
 
 export function askRobloxCodes(order) {
   const gameName=codeDeliveryName(order);
+  const maxCodes=gameName==="Minecraft"?1:MAX_ROBLOX_CODES;
   return new Promise(resolve => {
     let finished = false;
     const values = [{code:"",visible:false}];
@@ -52,7 +54,7 @@ export function askRobloxCodes(order) {
     info.textContent=(order?.product||"Pedido "+gameName)+" · Cliente: "+(order?.customer||order?.id||"NEXORA");
     info.style.cssText="color:#c0cede;line-height:1.5";
     const note=document.createElement("p");
-    note.textContent="Agrega los códigos necesarios para este pedido (máximo "+MAX_ROBLOX_CODES+"). Solo el comprador podrá verlos cuando marques el pedido como completado.";
+    note.textContent="Agrega los códigos necesarios para este pedido (máximo "+maxCodes+"). Solo el comprador podrá verlos cuando marques el pedido como completado.";
     note.style.cssText="color:#e1dfd6;line-height:1.65";
     const form=document.createElement("form");
     const entries=document.createElement("div");
@@ -118,10 +120,10 @@ export function askRobloxCodes(order) {
         }
         entries.append(container);
       });
-      add.disabled=values.length>=MAX_ROBLOX_CODES;
-      add.textContent=add.disabled?"Máximo "+MAX_ROBLOX_CODES+" códigos":"+ Agregar otro código";
+      add.disabled=values.length>=maxCodes;
+      add.textContent=add.disabled?"Máximo "+maxCodes+" códigos":"+ Agregar otro código";
     }
-    add.addEventListener("click",()=>{if(values.length<MAX_ROBLOX_CODES){values.push({code:"",visible:false});paint();entries.lastElementChild?.querySelector("input")?.focus();}});
+    add.addEventListener("click",()=>{if(values.length<maxCodes){values.push({code:"",visible:false});paint();entries.lastElementChild?.querySelector("input")?.focus();}});
     cancel.addEventListener("click",()=>finish(null));
     form.addEventListener("submit",event=>{
       event.preventDefault();
