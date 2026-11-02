@@ -2149,59 +2149,6 @@ const games = {
   },
 
 
-  "mobile-legends": {
-
-    title:
-      "Mobile Legends",
-
-    badge:
-      "DISPONIBLE AHORA",
-
-    subtitle:
-      "Diamantes, Pase Semanal & Crepúsculo",
-
-    description:
-      "Obtén tus diamantes utilizando tu ID + Server ID. Procesamiento en menos de 24 horas.",
-
-    hero:
-      "hero-mobile-legends.png",
-
-    playerTitle:
-      "Ingresa el ID y Server ID",
-
-    playerDescription:
-      "Ambos datos serán utilizados para identificar tu cuenta.",
-
-    mobileLegends:
-      true,
-
-    products: [
-
-      {
-
-        category:
-          "DIAMANTES - MOBILE LEGENDS",
-
-        items: [
-
-          ["78 + 8 Diamantes",4.50],
-          ["156 + 16 Diamantes",9.10],
-          ["234 + 23 Diamantes",13.50],
-          ["625 + 81 Diamantes",36.50],
-          ["1860 + 335 Diamantes",105.50],
-          ["3099 + 589 Diamantes",175.00],
-          ["4649 + 883 Diamantes",259.00],
-          ["7740 + 1548 Diamantes",435.00]
-
-        ]
-
-      }
-
-    ]
-
-  },
-
-
   "roblox": {
 
     title:
@@ -2284,87 +2231,6 @@ const games = {
 
   },
 
-  "fc-mobile": {
-
-    title:
-      "FC Mobile",
-
-    badge:
-      "NUEVO",
-
-    subtitle:
-      "FC Points, Silver & Pase Estelar",
-
-    description:
-      "Encuentra productos para FC Mobile. Tu pedido será procesado en menos de 24 horas.",
-
-    hero:
-      "hero-fc-mobile.png",
-
-    products: [
-
-      {
-
-        category:
-          "FC POINTS",
-
-        items: [
-
-          ["40 FC Points",3],
-          ["100 FC Points",6],
-          ["520 FC Points",26],
-          ["1070 FC Points",55],
-          ["2200 FC Points",109],
-          ["3020 FC Points",152],
-          ["5750 FC Points",275],
-          ["12000 FC Points",551]
-
-        ]
-
-      },
-
-
-      {
-
-        category:
-          "SILVER",
-
-        items: [
-
-          ["39 Silver",3],
-          ["99 Silver",6],
-          ["499 Silver",26],
-          ["999 Silver",55],
-          ["1999 Silver",109],
-          ["4999 Silver",275],
-          ["9999 Silver",551]
-
-        ]
-
-      },
-
-
-      {
-
-        category:
-          "PASE ESTELAR",
-
-        items: [
-
-          ["Booster Diario A — 99 Silver",6],
-          ["Minipase Especial de Verano — 499 Silver",26],
-          ["Booster Diario B — 499 Silver",26],
-          ["Pase Especial de Verano — 999 Silver",55],
-          ["Ticket Pase Estelar Premium — 999 Silver",55],
-          ["Paquete Pase Estelar Premium — 999 Silver",109]
-
-        ]
-
-      }
-
-    ]
-
-  }
 
 };
 
@@ -2377,6 +2243,7 @@ const params =
   new URLSearchParams(
     window.location.search
   );
+if(["mobile-legends","fc-mobile"].includes(params.get("game")))window.location.replace("index.html#catalogo");
 
 let gameKey =
   params.get("game");
