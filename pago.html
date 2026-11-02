@@ -204,7 +204,7 @@ footer{border-top:1px solid rgba(176,194,227,.09);font-size:11px}
 <div class="card-body">
 <div class="order-row"><span>Juego</span><strong id="orderGame">—</strong></div>
 <div class="order-row"><span>Producto</span><strong id="orderProduct">—</strong></div>
-<div class="order-row" id="idRow"><span>ID del jugador</span><div class="player-identity"><strong id="orderPlayerId">—</strong><span id="orderPlayerName" class="player-name" hidden></span></div></div>
+<div class="order-row" id="idRow"><span>ID del jugador</span><div class="player-identity"><strong id="orderPlayerId">—</strong></div></div>
 <div class="order-row" id="serverRow" hidden><span>Servidor</span><strong id="orderServerId">—</strong></div>
 <div class="order-row"><span>Plazo de atención</span><strong>Menos de 24 horas</strong></div>
 <div class="order-row order-total"><span>Precio del producto</span><strong id="orderTotal">S/ —</strong></div>
@@ -259,7 +259,6 @@ footer{border-top:1px solid rgba(176,194,227,.09);font-size:11px}
     <div class="modal-table">
       <div class="modal-row"><span>Paquete</span><strong id="modalProduct">—</strong></div>
       <div class="modal-row"><span>ID del jugador</span><strong id="modalPlayerId">—</strong></div>
-      <div class="modal-row"><span>Jugador</span><strong id="modalPlayerName">—</strong></div>
       <div class="modal-row total"><span>Total</span><strong id="modalPrice">S/ —</strong></div>
       <div class="modal-row"><span>Saldo restante</span><strong id="modalRemaining">S/ —</strong></div>
     </div>
@@ -340,7 +339,6 @@ function showInsufficient(){
 function showConfirmation(order){
  byId("modalProduct").textContent=order.product;
  byId("modalPlayerId").textContent=[order.playerId,order.serverId].filter(Boolean).join(" / ")||"No indicado";
- byId("modalPlayerName").textContent=order.playerName||"Nombre no verificado";
  byId("modalPrice").textContent=formatSoles(approvedPriceCents);
  byId("modalRemaining").textContent=formatSoles(visibleBalance-approvedPriceCents);
  showModal("confirmModal");
@@ -370,11 +368,6 @@ function setDisplayOrder(order){
  byId("orderTotal").textContent="S/ "+Number(order.price).toFixed(2);
  if(order.playerId){
   byId("orderPlayerId").textContent=order.playerId;
-  const name=byId("orderPlayerName");
-  const verifiedName=typeof order.playerName==="string"?order.playerName.trim():"";
-  name.hidden=false;
-  name.classList.toggle("not-verified",!verifiedName);
-  name.textContent=verifiedName?("Jugador: "+verifiedName):"Nombre no verificado";
  } else byId("idRow").hidden=true;
  if(order.serverId){byId("serverRow").hidden=false;byId("orderServerId").textContent=order.serverId;}
 }
