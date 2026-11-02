@@ -1,6 +1,6 @@
 /* NEXORA STORE PWA · Cache limitado a recursos públicos del propio sitio.
    No almacena llamadas a Firebase, métodos POST, APIs ni respuestas privadas. */
-const CACHE_NAME = "nexora-public-v13-logo";
+const CACHE_NAME = "nexora-public-v14-brand";
 const SHELL = [
   "./",
   "./index.html",
@@ -9,7 +9,8 @@ const SHELL = [
   "./nexora-experience.js?v=3",
   "./icon-192.png?v=nexora-logo-2",
   "./icon-512.png?v=nexora-logo-2",
-  "./nexora-logo.png"
+  "./nexora-logo.svg?v=4",
+  "./nexora-symbol.svg?v=4"
 ];
 const ROOT = new URL("./", self.registration.scope);
 const allowedFiles = /\.(?:css|js|svg|png|jpe?g|webp|gif|ico|woff2?|json)$/i;
