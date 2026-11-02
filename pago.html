@@ -138,7 +138,22 @@ h1{font-size:clamp(31px,4.3vw,47px);line-height:1.1;letter-spacing:-1.6px;margin
 .pay:disabled{background:#334052;color:#aeb9c9;box-shadow:none;transform:none}
 .status{min-height:0;padding:13px 0;font-size:12px;line-height:1.7}
 .status.success{color:#87f1be}
-.status.error{color:#ff9aa5}
+ .status.error{color:#ff9aa5}
+.minecraft-mvp-activation[hidden]{display:none!important}
+.minecraft-mvp-activation{
+ margin:12px 0 19px;padding:15px 13px;border:1px solid rgba(255,184,89,.32);
+ background:rgba(246,166,35,.065);border-radius:13px;color:#d8e3eb;
+}
+.minecraft-mvp-activation strong{display:block;color:#ffcc80;font-size:13px;margin:0 0 7px}
+.minecraft-mvp-activation p{font-size:12px;line-height:1.6;margin:6px 0 11px}
+.minecraft-mvp-activation button{
+ border:1px solid rgba(255,195,114,.62);background:#ffa932;color:#23160a;
+ border-radius:10px;padding:12px 13px;min-height:44px;width:100%;
+ font-weight:900;cursor:pointer;
+}
+.minecraft-mvp-activation button:disabled{opacity:.5;cursor:wait}
+.minecraft-mvp-activation a{display:inline-block;margin-top:9px;color:#ffd28e;text-decoration:underline}
+.minecraft-mvp-activation .minecraft-mvp-feedback{min-height:0;margin-bottom:0}
 .small{font-size:11px;line-height:1.7;color:#9facbe}
 .help-links{padding-top:15px;margin-top:14px;border-top:1px solid rgba(148,170,198,.13);gap:13px}
 .help-links a{display:flex;align-items:center;gap:7px;text-decoration:none;color:#ffd086;font-size:12px;font-weight:700}
@@ -228,6 +243,13 @@ footer{border-top:1px solid rgba(176,194,227,.09);font-size:11px}
 <div class="balance-row highlight" id="remainingRow"><span>Saldo después de comprar</span><strong id="walletRemaining">—</strong></div>
 <div class="actions"><button type="button" class="pay" id="confirmPurchase" disabled>Comprobando saldo…</button></div>
 <p class="status" id="purchaseStatus" role="status" aria-live="polite">Verificaremos el precio y tu saldo con Firebase.</p>
+<div id="minecraftMvpActivation" class="minecraft-mvp-activation" hidden>
+  <strong>Solo MVP · Activar pagos de Minecoins</strong>
+  <p>Los precios ya están definidos en el catálogo. Regístralos en Firebase para habilitar el pago con saldo a todos los clientes.</p>
+  <button type="button" id="activateMinecraftPayments">Activar los 4 paquetes de Minecoins</button>
+  <p id="minecraftActivationFeedback" class="minecraft-mvp-feedback" role="status" aria-live="polite"></p>
+  <a href="admin-catalogo.html">Abrir administración del catálogo</a>
+</div>
 <p class="small">Si no tienes saldo suficiente, recárgalo con Yape. La recarga será acreditada después de verificar el ingreso.</p>
 <div class="help-links"><a href="recargar-saldo.html">+ Recargar mi saldo con Yape</a><a href="perfil.html">Ver mi saldo</a><a href="compras.html">Ver mis compras</a></div>
 <div id="loginHelp" hidden>
@@ -286,7 +308,8 @@ footer{border-top:1px solid rgba(176,194,227,.09);font-size:11px}
 <script type="module">
 import { auth } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { PRODUCTOS_NEXORA } from "./catalogo-oficial.js?v=20261102-minecraft";
 import { getMyWallet, formatSoles, buyWithNexoraBalance } from "./wallet-data.js?v=20261023-roblox-pago-2";
 
 const byId=(id)=>document.getElementById(id);
@@ -299,6 +322,16 @@ let approvedPriceCents=null;
 let visibleBalance=null;
 let currentUserId=null;
 let lastFocus=null;
+const minecraftMvpActivation=byId("minecraftMvpActivation");
+const minecraftMvpButton=byId("activateMinecraftPayments");
+const minecraftActivationFeedback=byId("minecraftActivationFeedback");
+const MVP_EMAILS=new Set(["nexora.store.sf@gmail.com","stiven20eduu@gmail.com"]);
+const canManageCatalog=user=>Boolean(user?.emailVerified&&user?.email&&MVP_EMAILS.has(user.email.toLowerCase()));
+const minecoinProducts=PRODUCTOS_NEXORA.filter(item=>item.gameKey==="minecraft");
+function updateMinecraftMvpActivation(order,user,needActivation=false){
+ minecraftMvpActivation.hidden=!(needActivation&&order?.gameKey==="minecraft"&&canManageCatalog(user));
+}
+
 function showModal(id){
   closeModals(false);
   lastFocus=document.activeElement;
@@ -417,6 +450,7 @@ async function loadWallet(order,user){
  currentUserId=uid;
  approvedPriceCents=null;
  busy=false;paid=false;button.disabled=true;
+ updateMinecraftMvpActivation(order,user,false);
  setWalletState("Comprobando","waiting");
  byId("purchaseSuccess").hidden=true;
  if(!uid){
@@ -442,7 +476,12 @@ async function loadWallet(order,user){
   if(currentUserId!==uid)return;
   refreshAvailableBalance(wallet);
   if(await readExistingOrder(uid,order))return;
-  if(!catalog.exists()||!catalog.data().enabled)throw new Error("Este producto todavía no está habilitado para pagos con saldo.");
+  if(!catalog.exists()||!catalog.data().enabled){
+   updateMinecraftMvpActivation(order,user,true);
+   throw new Error(order.gameKey==="minecraft"
+     ? "Minecraft está pendiente de activar en el catálogo de Firebase. El MVP debe activar los 4 paquetes para permitir pagos con saldo."
+     : "Este producto todavía no está habilitado para pagos con saldo.");
+  }
   const official=catalog.data();
   if(official.game!==order.game || official.product!==order.product ||
     !Number.isSafeInteger(official.priceCents) || official.priceCents<100){
@@ -473,6 +512,35 @@ async function loadWallet(order,user){
   setStatus(error.message||"No pudimos verificar tu saldo. Intenta nuevamente más tarde.","error");
  }
 }
+
+minecraftMvpButton.addEventListener("click",async()=>{
+ const user=auth.currentUser;
+ if(!canManageCatalog(user)||originalOrder?.gameKey!=="minecraft"||busy||paid)return;
+ if(minecoinProducts.length!==4 || minecoinProducts.some(p=>!Number.isSafeInteger(p.priceCents)||p.priceCents<100)){
+  minecraftActivationFeedback.textContent="La lista de precios Minecoins está incompleta. No se guardó ningún cambio.";
+  return;
+ }
+ if(!window.confirm("¿Activar los cuatro paquetes de Minecoins con sus precios oficiales en Firebase? Esta acción no cobra dinero ni realiza compras."))return;
+ minecraftMvpButton.disabled=true;
+ minecraftActivationFeedback.textContent="Registrando precios seguros de Minecoins…";
+ try{
+  const batch=writeBatch(db);
+  for(const item of minecoinProducts){
+   batch.set(doc(db,"catalogPrices",item.id),{
+    gameKey:item.gameKey,game:item.game,product:item.product,
+    priceCents:item.priceCents,enabled:true,updatedAt:serverTimestamp()
+   });
+  }
+  await batch.commit();
+  minecraftActivationFeedback.textContent="¡Minecoins activados! Comprobando nuevamente el precio y tu saldo…";
+  await loadWallet(originalOrder,user);
+ }catch(error){
+  console.error("No fue posible activar el catálogo de Minecoins",error);
+  minecraftActivationFeedback.textContent=error?.code==="permission-denied"
+   ? "Firebase rechazó la activación. Revisa las reglas de Firestore y que estés usando una cuenta MVP verificada."
+   : "No se pudieron guardar los precios: "+(error?.message||"Error desconocido");
+ }finally{minecraftMvpButton.disabled=false;}
+});
 
 const originalOrder=readOrder();
 const robuxInMaintenance=false; // Robux reactivados; el pago mantiene la verificación de catálogo y saldo.
